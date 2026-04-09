@@ -1,0 +1,6 @@
+{
+    "name": "@ayaexptech/arcane",
+    "version": "0.0.0",
+    "include": ["README.md", "LICENSE", "src/**/*.ts"],
+    "exports": "./src/index.ts"
+}
