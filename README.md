@@ -48,6 +48,10 @@ Released under the [MIT License](LICENSE).
     import * as arcane from "@ayaexptech/arcane";
     ```
 
+## Usage
+
+[JSRのドキュメントページ](https://jsr.io/@ayaexptech/arcane/doc)及びJSDocコメントを参照してください。
+
 ## Contributing
 
 - バグ報告: [GitHub Issues](https://github.com/AXT-Studio/Arcane/issues)
