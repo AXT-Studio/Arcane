@@ -17,7 +17,7 @@ export class Iteration {
      * const arr = [1, 2, 3];
      * const permutations = Array.from(Iteration.next_permutation(arr));
      * console.log(permutations);
-     * // [[1, 2, 3], [1, 3, 2], [2, 1, 3], [2, 3, 1], [3, 2, 1], [3, 1, 2]]
+     * // [[1, 2, 3], [1, 3, 2], [2, 1, 3], [2, 3, 1], [3, 1, 2], [3, 2, 1]]
      * ```
      *
      * @example 順列を1つずつ処理する
@@ -30,8 +30,8 @@ export class Iteration {
      * // [1, 3, 2]
      * // [2, 1, 3]
      * // [2, 3, 1]
-     * // [3, 2, 1]
      * // [3, 1, 2]
+     * // [3, 2, 1]
      * ```
      *
      * @param array - 順列を生成するための配列。要素はcompareFnで比較可能で、かつ現時点で昇順ソートされている必要があります。

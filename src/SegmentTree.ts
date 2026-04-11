@@ -249,7 +249,7 @@ export class SegmentTree<T> {
      *
      * @example
      * ```ts
-     * const segTree = new SegmentTree(-Infinity, (a, b) => Math.max(a, b), 100);
+     * const segTree = new SegmentTree(Infinity, (a, b) => Math.min(a, b), 100);
      * segTree.set(0, 10);
      * segTree.set(1, 20);
      * const minLeft = segTree.minLeft(2, (x) => x > 15);

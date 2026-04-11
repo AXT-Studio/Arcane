@@ -225,16 +225,16 @@ export class ExtendedMath {
         if (m === 1n) return 0n;
         // 繰り返し二乗法をやる
         let result = 1n;
-        let base = a % m;
+        let base = ((a % m) + m) % m;
         let exponent = n;
         while (exponent > 0n) {
             if (exponent % 2n === 1n) {
-                result = (result * base) % m;
+                result = (((result * base) % m) + m) % m;
             }
-            base = (base * base) % m;
+            base = (((base * base) % m) + m) % m;
             exponent = exponent / 2n;
         }
-        return result;
+        return ((result % m) + m) % m;
     }
 
     /**
