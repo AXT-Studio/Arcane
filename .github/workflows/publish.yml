@@ -28,7 +28,7 @@ jobs:
         uses: actions/checkout@v5
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: "22"
 
@@ -94,6 +94,24 @@ jobs:
 
           echo "Updated jsr.json version to $SEMVER"
           grep -n '"version"' jsr.json
+
+      - name: Commit updated jsr.json locally
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          git config user.name "AXT-AyaKoto"
+          git config user.email "148830788+AXT-AyaKoto@users.noreply.github.com"
+
+          git add jsr.json
+
+          if git diff --cached --quiet; then
+            echo "No staged changes in jsr.json; skipping local commit."
+          else
+            git commit -m "chore(ci): sync jsr version to $SEMVER for publish"
+            echo "Created local commit to keep worktree clean."
+            git --no-pager log -1 --oneline
+          fi
 
       - name: Publish package to JSR
         if: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && !inputs.dry_run) }}
