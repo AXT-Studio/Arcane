@@ -9,11 +9,9 @@
 export class LinearSieve {
     /**
      * N以下のすべての整数について、その最小素因数を列挙します。
+     * 戻り値の`0`番目・`1`番目の要素はNaNになります。
      *
      * 時間計算量: O(N)
-     *
-     * @remarks
-     * - 戻り値の`0`番目・`1`番目の要素はNaNになります。
      *
      * @example
      * ```ts
@@ -44,11 +42,10 @@ export class LinearSieve {
 
     /**
      * N以下のすべての素数を列挙します。
+     * `N < 2`の場合は空配列を返します。
      *
      * 時間計算量: O(N)
      *
-     * @remarks
-     * - `N < 2`の場合は空配列を返します。
      *
      * @example
      * ```ts
@@ -71,11 +68,9 @@ export class LinearSieve {
 
     /**
      * Nの素因数分解を行います。
+     * `N < 2`の場合は空配列を返します。
      *
      * 時間計算量: O(log N)
-     *
-     * @remarks
-     * - `N < 2`の場合は空配列を返します。
      *
      * @example
      * ```ts

@@ -183,6 +183,9 @@ export class SegmentTree<T> {
      *
      * 時間計算量: O(log N) (Nはセグメント木のサイズ)
      *
+     * 以下の点に注意してください。
+     * - fn(e)はtrueである必要があり、これを満たさない場合は例外がスローされます。
+     * - lは0以上size以下である必要があり、これを満たさない場合は例外がスローされます。
      *
      * @example
      * ```ts
@@ -192,10 +195,6 @@ export class SegmentTree<T> {
      * const maxRight = segTree.maxRight(0, (x) => x < 15);
      * console.log(maxRight); // => 1 (index 0の値は10で条件を満たすが、index 1の値は20で条件を満たさないため)
      * ```
-     *
-     * @remarks
-     * - fn(e)はtrueである必要があり、これを満たさない場合は例外がスローされます。
-     * - lは0以上size以下である必要があり、これを満たさない場合は例外がスローされます。
      *
      * @param l - 区間の左端 (0-indexed, 含む, 0以上size以下)
      * @param fn - 条件を表す関数
@@ -244,6 +243,10 @@ export class SegmentTree<T> {
      *
      * 時間計算量: O(log N) (Nはセグメント木のサイズ)
      *
+     * 以下の点に注意してください。
+     * - fn(e)はtrueである必要があり、これを満たさない場合は例外がスローされます。
+     * - rは0以上size以下である必要があり、これを満たさない場合は例外がスローされます。
+     *
      * @example
      * ```ts
      * const segTree = new SegmentTree(-Infinity, (a, b) => Math.max(a, b), 100);
@@ -252,10 +255,6 @@ export class SegmentTree<T> {
      * const minLeft = segTree.minLeft(2, (x) => x > 15);
      * console.log(minLeft); // => 1 (index 1の値は20で条件を満たすが、index 0の値は10で条件を満たさないため)
      * ```
-     *
-     * @remarks
-     * - fn(e)はtrueである必要があり、これを満たさない場合は例外がスローされます。
-     * - rは0以上size以下である必要があり、これを満たさない場合は例外がスローされます。
      *
      * @param r - 区間の右端 (0-indexed, 含まない, 0以上size以下)
      * @param fn - 条件を表す関数

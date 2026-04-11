@@ -21,9 +21,112 @@
  *         - `(newF: F, oldF: F) => F`を指定します。引数の順序(あとに適用する作用が先に記述される)に注意してください。
  *         - `composition`は結合律、すなわち任意の`s: S`, `f1: F`, `f2: F`に対して`mapping(mapping(s, f1), f2) === mapping(s, composition(f2, f1))`を満たす必要があります。
  *
- * @remarks
+ * 以下の点に注意してください。
  * - 配列は0-indexedで管理されます。つまり、最初の要素のindexは`0`、最後の要素のindexは`size - 1`になります。
  * - `S`や`F`がPrimitiveでない場合に発生するオーバーヘッドが、競技プログラミングにおいて実行時間制限を超える原因になることがあります。使用時には十分注意してください。
+ *
+ * @example 作用: 作用の値が現在の値を超えるなら更新 / 区間総積: 区間の最大値
+ * ```ts
+ * const lazySegTree = new LazySegmentTree(
+ *     -Infinity, // e: 区間の最大値の単位元は負の無限大
+ *     (a, b) => Math.max(a, b), // op: 区間の最大値を求める関数
+ *     (s, f) => Math.max(s, f), // mapping: 作用は「sをfで更新する(ただしfがsより大きい場合のみ)」
+ *     -Infinity, // id: 作用の単位元は負の無限大 (これをmappingに渡してもsは更新されない)
+ *     (newF, oldF) => Math.max(newF, oldF), // composition: 作用の合成は「新しい作用と古い作用のうち大きい方」
+ *     100, // size: セグメント木のサイズ
+ * );
+ * ```
+ *
+ * @example 作用: 区間の要素に値を加算 / 区間総積: 区間の最小値
+ * ```ts
+ * const lazySegTree = new LazySegmentTree<number, number>(
+ *  Infinity,
+ *     (a, b) => Math.min(a, b),
+ *     (s, f) => s + f,
+ *     0,
+ *     (newF, oldF) => newF + oldF,
+ *     size,
+ *     initialValues // number[]
+ * );
+ * ```
+ *
+ * @example 作用: 区間の要素に値を加算 / 区間総積: 区間の最大値
+ * ```ts
+ * const lazySegTree = new LazySegmentTree<number, number>(
+ *     -Infinity,
+ *     (a, b) => Math.max(a, b),
+ *     (s, f) => s + f,
+ *     0,
+ *     (newF, oldF) => newF + oldF,
+ *     size,
+ *     initialValues // number[]
+ * );
+ * ```
+ *
+ * @example 作用: 区間の要素を値で更新(上書き) / 区間総積: 区間の最小値
+ * ```ts
+ * const lazySegTree = new LazySegmentTree<number, number | null>(
+ *     Infinity,
+ *     (a, b) => Math.min(a, b),
+ *     (s, f) => f === null ? s : f,
+ *     null,
+ *     (newF, oldF) => newF === null ? oldF : newF,
+ *     size,
+ *     initialValues // number[]
+ * );
+ * ```
+ *
+ * @example 作用: 区間の要素を値で更新(上書き) / 区間総積: 区間の最大値
+ * ```ts
+ * const lazySegTree = new LazySegmentTree<number, number | null>(
+ *     -Infinity,
+ *     (a, b) => Math.max(a, b),
+ *     (s, f) => f === null ? s : f,
+ *     null,
+ *     (newF, oldF) => newF === null ? oldF : newF,
+ *     size,
+ *     initialValues // number[]
+ * );
+ * ```
+ *
+ * @example 作用: 区間の要素に値を加算 / 区間総積: 区間の合計値
+ * ```ts
+ * const lazySegTree = new LazySegmentTree<{ value: number; size: number }, number>(
+ *     { value: 0, size: 0 },
+ *     (a, b) => ({ value: a.value + b.value, size: a.size + b.size }),
+ *     (s, f) => ({ value: s.value + f * s.size, size: s.size }),
+ *     0,
+ *     (newF, oldF) => newF + oldF,
+ *     size,
+ *     initialValues // { value: 初期値, size: 1 } の配列にする必要があります
+ * );
+ * ```
+ *
+ * @example 作用: 区間の要素を値で更新(上書き) / 区間総積: 区間の合計値
+ * ```ts
+ * const lazySegTree = new LazySegmentTree<{ value: number; size: number }, number | null>(
+ *     { value: 0, size: 0 },
+ *     (a, b) => ({ value: a.value + b.value, size: a.size + b.size }),
+ *     (s, f) => f === null ? s : { value: f * s.size, size: s.size },
+ *     null,
+ *     (newF, oldF) => newF === null ? oldF : newF,
+ *     size,
+ *     initialValues // { value: 初期値, size: 1 } の配列にする必要があります
+ * );
+ * ```
+ *
+ * @example 作用: 区間アフィン変換(区間各要素にa掛けてb足す) / 区間総積: 区間の合計値
+ * ```ts
+ * const lazySegTree = new LazySegmentTree<{ value: number; size: number }, { a: number; b: number }>(
+ *     { value: 0, size: 0 },
+ *     (x, y) => ({ value: x.value + y.value, size: x.size + y.size }),
+ *     (s, f) => ({ value: f.a * s.value + f.b * s.size, size: s.size }),
+ *     { a: 1, b: 0 },
+ *     (newF, oldF) => ({ a: newF.a * oldF.a, b: newF.a * oldF.b + newF.b }),
+ *     size,
+ *     initialValues // { value: 初期値, size: 1 } の配列にする必要があります
+ * );
+ * ```
  *
  * @template S - 配列の要素の型
  * @template F - 作用のパラメーターの型
@@ -55,109 +158,6 @@ export class LazySegmentTree<S, F> {
      * 初期値として配列を与えることができます。初期値の長さが`size`に満たない場合、残りの要素はすべて`e`で初期化されます。
      *
      * 時間計算量: O(N) (Nはセグメント木のサイズ`size`)
-     *
-     * @example 作用: 作用の値が現在の値を超えるなら更新 / 区間総積: 区間の最大値
-     * ```ts
-     * const lazySegTree = new LazySegmentTree(
-     *     -Infinity, // e: 区間の最大値の単位元は負の無限大
-     *     (a, b) => Math.max(a, b), // op: 区間の最大値を求める関数
-     *     (s, f) => Math.max(s, f), // mapping: 作用は「sをfで更新する(ただしfがsより大きい場合のみ)」
-     *     -Infinity, // id: 作用の単位元は負の無限大 (これをmappingに渡してもsは更新されない)
-     *     (newF, oldF) => Math.max(newF, oldF), // composition: 作用の合成は「新しい作用と古い作用のうち大きい方」
-     *     100, // size: セグメント木のサイズ
-     * );
-     * ```
-     *
-     * @example 作用: 区間の要素に値を加算 / 区間総積: 区間の最小値
-     * ```ts
-     * const lazySegTree = new LazySegmentTree<number, number>(
-     *  Infinity,
-     *     (a, b) => Math.min(a, b),
-     *     (s, f) => s + f,
-     *     0,
-     *     (newF, oldF) => newF + oldF,
-     *     size,
-     *     initialValues // number[]
-     * );
-     * ```
-     *
-     * @example 作用: 区間の要素に値を加算 / 区間総積: 区間の最大値
-     * ```ts
-     * const lazySegTree = new LazySegmentTree<number, number>(
-     *     -Infinity,
-     *     (a, b) => Math.max(a, b),
-     *     (s, f) => s + f,
-     *     0,
-     *     (newF, oldF) => newF + oldF,
-     *     size,
-     *     initialValues // number[]
-     * );
-     * ```
-     *
-     * @example 作用: 区間の要素を値で更新(上書き) / 区間総積: 区間の最小値
-     * ```ts
-     * const lazySegTree = new LazySegmentTree<number, number | null>(
-     *     Infinity,
-     *     (a, b) => Math.min(a, b),
-     *     (s, f) => f === null ? s : f,
-     *     null,
-     *     (newF, oldF) => newF === null ? oldF : newF,
-     *     size,
-     *     initialValues // number[]
-     * );
-     * ```
-     *
-     * @example 作用: 区間の要素を値で更新(上書き) / 区間総積: 区間の最大値
-     * ```ts
-     * const lazySegTree = new LazySegmentTree<number, number | null>(
-     *     -Infinity,
-     *     (a, b) => Math.max(a, b),
-     *     (s, f) => f === null ? s : f,
-     *     null,
-     *     (newF, oldF) => newF === null ? oldF : newF,
-     *     size,
-     *     initialValues // number[]
-     * );
-     * ```
-     *
-     * @example 作用: 区間の要素に値を加算 / 区間総積: 区間の合計値
-     * ```ts
-     * const lazySegTree = new LazySegmentTree<{ value: number; size: number }, number>(
-     *     { value: 0, size: 0 },
-     *     (a, b) => ({ value: a.value + b.value, size: a.size + b.size }),
-     *     (s, f) => ({ value: s.value + f * s.size, size: s.size }),
-     *     0,
-     *     (newF, oldF) => newF + oldF,
-     *     size,
-     *     initialValues // { value: 初期値, size: 1 } の配列にする必要があります
-     * );
-     * ```
-     *
-     * @example 作用: 区間の要素を値で更新(上書き) / 区間総積: 区間の合計値
-     * ```ts
-     * const lazySegTree = new LazySegmentTree<{ value: number; size: number }, number | null>(
-     *     { value: 0, size: 0 },
-     *     (a, b) => ({ value: a.value + b.value, size: a.size + b.size }),
-     *     (s, f) => f === null ? s : { value: f * s.size, size: s.size },
-     *     null,
-     *     (newF, oldF) => newF === null ? oldF : newF,
-     *     size,
-     *     initialValues // { value: 初期値, size: 1 } の配列にする必要があります
-     * );
-     * ```
-     *
-     * @example 作用: 区間アフィン変換(区間各要素にa掛けてb足す) / 区間総積: 区間の合計値
-     * ```ts
-     * const lazySegTree = new LazySegmentTree<{ value: number; size: number }, { a: number; b: number }>(
-     *     { value: 0, size: 0 },
-     *     (x, y) => ({ value: x.value + y.value, size: x.size + y.size }),
-     *     (s, f) => ({ value: f.a * s.value + f.b * s.size, size: s.size }),
-     *     { a: 1, b: 0 },
-     *     (newF, oldF) => ({ a: newF.a * oldF.a, b: newF.a * oldF.b + newF.b }),
-     *     size,
-     *     initialValues // { value: 初期値, size: 1 } の配列にする必要があります
-     * );
-     * ```
      *
      * @param e - [区間総積] モノイド演算の単位元
      * @param op - [区間総積] モノイド演算を表す関数

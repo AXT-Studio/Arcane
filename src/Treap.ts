@@ -227,9 +227,6 @@ export class Treap<K, V> {
      * console.log(treap.get(3)); // => undefined (存在しないキー)
      * ```
      *
-     * @remarks
-     * - キーが存在しない場合は`undefined`を返すため、値の型Vに`undefined`が含まれる場合は注意が必要です。
-     *
      * @param key - 取得する要素のキー
      * @returns 指定されたキーの要素の値、存在しない場合は`undefined`
      */
@@ -259,9 +256,6 @@ export class Treap<K, V> {
      * console.log(treap.lowerBound(3)); // => { key: 3, value: 'three' } (3が3以上の最小のキー)
      * console.log(treap.lowerBound(6)); // => undefined (6以上のキーは存在しない)
      * ```
-     *
-     * @remarks
-     * - キーが存在しない場合は`undefined`を返すため、値の型Vに`undefined`が含まれる場合は注意が必要です。
      *
      * @param key - 基準となるキー
      * @returns キーがkey以上の最小のキーとその値、存在しない場合は`undefined`
@@ -308,9 +302,6 @@ export class Treap<K, V> {
      * console.log(treap.upperBound(5)); // => undefined (5より大きいキーは存在しない)
      * ```
      *
-     * @remarks
-     * - キーが存在しない場合は`undefined`を返すため、値の型Vに`undefined`が含まれる場合は注意が必要です。
-     *
      * @param key - 基準となるキー
      * @returns キーがkeyより大きい最小のキーとその値、存在しない場合は`undefined`
      */
@@ -341,6 +332,10 @@ export class Treap<K, V> {
      *
      * 時間計算量: O(log N) (NはTreap内の要素数)
      *
+     * 以下の点に注意してください。
+     * - kは0以上である必要があり、これを満たさない場合は例外がスローされます。
+     * - kがTreap内の要素数以上の場合は`undefined`を返します。
+     *
      * @example
      * ```ts
      * const treap = new Treap((a, b) => a - b);
@@ -352,10 +347,6 @@ export class Treap<K, V> {
      * console.log(treap.kthElement(2)); // => { key: 30, value: 'thirty' } (2番目に小さい要素)
      * console.log(treap.kthElement(3)); // => undefined (3番目に小さい要素は存在しない)
      * ```
-     *
-     * @remarks
-     * - kは0以上である必要があり、これを満たさない場合は例外がスローされます。
-     * - kがTreap内の要素数以上の場合は`undefined`を返します。
      *
      * @param k - 取得する要素のインデックス (0-indexed)
      * @returns k番目に小さい要素のキーと値、存在しない場合は`undefined`
@@ -462,6 +453,10 @@ export class Treap<K, V> {
      *
      * 時間計算量: 全要素の反復がO(N) (NはTreap内の要素数)
      *
+     * 以下の点に注意してください。
+     * - イテレーターは、Treap内の要素をキーの昇順で列挙します。
+     * - イテレーターは、Treap内の要素を{ key, value }の形でyieldします。
+     *
      * @example for...of ループを用いた反復処理
      * このメソッドが存在することで、`for...of`ループを使用して`Treap`内の要素を反復処理できます。
      * ```ts
@@ -494,10 +489,6 @@ export class Treap<K, V> {
      * console.log(iterator.next().done);  // Expected Log Output : true
      * console.log(iterator.next().value); // Expected Log Output : undefined
      * ```
-     *
-     * @remarks
-     * - イテレーターは、Treap内の要素をキーの昇順で列挙します。
-     * - イテレーターは、Treap内の要素を{ key, value }の形でyieldします。
      *
      * @yields Treap内の要素をキーの昇順で{ key, value }の形でyieldします。
      */
