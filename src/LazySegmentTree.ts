@@ -159,6 +159,18 @@ export class LazySegmentTree<S, F> {
      *
      * 時間計算量: O(N) (Nはセグメント木のサイズ`size`)
      *
+     * @example 作用: 作用の値が現在の値を超えるなら更新 / 区間総積: 区間の最大値
+     * ```ts
+     * const lazySegTree = new LazySegmentTree(
+     *     -Infinity, // e: 区間の最大値の単位元は負の無限大
+     *     (a, b) => Math.max(a, b), // op: 区間の最大値を求める関数
+     *     (s, f) => Math.max(s, f), // mapping: 作用は「sをfで更新する(ただしfがsより大きい場合のみ)」
+     *     -Infinity, // id: 作用の単位元は負の無限大 (これをmappingに渡してもsは更新されない)
+     *     (newF, oldF) => Math.max(newF, oldF), // composition: 作用の合成は「新しい作用と古い作用のうち大きい方」
+     *     100, // size: セグメント木のサイズ
+     * );
+     * ```
+     *
      * @param e - [区間総積] モノイド演算の単位元
      * @param op - [区間総積] モノイド演算を表す関数
      * @param mapping - [区間作用] 作用を行う関数

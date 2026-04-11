@@ -205,6 +205,7 @@ export class StringOperations {
     /**
      * 文字列・数列のZ Arrayを構築します。
      * Z Arrayは、文字列・数列の各位置から始まる接尾辞と、文字列・数列そのものとの最長共通接頭辞の長さを格納する配列です。
+     * 長さ0の列が渡された場合は、空の配列を返します。
      *
      * 時間計算量: O(N) (Nは文字列・数列の長さ)
      *
@@ -219,6 +220,7 @@ export class StringOperations {
      * @returns Z Array。戻り値を`z`として、`z[i]`は`s`の位置`i`から始まる接尾辞と、`s`そのものとの最長共通接頭辞の長さを表す。
      */
     static zArray<T>(s: ArrayLike<T>): number[] {
+        if (s.length === 0) return [];
         const z = new Array(s.length).fill(0);
         z[0] = s.length;
         // 今わかっている中で、一番右に伸びている s[0...r-l) と s[l..r) が完全一致する区間 (z-box)
@@ -243,6 +245,7 @@ export class StringOperations {
     /**
      * 文字列・数列のSuffix Arrayを構築します。
      * Suffix Arrayは、文字列・数列の接尾辞を辞書順に並べたときの、元の文字列・数列における開始位置を格納する配列です。
+     * 長さ0の列が渡された場合は、空の配列を返します。
      *
      * 時間計算量: 以下の通り
      * - s: ArrayLike<number>で、sの最大値と最小値の差が255以下の場合: O(N) (Nは数列の長さ)
@@ -259,6 +262,7 @@ export class StringOperations {
      * @return Suffix Array。すなわち、「文字列sの接尾辞を辞書順に並べたときの、各接尾辞の開始位置」をまとめた配列。
      */
     static getSuffixArray<T extends string | number>(s: ArrayLike<T>): number[] {
+        if (s.length === 0) return [];
         // 数値の配列に変換する
         const transformedArray: number[] = [];
         if (typeof s[0] === "string") {
@@ -301,6 +305,7 @@ export class StringOperations {
     /**
      * 文字列・数列のLCP Arrayを構築します。
      * LCP Arrayは、Suffix Arrayの隣接する要素が指す接尾辞同士の最長共通接頭辞の長さを格納する配列です。
+     * 長さ0の列・Suffix Arrayが渡された場合は、空の配列を返します。
      *
      * 時間計算量: O(N) (Nは文字列・数列の長さ)
      *
@@ -314,8 +319,13 @@ export class StringOperations {
      * @param s - LCP Arrayを構築する文字列か数列。ArrayLikeでも各要素が文字列か数列であれば渡せます。
      * @param sa - 文字列sのSuffix Array。`getSuffixArray(s)`で取得できます。
      * @return LCP Array。すなわち、「文字列sの接尾辞を辞書順に並べたときの、隣り合う接尾辞同士の最長共通接頭辞の長さ」をまとめた配列。
+     * @throw Error - 列sの長さとSuffix Arrayの長さが等しくない場合。
      */
     static getLCPArray<T extends string | number>(s: ArrayLike<T>, sa: number[]): number[] {
+        if (s.length !== sa.length) {
+            throw new Error("Length of s and sa must be the same.");
+        }
+        if (s.length === 0) return [];
         const n = s.length;
         // 1. rank配列の構築
         const rank = new Array(n);

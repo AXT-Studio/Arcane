@@ -28,7 +28,7 @@ export class UniqueID {
      * @param [timestamp] - UUIDv7の生成に使用するUNIXタイムスタンプ (ミリ秒単位)。省略した場合は現在のタイムスタンプが使用されます。
      * @returns 生成されたUUIDv7
      */
-    static generateUUIDv7(timestamp?: number): string {
+    static generateUUIDv7(timestamp: number = Date.now()): string {
         // Validation: タイムスタンプが整数かつ48bit以内であることを確認
         if (
             typeof timestamp !== "number" ||

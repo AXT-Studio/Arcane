@@ -103,6 +103,16 @@ export class MaxFlow {
      * - `max`を指定した場合、点`s`から点`t`への最大流量が`max`を超えることはありません。
      * - このメソッドは残余グラフを更新するため、同じインスタンスに対して複数回呼び出すと状態を引き継いで追加で流量を流すことになります。
      *
+     * @example
+     * ```ts
+     * const maxFlow = new MaxFlow(4);
+     * maxFlow.addEdge(0, 1, 2);
+     * maxFlow.addEdge(0, 2, 1);
+     * maxFlow.addEdge(1, 3, 1);
+     * maxFlow.addEdge(2, 3, 1);
+     * const flow = maxFlow.flow(0, 3);
+     * console.log(flow); // => 2 (0->1->3で1、0->2->3で1の流量を流せるので、合計2)
+     *
      * @param s - 流量の始点
      * @param t - 流量の終点
      * @param max - 流量の上限 (デフォルトはInfinity)

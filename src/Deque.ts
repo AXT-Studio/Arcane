@@ -16,6 +16,17 @@ export class Deque<T> {
      * 新しいDequeインスタンスを生成します。
      * 初期値を与えた場合は、その要素を先頭から順にDeque(の末尾)に追加します。
      *
+     * 時間計算量: NをinitialValuesの要素数とすると、O(N) (初期値を与えた場合)
+     *
+     * @example
+     * ```ts
+     * const deque = new Deque<number>([1, 2, 3]);
+     * console.log(deque.toArray()); // [1, 2, 3]
+     * deque.unshift(0);
+     * deque.push(4);
+     * console.log(deque.toArray()); // [0, 1, 2, 3, 4]
+     * ```
+     *
      * 新しいDequeインスタンスを生成する
      * @param [initialValues] - 初期値の配列
      * @constructor

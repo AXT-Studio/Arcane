@@ -308,6 +308,14 @@ export class BinaryHeap<T> {
      * 時間計算量: Map・Setの操作をO(1)と仮定したとき、要素数をNとして、最悪O(log N)
      * (Map・Setの操作の計算量は実行エンジンに依存しますが、一般的には期待O(1)、最悪O(N)となります)
      *
+     * @example
+     * ```ts
+     * const heap = new BinaryHeap<number>((a, b) => a - b, [5, 3, 8]);
+     * console.log(heap.remove(3)); // => true (3が存在して削除される)
+     * console.log(heap.peek()); // => 5 (次の最小値がルートに来るため)
+     * console.log(heap.remove(10)); // => false (10は存在しないため削除されない)
+     * ```
+     *
      * @param value - 削除する要素
      * @returns 指定要素が存在して削除された場合は`true`、存在しなかった場合は`false`
      */
