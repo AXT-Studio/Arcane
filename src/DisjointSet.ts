@@ -128,6 +128,28 @@ export class DisjointSet {
     }
 
     /**
+     * 要素`x`が属する集合のサイズを返します。
+     *
+     * 時間計算量: 要素数をNとして、償却O(α(N))
+     * ここで、α(N)はアッカーマン関数の逆関数で、N <= 10^80に対してα(N) <= 4であることが知られています。
+     *
+     * @example
+     * ```ts
+     * const ds = new DisjointSet(5);
+     * console.log(ds.getGroupSize(0)); // 1 (初期状態では全ての要素が別々の集合に属しているため、要素0の集合のサイズは1)
+     * ds.union(0, 1);
+     * console.log(ds.getGroupSize(0)); // 2 (要素0と要素1を結合したため、要素0の集合のサイズは2)
+     * ```
+     *
+     * @param x - 要素 (0以上size-1以下の整数)
+     * @returns - 要素xが属する集合のサイズ
+     */
+    getGroupSize(x: number): number {
+        const root = this.find(x);
+        return this.#size[root];
+    }
+
+    /**
      * 現在の連結成分の数を返します。
      *
      * 時間計算量: O(1)
