@@ -1,5 +1,6 @@
 export { BinaryHeap, BinaryHeapLite } from "./src/BinaryHeap.ts";
 export { BinarySearch } from "./src/BinarySearch.ts";
+export { Combination } from "./src/Combination.ts";
 export { Deque } from "./src/Deque.ts";
 export { DisjointSet } from "./src/DisjointSet.ts";
 export { ExtendedMath } from "./src/ExtendedMath.ts";
