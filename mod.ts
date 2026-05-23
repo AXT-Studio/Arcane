@@ -13,3 +13,4 @@ export { StringOperations } from "./src/StringOperations.ts";
 export { Treap } from "./src/Treap.ts";
 export { UniqueID } from "./src/UniqueID.ts";
 export { Vector2D } from "./src/Vector2D.ts";
+export { Combination } from "./src/Combination.ts";
