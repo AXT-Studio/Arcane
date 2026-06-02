@@ -4,7 +4,7 @@
 
 ## License
 
-copyright (c) 2026- Ayasaka-Koto(AyaExpTech)
+copyright (c) 2026- Ayasaka-Koto(AyaExpTech)  
 Released under the [MIT License](LICENSE).
 
 ## Installation
@@ -47,6 +47,15 @@ Released under the [MIT License](LICENSE).
     ```js
     import * as arcane from "@ayaexptech/arcane";
     ```
+
+> [!TIP]
+> コードを直接コピペしないと使えない環境については、[AXT-AyaKoto/axt-arcane-bundler](https://github.com/AXT-AyaKoto/axt-arcane-bundler)を使用することができます。  
+> Denoをインストールしたうえで以下のコマンドを実行し、ウィザードでバージョンと必要なモジュールを選択することで、クリップボードに必要なコードがコピーされます。  
+> 詳細は[`AXT-AyaKoto/axt-arcane-bundler`のリポジトリ・README](https://github.com/AXT-AyaKoto/axt-arcane-bundler)などを参照してください。
+>
+> ```sh
+> deno run -A jsr:@axt-ayakoto/axt-arcane-bundler
+> ```
 
 ## Usage
 
