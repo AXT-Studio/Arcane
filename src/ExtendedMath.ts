@@ -134,9 +134,9 @@ export class ExtendedMath {
         if (n < 1) return [];
         if (n === 1) return [1];
         /** @type {number[]} */
-        const smallDivisors = [];
+        const smallDivisors: number[] = [];
         /** @type {number[]} */
-        const largeDivisors = [];
+        const largeDivisors: number[] = [];
         const limit = Math.sqrt(n);
         // 1から√nまでの整数で割り切れるかを調べ、割り切れたらiをsmallDivisors、n/iをlargeDivisorsに追加する
         for (let i = 1; i <= limit; i++) {
@@ -309,5 +309,27 @@ export class ExtendedMath {
         }
         // すべての基数で「素数っぽい」場合は素数かもしれない
         return true;
+    }
+
+    /**
+     * 符号なし32bit整数`n`における立っているビットの数(popcount)を返します。
+     * なお、nが整数でない場合、`0`未満の場合、`2**32`以上の場合の動作は未定義です。
+     * (エラーを吐かず、多くの場合で誤った値を返します。この関数を使用する際は入力値が`0`以上`2**32`未満の整数であることを確認してください。)
+     *
+     * 時間計算量: O(1)
+     *
+     * @example
+     * ```ts
+     * ExtendedMath.popcount32(0b10101010) // => 4
+     * ExtendedMath.popcount32(0b11111111) // => 8
+     * ```
+     *
+     * @param n - 対象の整数 (`0`以上`2**32`未満)
+     * @returns nにおける立っているビットの数
+     */
+    static popcount32(n: number): number {
+        n = n - ((n >>> 1) & 0x55555555);
+        n = (n & 0x33333333) + ((n >>> 2) & 0x33333333);
+        return (((n + (n >>> 4)) & 0x0f0f0f0f) * 0x01010101) >>> 24;
     }
 }
