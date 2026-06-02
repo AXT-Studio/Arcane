@@ -71,7 +71,7 @@ const sa_is = (s: number[]): number[] => {
     }
     // saからLMSを指す数値だけ抜き出し、もとの文字列のindexに変えて並べる
     /** 辞書順にソートされたLMSのインデックス */
-    const sortedLMS = [];
+    const sortedLMS: number[] = [];
     for (let i = 0; i < n; i++) {
         const v = sa[i];
         if (v > 0 && isS[v] && !isS[v - 1]) sortedLMS.push(v);
@@ -108,12 +108,12 @@ const sa_is = (s: number[]): number[] => {
         }
     }
     // LMS部分文字列のランクを元の文字列における出現順に並べた配列を作る
-    const S1 = [];
+    const S1: number[] = [];
     for (let i = 0; i < names.length; i++) {
         if (names[i] !== -1) S1.push(names[i]);
     }
     // S1のSuffix Arrayを取得する
-    const SA1 = [];
+    const SA1: number[] = [];
     if (nameCounter + 1 === S1.length) {
         for (let i = 0; i < S1.length; i++) {
             SA1[S1[i]] = i;
