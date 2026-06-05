@@ -4,12 +4,20 @@
 
 /**
  * 双方向キュー (Deque: Double-Ended Queue) です。
- * 両端への要素の追加・削除を 償却O(1) で行うことができます。
+ * 両端に対する要素の追加・削除、添字アクセス(参照・置換)、要素数の取得を 償却O(1) で行うことができます。
  *
  * @template T - Dequeに格納する要素の型
  */
 export class Deque<T> {
+    /**
+     * @private
+     * #frontはDequeの先頭側にある要素を**逆順で**保持します。
+     */
     #front: T[];
+    /**
+     * @private
+     * #backはDequeの末尾側にある要素を**正順**で保持します。
+     */
     #back: T[];
 
     /**
@@ -204,6 +212,65 @@ export class Deque<T> {
         }
         // #backの最後の値を返す
         return this.#back[this.#back.length - 1];
+    }
+    /**
+     * Dequeの先頭から`i`番目の値を取得します。(`i`は0-indexed)
+     * ただし、`i`が0未満、あるいはDeque全体の長さ以上であった場合、`undefined`を返します。
+     *
+     * 時間計算量: O(1)
+     *
+     * @example
+     * ```ts
+     * const deque = new Deque<number>([1, 2, 3]);
+     * console.log(deque.get(0)); // 1
+     * console.log(deque.get(1)); // 2
+     * console.log(deque.get(2)); // 3
+     * console.log(deque.get(3)); // undefined
+     * console.log(deque.get(-1)); // undefined
+     * ```
+     *
+     * @param i - 取得する要素のインデックス (0-indexed)
+     * @returns Dequeの先頭から`i`番目の値 または`i`が0未満、あるいはDeque全体の長さ以上の場合は`undefined`
+     */
+    get(i: number): T | undefined {
+        if (i < 0 || i >= this.size) {
+            return undefined;
+        }
+        if (i < this.#front.length) {
+            return this.#front[this.#front.length - 1 - i] as T;
+        }
+        return this.#back[i - this.#front.length] as T;
+    }
+    /**
+     * Dequeの`i`番目の要素を`value`に置換します。(`i`は0-indexed)
+     * ただし、`i`が0未満、あるいはDeque全体の長さ以上であった場合、RangeErrorをthrowします。
+     *
+     * 時間計算量: O(1)
+     *
+     * @example
+     * ```ts
+     * const deque = new Deque<number>([1, 2, 3]);
+     * deque.set(0, 4);
+     * console.log(deque.toArray()); // [4, 2, 3]
+     * deque.set(1, 5);
+     * console.log(deque.toArray()); // [4, 5, 3]
+     * deque.set(2, 6);
+     * console.log(deque.toArray()); // [4, 5, 6]
+     * deque.set(3, 7); // RangeError: Index out of range
+     * ```
+     *
+     * @param i - 置換する要素のインデックス (0-indexed)
+     * @param value - 新しい値
+     */
+    set(i: number, value: T): void {
+        if (i < 0 || i >= this.size) {
+            throw new RangeError("Index out of range");
+        }
+        if (i < this.#front.length) {
+            this.#front[this.#front.length - 1 - i] = value as T;
+        } else {
+            this.#back[i - this.#front.length] = value as T;
+        }
     }
     /**
      * Dequeが空かどうかを判定します。
