@@ -4,6 +4,7 @@ export { Combination } from "./src/Combination.ts";
 export { Deque } from "./src/Deque.ts";
 export { DisjointSet } from "./src/DisjointSet.ts";
 export { ExtendedMath } from "./src/ExtendedMath.ts";
+export { GraphAdjacencyList } from "./src/GraphAdjacencyList.ts";
 export { Iteration } from "./src/Iteration.ts";
 export { LazySegmentTree } from "./src/LazySegmentTree.ts";
 export { LinearSieve } from "./src/LinearSieve.ts";
