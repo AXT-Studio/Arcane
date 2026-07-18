@@ -15,7 +15,7 @@ export class Iteration {
      * @example 順列を配列に展開する
      * ```ts
      * const arr = [1, 2, 3];
-     * const permutations = Array.from(Iteration.next_permutation(arr));
+     * const permutations = Array.from(Iteration.next_permutation(arr, (a, b) => a - b));
      * console.log(permutations);
      * // [[1, 2, 3], [1, 3, 2], [2, 1, 3], [2, 3, 1], [3, 1, 2], [3, 2, 1]]
      * ```
@@ -23,7 +23,7 @@ export class Iteration {
      * @example 順列を1つずつ処理する
      * ```ts
      * const arr = [1, 2, 3];
-     * for (const perm of Iteration.next_permutation(arr)) {
+     * for (const perm of Iteration.next_permutation(arr, (a, b) => a - b)) {
      *     console.log(perm);
      * }
      * // [1, 2, 3]
@@ -35,8 +35,8 @@ export class Iteration {
      * ```
      *
      * @param array - 順列を生成するための配列。要素はcompareFnで比較可能で、かつ現時点で昇順ソートされている必要があります。
-     * @param compareFn - 要素の比較関数。デフォルトでは文字列として辞書順に比較。
-     * @yields 配列の各要素を並び替えたもの。呼び出されるたびに異なる並び順を辞書順に返し、辞書順で最も後ろの並び方を返したときにreturn(ジェネレーター終了)します。
+     * @param compareFn - 要素の比較関数。Array.sortの引数と同じです。
+     * @yields 配列の各要素を並び替えたもの。呼び出されるたびに辞書順で次の順列を返し、最後の順列を返したらreturn(ジェネレーター終了)します。
      */
     static *next_permutation<T>(
         array: T[],
@@ -75,6 +75,53 @@ export class Iteration {
                 l++;
                 r--;
             }
+        }
+    }
+    /**
+     * 呼び出されるたびに、各位置`i`について`0`以上`max[i]`未満の整数からなる組の次の要素を返すジェネレーター関数です。
+     * bit全探索(`[2, 2, ..., 2]`)などに使うことができます。
+     *
+     * 時間計算量: max.lengthをNとして、呼び出しごとに O(N)、全列挙全体で O(N × Π(max[i]))
+     *
+     * @example bit全探索
+     * ```ts
+     * const products = Array.from(Iteration.next_product([2, 2]));
+     * console.log(products);
+     * // [[0, 0], [0, 1], [1, 0], [1, 1]]
+     * ```
+     *
+     * @example 桁ごとに上限を変える場合
+     * ```ts
+     * const products = Array.from(Iteration.next_product([2, 3]));
+     * console.log(products);
+     * // [[0, 0], [0, 1], [0, 2], [1, 0], [1, 1], [1, 2]]
+     * ```
+     *
+     * @example 空配列の場合（空直積は元が1つなので [[]] を返す）
+     * ```ts
+     * const products = Array.from(Iteration.next_product([]));
+     * console.log(products);
+     * // [[]]
+     * ```
+     *
+     * @param max - 各位置の上限を表す正の整数の配列。0以下を含む場合何も返さずreturnされます。
+     * @yields 直積の各要素。末尾側から繰り上がる辞書順で返し、最後の組を返したらreturn(ジェネレーター終了)します。
+     */
+    static *next_product(max: number[]): Generator<number[], void, unknown> {
+        if (max.some((n) => n <= 0)) return;
+        const a = Array.from({ length: max.length }, () => 0);
+        while (true) {
+            yield [...a];
+            for (let i = a.length - 1; i >= 0; i--) {
+                a[i]++;
+                if (i === 0) break;
+                if (a[i] === max[i]) {
+                    a[i] = 0;
+                } else {
+                    break;
+                }
+            }
+            if (a[0] === max[0]) return;
         }
     }
 }
