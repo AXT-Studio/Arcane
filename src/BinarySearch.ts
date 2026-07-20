@@ -25,11 +25,7 @@ export class BinarySearch {
      * @param compareFn - 比較関数
      * @returns `target`と等しい値が存在すれば`true`、そうでなければ`false`
      */
-    static binary_search<T>(
-        array: readonly T[],
-        target: T,
-        compareFn: (a: T, b: T) => number,
-    ): boolean {
+    static binary_search<T>(array: readonly T[], target: T, compareFn: (a: T, b: T) => number): boolean {
         let low = 0;
         let high = array.length - 1;
         while (low <= high) {
@@ -60,11 +56,7 @@ export class BinarySearch {
      * @param compareFn - 比較関数
      * @returns `target`以上と判定される最初の要素のインデックス または`array.length`
      */
-    static lower_bound<T>(
-        array: readonly T[],
-        target: T,
-        compareFn: (a: T, b: T) => number,
-    ): number {
+    static lower_bound<T>(array: readonly T[], target: T, compareFn: (a: T, b: T) => number): number {
         let low = 0;
         let high = array.length;
         while (low < high) {
@@ -95,11 +87,7 @@ export class BinarySearch {
      * @param compareFn - 比較関数
      * @returns `target`より大きいと判定される最初の要素のインデックス または`array.length`
      */
-    static upper_bound<T>(
-        array: readonly T[],
-        target: T,
-        compareFn: (a: T, b: T) => number,
-    ): number {
+    static upper_bound<T>(array: readonly T[], target: T, compareFn: (a: T, b: T) => number): number {
         let low = 0;
         let high = array.length;
         while (low < high) {

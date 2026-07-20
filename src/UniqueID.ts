@@ -32,24 +32,15 @@ export class UniqueID {
      */
     static generateUUIDv7(timestamp: number = Date.now()): string {
         // Validation: タイムスタンプが整数かつ48bit以内であることを確認
-        if (
-            typeof timestamp !== "number" ||
-            !Number.isInteger(timestamp) ||
-            timestamp < 0 ||
-            timestamp > 2 ** 48 - 1
-        ) {
-            throw new TypeError(
-                "Timestamp must be a non-negative integer not greater than 2**48-1 (48 bits).",
-            );
+        if (typeof timestamp !== "number" || !Number.isInteger(timestamp) || timestamp < 0 || timestamp > 2 ** 48 - 1) {
+            throw new TypeError("Timestamp must be a non-negative integer not greater than 2**48-1 (48 bits).");
         }
         // UUIDv7でランダムな部分を残すためのビットマスク用の値を定義
         const RANDOM_PART_MASK = 0x0000000000000fff3fffffffffffffffn;
         // とりあえず128bitの乱数をつくってBigIntにする
         const randomUint8Array = new Uint8Array(16);
         crypto.getRandomValues(randomUint8Array);
-        const randomHexString = Array.from(randomUint8Array, (byte) =>
-            byte.toString(16).padStart(2, "0"),
-        ).join(""); // Note: Uint8Array.toHex()がサポートされればそれでOK
+        const randomHexString = Array.from(randomUint8Array, (byte) => byte.toString(16).padStart(2, "0")).join(""); // Note: Uint8Array.toHex()がサポートされればそれでOK
         const randomBigInt = BigInt(`0x${randomHexString}`);
         // UUIDv7文字列の元になる1つのBigIntを作成する
         const uuidBigInt =

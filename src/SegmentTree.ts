@@ -46,7 +46,7 @@ export class SegmentTree<T> {
         // sizeは与えられたsize以上の最小の2冪に設定
         this.#size = 2 ** Math.ceil(Math.log2(size));
         // data配列を初期化
-        this.#tree = new Array(this.#size * 2).fill(e);
+        this.#tree = Array.from({ length: this.#size * 2 }, () => e);
         // initialValuesが与えられた場合、data配列の後半にセット
         if (initialValues) {
             for (let i = 0; i < initialValues.length; i++) {

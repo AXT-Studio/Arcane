@@ -10,7 +10,7 @@
 const sa_is = (s: number[]): number[] => {
     const n = s.length;
     // S型・L型の分類をする
-    const isS = new Array(n).fill(false);
+    const isS = Array.from({ length: n }, () => false);
     isS[n - 1] = true;
     for (let i = n - 2; i >= 0; i--) {
         if (s[i] > s[i + 1]) {
@@ -26,14 +26,14 @@ const sa_is = (s: number[]): number[] => {
     for (let i = 1; i < n; i++) {
         if (isS[i] && !isS[i - 1]) lmsIndices.push(i);
     }
-    const isLMS = new Array(n).fill(false);
+    const isLMS = Array.from({ length: n }, () => false);
     for (let i = 0; i < lmsIndices.length; i++) {
         isLMS[lmsIndices[i]] = true;
     }
     // S内に登場する数値の最大値を確認する
     const S_max = s.reduce((a, c) => Math.max(a, c));
     // 0以上S以下の数値が、それぞれ何回出てくるかカウントする
-    const countInS = new Array(S_max + 1).fill(0);
+    const countInS = Array.from({ length: S_max + 1 }, () => 0);
     for (let i = 0; i < n; i++) countInS[s[i]]++;
     // カウントの累積和を取る
     const scan = [countInS[0]];
@@ -42,7 +42,7 @@ const sa_is = (s: number[]): number[] => {
     const heads_1 = [0, ...scan.slice(0, -1)];
     const tails_1a = scan.map((n) => n - 1);
     // Induced Sorting (1回目)
-    const sa = new Array(n).fill(-1);
+    const sa = Array.from({ length: n }, () => -1);
     // 1. LMSを仮置きする (先頭文字のバケツ領域の末尾)
     for (let i = 0; i < lmsIndices.length; i++) {
         const lmsIndex = lmsIndices[i];
@@ -77,13 +77,13 @@ const sa_is = (s: number[]): number[] => {
         if (v > 0 && isS[v] && !isS[v - 1]) sortedLMS.push(v);
     }
     // LMS部分文字列に対して名前をつけていく
-    const names = new Array(n).fill(-1);
+    const names = Array.from({ length: n }, () => -1);
     let nameCounter = 0;
     names[sortedLMS[0]] = nameCounter;
     for (let i = 1; i < sortedLMS.length; i++) {
         const prevLMS = sortedLMS[i - 1];
         const currLMS = sortedLMS[i];
-        // biome-ignore lint/correctness/noConstantCondition: どこかでbreakするので問題ない
+        // oxlint-disable-next-line no-constant-condition (reason: 下記のforループはロジック上どこかでbreakすることが保証されている)
         for (let d = 0; true; d++) {
             // 文字そのものが違えば不一致
             if (s[prevLMS + d] !== s[currLMS + d]) {
@@ -128,7 +128,7 @@ const sa_is = (s: number[]): number[] => {
     const heads_2 = [0, ...scan.slice(0, -1)];
     const tails_2a = scan.map((n) => n - 1);
     const tails_2b = scan.map((n) => n - 1);
-    const answer = new Array(n).fill(-1);
+    const answer = Array.from({ length: n }, () => -1);
     // 1. LMSを埋める (末尾)
     for (let i = SA1.length - 1; i >= 0; i--) {
         const lmsIndex = lmsIndices[SA1[i]];
@@ -221,7 +221,7 @@ export class StringOperations {
      */
     static zArray<T>(s: ArrayLike<T>): number[] {
         if (s.length === 0) return [];
-        const z = new Array(s.length).fill(0);
+        const z = Array.from({ length: s.length }, () => 0);
         z[0] = s.length;
         // 今わかっている中で、一番右に伸びている s[0...r-l) と s[l..r) が完全一致する区間 (z-box)
         let l = 0,
@@ -328,12 +328,12 @@ export class StringOperations {
         if (s.length === 0) return [];
         const n = s.length;
         // 1. rank配列の構築
-        const rank = new Array(n);
+        const rank = Array.from({ length: n }, () => 0);
         for (let i = 0; i < n; i++) {
             rank[sa[i]] = i;
         }
         // LCP配列の長さは要素数-1になる
-        const lcp = new Array(n - 1).fill(0);
+        const lcp = Array.from({ length: n - 1 }, () => 0);
         let h = 0;
         // 2. 元の文字列の順番で処理していく
         for (let i = 0; i < n; i++) {

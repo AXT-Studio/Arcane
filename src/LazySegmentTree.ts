@@ -195,9 +195,9 @@ export class LazySegmentTree<S, F> {
         this.#log = Math.ceil(Math.log2(size));
         this.#size = 2 ** this.#log;
         // lazyを初期化
-        this.#lazy = new Array(this.#size * 2).fill(id);
+        this.#lazy = Array.from({ length: this.#size * 2 }, () => id);
         // data配列を初期化
-        this.#data = new Array(this.#size * 2).fill(e);
+        this.#data = Array.from({ length: this.#size * 2 }, () => e);
         // initialValuesが与えられた場合、data配列の後半にセット
         if (initialValues) {
             for (let i = 0; i < initialValues.length; i++) {

@@ -38,10 +38,7 @@ export class Iteration {
      * @param compareFn - 要素の比較関数。Array.sortの引数と同じです。
      * @yields 配列の各要素を並び替えたもの。呼び出されるたびに辞書順で次の順列を返し、最後の順列を返したらreturn(ジェネレーター終了)します。
      */
-    static *next_permutation<T>(
-        array: T[],
-        compareFn: (a: T, b: T) => number,
-    ): Generator<T[], void, unknown> {
+    static *next_permutation<T>(array: T[], compareFn: (a: T, b: T) => number): Generator<T[], void, unknown> {
         // 入力配列のコピーを作成する。
         const a = [...array];
         while (true) {

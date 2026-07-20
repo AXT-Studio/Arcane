@@ -25,7 +25,7 @@ export class Combination {
      *
      * @example
      * ```ts
-     * const combination = new Combination(7n, 10n);
+     * const combination = new Combination(83n, 10n);
      * ```
      *
      * @param p - 法(素数)
@@ -57,8 +57,8 @@ export class Combination {
      *
      * @example
      * ```ts
-     * const combination = new Combination(7n, 10n);
-     * console.log(combination.get(10, 5)); // => 0 (252 mod 7 = 0)
+     * const combination = new Combination(83n, 10n);
+     * console.log(combination.get(10, 5)); // => 3n (252 ≡ 3 (mod 83))
      * ```
      *
      * @param n - 整数
@@ -68,9 +68,6 @@ export class Combination {
     get(n: number, k: number): bigint {
         if (n < k) return 0n;
         if (n < 0 || k < 0) return 0n;
-        return this.#modOps.mul(
-            this.#modOps.mul(this.#fact[n], this.#ifact[k]),
-            this.#ifact[n - k],
-        );
+        return this.#modOps.mul(this.#modOps.mul(this.#fact[n], this.#ifact[k]), this.#ifact[n - k]);
     }
 }

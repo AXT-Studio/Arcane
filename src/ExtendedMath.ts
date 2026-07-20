@@ -77,9 +77,9 @@ export class ExtendedMath {
      * ```ts
      * const [g, x, y] = ExtendedMath.extendedGCD(30n, 21n);
      * console.log(g); // => 3n
-     * console.log(x); // => 1n
-     * console.log(y); // => -1n
-     * // 確認: 30*1 + 21*(-1) === 3
+     * console.log(x); // => -2n
+     * console.log(y); // => 3n
+     * // 確認: 30*(-2) + 21*3 === 3
      * console.log(30n * x + 21n * y === g); // => true
      * ```
      *
@@ -87,7 +87,7 @@ export class ExtendedMath {
      * @param b - 非負整数b
      * @returns [g, x, y] - gはaとbの最大公約数、xとyはax + by = gを満たす整数
      */
-    static extendedGCD(a: bigint, b: bigint): [bigint, bigint, bigint] {
+    static extendedGCD(a: bigint, b: bigint): [g: bigint, x: bigint, y: bigint] {
         let r0 = a;
         let r1 = b;
         let x0 = 1n;

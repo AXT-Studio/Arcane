@@ -13,7 +13,7 @@ Released under the [MIT License](LICENSE).
 
 - Web (esm.sh CDN)
     ```js
-    import * as arcane from 'https://esm.sh/jsr/@ayaexptech/arcane';
+    import * as arcane from "https://esm.sh/jsr/@ayaexptech/arcane";
     ```
 - npm
     ```bash
