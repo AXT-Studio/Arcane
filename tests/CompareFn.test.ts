@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { CompareFn } from "../src/CompareFn.ts";
 
-describe("CompareFn @example", () => {
+describe("CompareFn の @example", () => {
     it("number_asc", () => {
         const arr = [5, 2, 9, 1, 5];
         arr.sort(CompareFn.number_asc);

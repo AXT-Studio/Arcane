@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { MaxFlow } from "../src/MaxFlow.ts";
 
-describe("MaxFlow @example", () => {
+describe("MaxFlow の @example", () => {
     it("constructor", () => {
         expect(() => new MaxFlow(4)).not.toThrow();
     });

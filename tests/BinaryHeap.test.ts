@@ -1,12 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { BinaryHeap, BinaryHeapLite } from "../src/BinaryHeap.ts";
 
-describe("BinaryHeap @example", () => {
+describe("BinaryHeap の @example", () => {
     it("constructor", () => {
         expect(() => new BinaryHeap<number>((a, b) => a - b)).not.toThrow();
     });
 
-    it("constructor with initial values", () => {
+    it("初期値付きの constructor", () => {
         const minHeap = new BinaryHeap<number>((a, b) => a - b, [5, 3, 8, 1]);
         expect(minHeap.pop()).toBe(1);
         expect(minHeap.pop()).toBe(3);
@@ -23,7 +23,7 @@ describe("BinaryHeap @example", () => {
         expect(heap.size).toBe(1);
     });
 
-    it("peek after push", () => {
+    it("push 後の peek", () => {
         const heap = new BinaryHeap<number>((a, b) => a - b);
         heap.push(5);
         heap.push(3);
@@ -39,7 +39,7 @@ describe("BinaryHeap @example", () => {
         expect(heap.pop()).toBeUndefined();
     });
 
-    it("peek after pop", () => {
+    it("pop 後の peek", () => {
         const heap = new BinaryHeap<number>((a, b) => a - b, [5, 3, 8]);
         expect(heap.peek()).toBe(3);
         heap.pop();
@@ -69,12 +69,12 @@ describe("BinaryHeap @example", () => {
     });
 });
 
-describe("BinaryHeapLite @example", () => {
+describe("BinaryHeapLite の @example", () => {
     it("constructor", () => {
         expect(() => new BinaryHeapLite<number>((a, b) => a - b)).not.toThrow();
     });
 
-    it("constructor with initial values", () => {
+    it("初期値付きの constructor", () => {
         const minHeap = new BinaryHeapLite<number>((a, b) => a - b, [5, 3, 8, 1]);
         expect(minHeap.pop()).toBe(1);
         expect(minHeap.pop()).toBe(3);
@@ -91,7 +91,7 @@ describe("BinaryHeapLite @example", () => {
         expect(heap.size).toBe(1);
     });
 
-    it("peek after push", () => {
+    it("push 後の peek", () => {
         const heap = new BinaryHeapLite<number>((a, b) => a - b);
         heap.push(5);
         heap.push(3);
@@ -107,7 +107,7 @@ describe("BinaryHeapLite @example", () => {
         expect(heap.pop()).toBeUndefined();
     });
 
-    it("peek after pop", () => {
+    it("pop 後の peek", () => {
         const heap = new BinaryHeapLite<number>((a, b) => a - b, [5, 3, 8]);
         expect(heap.peek()).toBe(3);
         heap.pop();

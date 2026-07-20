@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { Vector2DFloat, Vector2DInt } from "../src/Vector2D.ts";
 
-describe("Vector2DFloat @example", () => {
+describe("Vector2DFloat の @example", () => {
     it("constructor", () => {
         const v = new Vector2DFloat(1, 2);
         expect(v.x).toBe(1);
@@ -64,7 +64,7 @@ describe("Vector2DFloat @example", () => {
     });
 });
 
-describe("Vector2DInt @example", () => {
+describe("Vector2DInt の @example", () => {
     it("constructor", () => {
         const v = new Vector2DInt(1n, 2n);
         expect(v.x).toBe(1n);

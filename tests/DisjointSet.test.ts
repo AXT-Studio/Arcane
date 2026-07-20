@@ -1,13 +1,13 @@
 import { describe, expect, it } from "vitest";
 import { DisjointSet } from "../src/DisjointSet.ts";
 
-describe("DisjointSet @example", () => {
-    it("constructor / componentCount initial", () => {
+describe("DisjointSet の @example", () => {
+    it("constructor と初期の componentCount", () => {
         const ds = new DisjointSet(5);
         expect(ds.componentCount).toBe(5);
     });
 
-    it("find and union", () => {
+    it("find と union", () => {
         const ds = new DisjointSet(5);
         expect(ds.find(0)).toBe(0);
         expect(ds.find(1)).toBe(1);
@@ -15,7 +15,7 @@ describe("DisjointSet @example", () => {
         expect(ds.find(0) === ds.find(1)).toBe(true);
     });
 
-    it("union returns whether merge happened", () => {
+    it("union が結合したかどうかを返す", () => {
         const ds = new DisjointSet(5);
         expect(ds.union(0, 1)).toBe(true);
         expect(ds.union(0, 1)).toBe(false);
@@ -35,7 +35,7 @@ describe("DisjointSet @example", () => {
         expect(ds.getGroupSize(0)).toBe(2);
     });
 
-    it("componentCount after union", () => {
+    it("union 後の componentCount", () => {
         const ds = new DisjointSet(5);
         expect(ds.componentCount).toBe(5);
         ds.union(0, 1);

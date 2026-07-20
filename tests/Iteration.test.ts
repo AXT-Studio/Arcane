@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { Iteration } from "../src/Iteration.ts";
 
-describe("Iteration @example", () => {
-    it("next_permutation as Array.from", () => {
+describe("Iteration の @example", () => {
+    it("next_permutation を Array.from で展開", () => {
         const arr = [1, 2, 3];
         const permutations = Array.from(Iteration.next_permutation(arr, (a, b) => a - b));
         expect(permutations).toEqual([
@@ -15,7 +15,7 @@ describe("Iteration @example", () => {
         ]);
     });
 
-    it("next_permutation via for-of", () => {
+    it("next_permutation を for-of で走査", () => {
         const arr = [1, 2, 3];
         const permutations: number[][] = [];
         for (const perm of Iteration.next_permutation(arr, (a, b) => a - b)) {
@@ -31,7 +31,7 @@ describe("Iteration @example", () => {
         ]);
     });
 
-    it("next_product bit enumeration", () => {
+    it("next_product による bit 全探索", () => {
         const products = Array.from(Iteration.next_product([2, 2]));
         expect(products).toEqual([
             [0, 0],
@@ -41,7 +41,7 @@ describe("Iteration @example", () => {
         ]);
     });
 
-    it("next_product with mixed bounds", () => {
+    it("上限が異なる next_product", () => {
         const products = Array.from(Iteration.next_product([2, 3]));
         expect(products).toEqual([
             [0, 0],
@@ -53,7 +53,7 @@ describe("Iteration @example", () => {
         ]);
     });
 
-    it("next_product empty", () => {
+    it("空配列の next_product", () => {
         const products = Array.from(Iteration.next_product([]));
         expect(products).toEqual([[]]);
     });

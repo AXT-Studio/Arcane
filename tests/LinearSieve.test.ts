@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { LinearSieve } from "../src/LinearSieve.ts";
 
-describe("LinearSieve @example", () => {
+describe("LinearSieve の @example", () => {
     it("getAllMPF", () => {
         const mpf = LinearSieve.getAllMPF(10);
         expect(mpf).toEqual([NaN, NaN, 2, 3, 2, 5, 2, 7, 2, 3, 2]);

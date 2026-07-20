@@ -12,12 +12,12 @@ function maxChmaxTree(size = 100) {
     );
 }
 
-describe("LazySegmentTree @example", () => {
-    it("constructor (chmax)", () => {
+describe("LazySegmentTree の @example", () => {
+    it("constructor（chmax）", () => {
         expect(() => maxChmaxTree()).not.toThrow();
     });
 
-    it("constructor (range add + range min)", () => {
+    it("constructor（区間加算 + 区間最小）", () => {
         expect(
             () =>
                 new LazySegmentTree<number, number>(
@@ -31,7 +31,7 @@ describe("LazySegmentTree @example", () => {
         ).not.toThrow();
     });
 
-    it("constructor (range add + range max)", () => {
+    it("constructor（区間加算 + 区間最大）", () => {
         expect(
             () =>
                 new LazySegmentTree<number, number>(
@@ -45,7 +45,7 @@ describe("LazySegmentTree @example", () => {
         ).not.toThrow();
     });
 
-    it("constructor (range update + range min)", () => {
+    it("constructor（区間更新 + 区間最小）", () => {
         expect(
             () =>
                 new LazySegmentTree<number, number | null>(
@@ -59,7 +59,7 @@ describe("LazySegmentTree @example", () => {
         ).not.toThrow();
     });
 
-    it("constructor (range update + range max)", () => {
+    it("constructor（区間更新 + 区間最大）", () => {
         expect(
             () =>
                 new LazySegmentTree<number, number | null>(
@@ -73,7 +73,7 @@ describe("LazySegmentTree @example", () => {
         ).not.toThrow();
     });
 
-    it("constructor (range add + range sum)", () => {
+    it("constructor（区間加算 + 区間和）", () => {
         expect(
             () =>
                 new LazySegmentTree<{ value: number; size: number }, number>(
@@ -87,7 +87,7 @@ describe("LazySegmentTree @example", () => {
         ).not.toThrow();
     });
 
-    it("constructor (range update + range sum)", () => {
+    it("constructor（区間更新 + 区間和）", () => {
         expect(
             () =>
                 new LazySegmentTree<{ value: number; size: number }, number | null>(
@@ -101,7 +101,7 @@ describe("LazySegmentTree @example", () => {
         ).not.toThrow();
     });
 
-    it("constructor (affine + range sum)", () => {
+    it("constructor（アフィン変換 + 区間和）", () => {
         expect(
             () =>
                 new LazySegmentTree<{ value: number; size: number }, { a: number; b: number }>(
@@ -120,7 +120,7 @@ describe("LazySegmentTree @example", () => {
         expect(() => lazySegTree.apply(10, 20, 15)).not.toThrow();
     });
 
-    it("apply and query", () => {
+    it("apply と query", () => {
         const lazySegTree = maxChmaxTree();
         lazySegTree.apply(10, 20, 15);
         expect(lazySegTree.query(5, 15)).toBe(15);
@@ -148,20 +148,20 @@ describe("LazySegmentTree @example", () => {
         expect(lazySegTree.queryAll()).toBe(30);
     });
 
-    it("applyAt and get", () => {
+    it("applyAt と get", () => {
         const lazySegTree = maxChmaxTree();
         lazySegTree.applyAt(10, 15);
         expect(lazySegTree.get(10)).toBe(15);
     });
 
-    it("apply then get", () => {
+    it("apply 後の get", () => {
         const lazySegTree = maxChmaxTree();
         lazySegTree.apply(10, 20, 15);
         expect(lazySegTree.get(12)).toBe(15);
         expect(lazySegTree.get(5)).toBe(-Infinity);
     });
 
-    it("set overwrites after applyAt", () => {
+    it("applyAt 後の set による上書き", () => {
         const lazySegTree = maxChmaxTree();
         lazySegTree.applyAt(10, 15);
         lazySegTree.set(10, 20);

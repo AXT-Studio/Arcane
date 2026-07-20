@@ -1,20 +1,20 @@
 import { describe, expect, it } from "vitest";
 import { ExtendedMath } from "../src/ExtendedMath.ts";
 
-describe("ExtendedMath @example", () => {
-    it("gcd number", () => {
+describe("ExtendedMath の @example", () => {
+    it("gcd（number）", () => {
         expect(ExtendedMath.gcd(48, 18)).toBe(6);
     });
 
-    it("gcd bigint", () => {
+    it("gcd（bigint）", () => {
         expect(ExtendedMath.gcd(48n, 18n)).toBe(6n);
     });
 
-    it("lcm number", () => {
+    it("lcm（number）", () => {
         expect(ExtendedMath.lcm(12, 18)).toBe(36);
     });
 
-    it("lcm bigint", () => {
+    it("lcm（bigint）", () => {
         expect(ExtendedMath.lcm(12n, 18n)).toBe(36n);
     });
 
@@ -48,7 +48,7 @@ describe("ExtendedMath @example", () => {
         expect(ExtendedMath.isProbablyPrime(18n)).toBe(false);
     });
 
-    it("isProbablyPrime with bases", () => {
+    it("bases 指定の isProbablyPrime", () => {
         expect(ExtendedMath.isProbablyPrime(17n, [2n])).toBe(true);
         expect(ExtendedMath.isProbablyPrime(25326001n, [2n, 3n, 5n])).toBe(true);
     });

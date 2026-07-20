@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { BinarySearch } from "../src/BinarySearch.ts";
 
-describe("BinarySearch @example", () => {
+describe("BinarySearch の @example", () => {
     it("binary_search", () => {
         const arr = [1, 3, 5, 7, 9];
         expect(BinarySearch.binary_search(arr, 5, (a, b) => a - b)).toBe(true);

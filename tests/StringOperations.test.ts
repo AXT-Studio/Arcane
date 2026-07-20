@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { StringOperations } from "../src/StringOperations.ts";
 
-describe("StringOperations @example", () => {
+describe("StringOperations の @example", () => {
     it("runLengthEncoding", () => {
         expect(StringOperations.runLengthEncoding("aaabb")).toEqual([
             { value: "a", count: 3 },

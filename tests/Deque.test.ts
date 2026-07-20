@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { Deque } from "../src/Deque.ts";
 
-describe("Deque @example", () => {
-    it("constructor + unshift/push", () => {
+describe("Deque の @example", () => {
+    it("constructor と unshift / push", () => {
         const deque = new Deque<number>([1, 2, 3]);
         expect(deque.toArray()).toEqual([1, 2, 3]);
         deque.unshift(0);
@@ -10,7 +10,7 @@ describe("Deque @example", () => {
         expect(deque.toArray()).toEqual([0, 1, 2, 3, 4]);
     });
 
-    it("unshift then push", () => {
+    it("unshift のあと push", () => {
         const deque = new Deque<number>();
         deque.unshift(3);
         deque.unshift(2);
@@ -21,7 +21,7 @@ describe("Deque @example", () => {
         expect(deque.toArray()).toEqual([1, 2, 3, 4, 5]);
     });
 
-    it("shift and pop", () => {
+    it("shift と pop", () => {
         const deque = new Deque<number>([1, 2, 3, 4, 5]);
         expect(deque.toArray()).toEqual([1, 2, 3, 4, 5]);
         expect(deque.shift()).toBe(1);
@@ -30,7 +30,7 @@ describe("Deque @example", () => {
         expect(deque.toArray()).toEqual([2, 3, 4]);
     });
 
-    it("first and last", () => {
+    it("first と last", () => {
         const deque = new Deque<number>([1, 2, 3]);
         expect(deque.first()).toBe(1);
         expect(deque.last()).toBe(3);

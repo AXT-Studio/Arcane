@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { Combination } from "../src/Combination.ts";
 
-describe("Combination @example", () => {
+describe("Combination の @example", () => {
     it("constructor", () => {
         expect(() => new Combination(83n, 10n)).not.toThrow();
     });

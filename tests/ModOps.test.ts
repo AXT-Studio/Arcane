@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { ModOps } from "../src/ModOps.ts";
 
-describe("ModOps @example", () => {
+describe("ModOps の @example", () => {
     it("constructor", () => {
         expect(() => new ModOps(7n)).not.toThrow();
     });

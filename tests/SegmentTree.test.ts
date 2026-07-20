@@ -1,12 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { SegmentTree } from "../src/SegmentTree.ts";
 
-describe("SegmentTree @example", () => {
+describe("SegmentTree の @example", () => {
     it("constructor", () => {
         expect(() => new SegmentTree(-Infinity, (a, b) => Math.max(a, b), 100)).not.toThrow();
     });
 
-    it("set and query", () => {
+    it("set と query", () => {
         const segTree = new SegmentTree(-Infinity, (a, b) => Math.max(a, b), 100);
         segTree.set(0, 10);
         segTree.set(1, 20);
@@ -22,7 +22,7 @@ describe("SegmentTree @example", () => {
         expect(segTree.get(2)).toBe(-Infinity);
     });
 
-    it("query ranges", () => {
+    it("query による区間取得", () => {
         const segTree = new SegmentTree(-Infinity, (a, b) => Math.max(a, b), 100);
         segTree.set(0, 10);
         segTree.set(1, 20);

@@ -1,12 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { Treap } from "../src/Treap.ts";
 
-describe("Treap @example", () => {
+describe("Treap の @example", () => {
     it("constructor", () => {
         expect(() => new Treap<number, string>((a, b) => a - b)).not.toThrow();
     });
 
-    it("set overwrites value", () => {
+    it("set による値の上書き", () => {
         const treap = new Treap<number, string>((a, b) => a - b);
         treap.set(1, "one");
         treap.set(2, "two");

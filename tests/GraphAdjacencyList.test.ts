@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { GraphAdjacencyList } from "../src/GraphAdjacencyList.ts";
 
-describe("GraphAdjacencyList @example", () => {
+describe("GraphAdjacencyList の @example", () => {
     it("constructor", () => {
         const graph = new GraphAdjacencyList(3);
         expect(graph.raw).toEqual([[], [], []]);
