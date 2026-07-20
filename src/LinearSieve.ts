@@ -26,7 +26,7 @@ export class LinearSieve {
         /** 発見した素数のリスト */
         const primes: number[] = [];
         /** 最小素因数のリスト */
-        const mpf: number[] = new Array(N + 1).fill(NaN);
+        const mpf: number[] = Array.from({ length: N + 1 }, () => NaN);
         for (let i = 2; i <= N; i++) {
             if (Number.isNaN(mpf[i])) {
                 mpf[i] = i;

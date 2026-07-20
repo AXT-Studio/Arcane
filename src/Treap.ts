@@ -68,10 +68,7 @@ export class Treap<K, V> {
      * @private
      * 2つのTreapをマージして、新しいTreapを返します。
      */
-    static #merge<K, V>(
-        left: TreapNode<K, V> | null,
-        right: TreapNode<K, V> | null,
-    ): TreapNode<K, V> | null {
+    static #merge<K, V>(left: TreapNode<K, V> | null, right: TreapNode<K, V> | null): TreapNode<K, V> | null {
         if (!left) return right;
         if (!right) return left;
         if (left.priority > right.priority) {
@@ -413,11 +410,7 @@ export class Treap<K, V> {
             return { less: 0, lessEqual: 0, greater: 0, greaterEqual: 0 };
         }
         // 現在の木を"key未満"・"keyと等しい"・"keyより大きい"の3つに分割
-        const { less, equal, greater } = Treap.#splitThreeWays<K, V>(
-            this.root,
-            key,
-            this.#keyCompareFn,
-        );
+        const { less, equal, greater } = Treap.#splitThreeWays<K, V>(this.root, key, this.#keyCompareFn);
         // それぞれの要素数を取得
         const lessCount = Treap.#getSize<K, V>(less);
         const equalCount = Treap.#getSize<K, V>(equal);
@@ -442,9 +435,7 @@ export class Treap<K, V> {
      * @param node - 走査の開始点となるノード
      * @returns ジェネレーターは、Treap内の要素をキーの昇順で{ key, value }の形でyieldします。
      */
-    *#inOrderTraversal(
-        node: TreapNode<K, V> | null,
-    ): Generator<{ key: K; value: V }, void, undefined> {
+    *#inOrderTraversal(node: TreapNode<K, V> | null): Generator<{ key: K; value: V }, void, undefined> {
         if (!node) return;
         yield* this.#inOrderTraversal(node.left);
         yield { key: node.key, value: node.value };

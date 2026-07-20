@@ -175,12 +175,7 @@ export class Vector2DFloat {
      * @param eps - 数値誤差の閾値
      * @returns 位置関係を表す整数値 (反時計回り: 1, 時計回り: -1, 一直線上: 0)
      */
-    static CCW(
-        p0: Vector2DFloat,
-        p1: Vector2DFloat,
-        p2: Vector2DFloat,
-        eps: number = 1e-10,
-    ): 0 | 1 | -1 {
+    static CCW(p0: Vector2DFloat, p1: Vector2DFloat, p2: Vector2DFloat, eps: number = 1e-10): 0 | 1 | -1 {
         const a = p1.sub(p0);
         const b = p2.sub(p0);
         const crossProduct = a.cross(b);
@@ -443,12 +438,7 @@ export class Vector2DInt {
      * @param b2 - 線分Bのもう一方の端点
      * @returns 線分が交差または接している場合は`true`、そうでない場合は`false`
      */
-    static areSegmentsIntersecting(
-        a1: Vector2DInt,
-        a2: Vector2DInt,
-        b1: Vector2DInt,
-        b2: Vector2DInt,
-    ): boolean {
+    static areSegmentsIntersecting(a1: Vector2DInt, a2: Vector2DInt, b1: Vector2DInt, b2: Vector2DInt): boolean {
         const t1 = Vector2DInt.CCW(a1, a2, b1);
         const t2 = Vector2DInt.CCW(a1, a2, b2);
         const t3 = Vector2DInt.CCW(b1, b2, a1);

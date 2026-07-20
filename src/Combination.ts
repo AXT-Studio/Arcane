@@ -68,9 +68,6 @@ export class Combination {
     get(n: number, k: number): bigint {
         if (n < k) return 0n;
         if (n < 0 || k < 0) return 0n;
-        return this.#modOps.mul(
-            this.#modOps.mul(this.#fact[n], this.#ifact[k]),
-            this.#ifact[n - k],
-        );
+        return this.#modOps.mul(this.#modOps.mul(this.#fact[n], this.#ifact[k]), this.#ifact[n - k]);
     }
 }

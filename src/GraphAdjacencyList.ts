@@ -162,7 +162,7 @@ export class GraphAdjacencyList {
      * @returns - 各頂点の入次数のリスト、戻り値のi番目(0-indexed)の値が頂点iの入次数を表す。
      */
     getInDegrees(): number[] {
-        const result = new Array<number>(this.raw.length).fill(0);
+        const result = Array.from({ length: this.raw.length }, () => 0);
         for (let u = 0; u < this.raw.length; u++) {
             this.raw[u].forEach((v) => {
                 result[v]++;

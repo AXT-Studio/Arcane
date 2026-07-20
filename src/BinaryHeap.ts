@@ -102,24 +102,14 @@ export class BinaryHeap<T> {
                 compareTargetChildIndex = leftChildIndex;
             } else {
                 // 左右の子で優先度が高い方を比較対象にする
-                if (
-                    this.#compareFn(
-                        this.#elements[leftChildIndex] as T,
-                        this.#elements[rightChildIndex] as T,
-                    ) < 0
-                ) {
+                if (this.#compareFn(this.#elements[leftChildIndex] as T, this.#elements[rightChildIndex] as T) < 0) {
                     compareTargetChildIndex = leftChildIndex;
                 } else {
                     compareTargetChildIndex = rightChildIndex;
                 }
             }
             // 親より子の方が優先度高ければ交換
-            if (
-                this.#compareFn(
-                    this.#elements[compareTargetChildIndex] as T,
-                    this.#elements[currentIndex] as T,
-                ) < 0
-            ) {
+            if (this.#compareFn(this.#elements[compareTargetChildIndex] as T, this.#elements[currentIndex] as T) < 0) {
                 // indexMapを先に更新
                 const currentElement = this.#elements[currentIndex];
                 const childElement = this.#elements[compareTargetChildIndex];
@@ -159,12 +149,7 @@ export class BinaryHeap<T> {
         while (currentIndex > 1) {
             const parentIndex = Math.floor(currentIndex / 2);
             // 子の方が優先度高ければ交換
-            if (
-                this.#compareFn(
-                    this.#elements[currentIndex] as T,
-                    this.#elements[parentIndex] as T,
-                ) < 0
-            ) {
+            if (this.#compareFn(this.#elements[currentIndex] as T, this.#elements[parentIndex] as T) < 0) {
                 // indexMapを先に更新
                 const currentElement = this.#elements[currentIndex];
                 const parentElement = this.#elements[parentIndex];
@@ -179,10 +164,7 @@ export class BinaryHeap<T> {
                     parentIndexSet.add(currentIndex);
                 }
                 // 交換
-                [this.#elements[currentIndex], this.#elements[parentIndex]] = [
-                    parentElement,
-                    currentElement,
-                ];
+                [this.#elements[currentIndex], this.#elements[parentIndex]] = [parentElement, currentElement];
                 currentIndex = parentIndex;
             } else {
                 break;
@@ -493,24 +475,14 @@ export class BinaryHeapLite<T> {
                 compareTargetChildIndex = leftChildIndex;
             } else {
                 // 左右の子で優先度が高い方を比較対象にする
-                if (
-                    this.#compareFn(
-                        this.#elements[leftChildIndex] as T,
-                        this.#elements[rightChildIndex] as T,
-                    ) < 0
-                ) {
+                if (this.#compareFn(this.#elements[leftChildIndex] as T, this.#elements[rightChildIndex] as T) < 0) {
                     compareTargetChildIndex = leftChildIndex;
                 } else {
                     compareTargetChildIndex = rightChildIndex;
                 }
             }
             // 親より子の方が優先度高ければ交換
-            if (
-                this.#compareFn(
-                    this.#elements[compareTargetChildIndex] as T,
-                    this.#elements[currentIndex] as T,
-                ) < 0
-            ) {
+            if (this.#compareFn(this.#elements[compareTargetChildIndex] as T, this.#elements[currentIndex] as T) < 0) {
                 // indexMapを先に更新
                 const currentElement = this.#elements[currentIndex];
                 const childElement = this.#elements[compareTargetChildIndex];
@@ -538,20 +510,12 @@ export class BinaryHeapLite<T> {
         while (currentIndex > 1) {
             const parentIndex = Math.floor(currentIndex / 2);
             // 子の方が優先度高ければ交換
-            if (
-                this.#compareFn(
-                    this.#elements[currentIndex] as T,
-                    this.#elements[parentIndex] as T,
-                ) < 0
-            ) {
+            if (this.#compareFn(this.#elements[currentIndex] as T, this.#elements[parentIndex] as T) < 0) {
                 // indexMapを先に更新
                 const currentElement = this.#elements[currentIndex];
                 const parentElement = this.#elements[parentIndex];
                 // 交換
-                [this.#elements[currentIndex], this.#elements[parentIndex]] = [
-                    parentElement,
-                    currentElement,
-                ];
+                [this.#elements[currentIndex], this.#elements[parentIndex]] = [parentElement, currentElement];
                 currentIndex = parentIndex;
             } else {
                 break;
