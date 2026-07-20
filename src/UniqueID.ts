@@ -25,6 +25,8 @@ export class UniqueID {
      * console.log(uuid2); // => 例: "01856aa0-c418-784f-94e1-7271487db7ef" (timestampに基づいて生成されたUUID)
      * ```
      *
+     * @throws {TypeError} - `timestamp`が非負の整数でない(0未満、もしくは非整数の)場合、もしくは2^48-1を超える場合
+     *
      * @param [timestamp] - UUIDv7の生成に使用するUNIXタイムスタンプ (ミリ秒単位)。省略した場合は現在のタイムスタンプが使用されます。
      * @returns 生成されたUUIDv7
      */

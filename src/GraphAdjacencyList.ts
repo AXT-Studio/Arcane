@@ -23,7 +23,7 @@ export class GraphAdjacencyList {
      * console.log(graph.raw); // [[], [], []]
      * ```
      *
-     * @throws v_size(頂点数)が1以上でない場合、RangeErrorを返します。
+     * @throws v_size(頂点数)が1以上でない場合、RangeErrorをスローします。
      *
      * @param v_size - 頂点数。1以上の整数である必要があります。
      */
@@ -231,7 +231,7 @@ export class GraphAdjacencyList {
      * ```
      *
      * @param raw - グラフの隣接リスト表現。raw[i]は頂点iに隣接する頂点(頂点`i`から辺で直接つながっている頂点)のリスト。0頂点はNG。
-     * @throws 頂点数が1以上でない場合、RangeErrorを返します。
+     * @throws 頂点数が1以上でない場合、RangeErrorをスローします。
      * @returns rawから作られたGraphAdjacencyListのインスタンス
      */
     static fromRaw(raw: number[][]): GraphAdjacencyList {

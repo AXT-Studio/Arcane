@@ -42,6 +42,7 @@ class TreapNode<K, V> {
  * @template V - 値の型
  */
 export class Treap<K, V> {
+    /** 根となるノード */
     root: TreapNode<K, V> | null;
     /** キーを比較するための関数。aがbより先なら負、aがbより後なら正、順序が等しいなら0を返す。 */
     #keyCompareFn: (a: K, b: K) => number;
@@ -53,7 +54,7 @@ export class Treap<K, V> {
      *
      * @example
      * ```ts
-     * const treap = new Treap((a, b) => a - b);
+     * const treap = new Treap<number, string>((a, b) => a - b);
      * ```
      *
      * @param keyCompareFn - キーを比較するための関数。aがbより先なら負、aがbより後なら正、順序が等しいなら0を返す。
@@ -160,13 +161,16 @@ export class Treap<K, V> {
      *
      * @example
      * ```ts
-     * const treap = new Treap((a, b) => a - b);
+     * const treap = new Treap<number, string>((a, b) => a - b);
      * treap.set(1, 'one');
      * treap.set(2, 'two');
      * treap.set(1, 'uno'); // 1のvalueは"uno"に上書きされる
      * console.log(treap.get(1)); // => "uno"
      * console.log(treap.get(2)); // => "two"
      * ```
+     *
+     * @param key - 挿入する要素のキー
+     * @param value - 挿入する要素の値
      */
     set(key: K, value: V): void {
         // ==== 現在の木を"key未満"・"keyと等しい"・"keyより大きい"の3つに分割して等しいやつは破棄 ====
@@ -190,7 +194,7 @@ export class Treap<K, V> {
      *
      * @example
      * ```ts
-     * const treap = new Treap((a, b) => a - b);
+     * const treap = new Treap<number, string>((a, b) => a - b);
      * treap.set(1, 'one');
      * treap.set(2, 'two');
      * treap.delete(1);
@@ -219,7 +223,7 @@ export class Treap<K, V> {
      *
      * @example
      * ```ts
-     * const treap = new Treap((a, b) => a - b);
+     * const treap = new Treap<number, string>((a, b) => a - b);
      * treap.set(1, 'one');
      * treap.set(2, 'two');
      * console.log(treap.get(1)); // => "one"
@@ -248,7 +252,7 @@ export class Treap<K, V> {
      *
      * @example
      * ```ts
-     * const treap = new Treap((a, b) => a - b);
+     * const treap = new Treap<number, string>((a, b) => a - b);
      * treap.set(1, 'one');
      * treap.set(3, 'three');
      * treap.set(5, 'five');
@@ -293,7 +297,7 @@ export class Treap<K, V> {
      *
      * @example
      * ```ts
-     * const treap = new Treap((a, b) => a - b);
+     * const treap = new Treap<number, string>((a, b) => a - b);
      * treap.set(1, 'one');
      * treap.set(3, 'three');
      * treap.set(5, 'five');
@@ -338,7 +342,7 @@ export class Treap<K, V> {
      *
      * @example
      * ```ts
-     * const treap = new Treap((a, b) => a - b);
+     * const treap = new Treap<number, string>((a, b) => a - b);
      * treap.set(10, 'ten');
      * treap.set(20, 'twenty');
      * treap.set(30, 'thirty');
@@ -382,7 +386,7 @@ export class Treap<K, V> {
      *
      * @example
      * ```ts
-     * const treap = new Treap((a, b) => a - b);
+     * const treap = new Treap<number, string>((a, b) => a - b);
      * treap.set(10, 'ten');
      * treap.set(20, 'twenty');
      * treap.set(30, 'thirty');
@@ -460,10 +464,10 @@ export class Treap<K, V> {
      * @example for...of ループを用いた反復処理
      * このメソッドが存在することで、`for...of`ループを使用して`Treap`内の要素を反復処理できます。
      * ```ts
-     * const treap = new Treap((a, b) => a - b);
-     * treap.insert(3, 'three');
-     * treap.insert(1, 'one');
-     * treap.insert(2, 'two');
+     * const treap = new Treap<number, string>((a, b) => a - b);
+     * treap.set(3, 'three');
+     * treap.set(1, 'one');
+     * treap.set(2, 'two');
      *
      * for (const { key, value } of treap) {
      *     console.log(key, value);
@@ -477,10 +481,10 @@ export class Treap<K, V> {
      * @example イテレーターを手動で手繰る
      * 返されたイテレーターオブジェクトの`next()`メソッドを手動で呼び出すことで、反復処理の制御を細かく行うこともできます。
      * ```ts
-     * const treap = new Treap((a, b) => a - b);
-     * treap.insert(3, 'three');
-     * treap.insert(1, 'one');
-     * treap.insert(2, 'two');
+     * const treap = new Treap<number, string>((a, b) => a - b);
+     * treap.set(3, 'three');
+     * treap.set(1, 'one');
+     * treap.set(2, 'two');
      *
      * const iterator = treap[Symbol.iterator]();
      * console.log(iterator.next().value); // Expected Log Output : { key: 1, value: 'one' }
@@ -503,7 +507,7 @@ export class Treap<K, V> {
      *
      * @example
      * ```ts
-     * const treap = new Treap((a, b) => a - b);
+     * const treap = new Treap<number, string>((a, b) => a - b);
      * console.log(treap.size); // => 0 (初期状態)
      * treap.set(1, 'one');
      * treap.set(2, 'two');

@@ -18,7 +18,7 @@ export class CompareFn {
      *
      * @param a - 比較対象の値1
      * @param b - 比較対象の値2
-     * @return `a`が`b`より小さい場合は負の数、等しい場合は0、大きい場合は正の数
+     * @returns `a`が`b`より小さい場合は負の数、等しい場合は0、大きい場合は正の数
      */
     static number_asc(a: number, b: number): number {
         return a - b;
@@ -36,7 +36,7 @@ export class CompareFn {
      *
      * @param a - 比較対象の値1
      * @param b - 比較対象の値2
-     * @return `a`が`b`より大きい場合は負の数、等しい場合は0、小さい場合は正の数
+     * @returns `a`が`b`より大きい場合は負の数、等しい場合は0、小さい場合は正の数
      */
     static number_desc(a: number, b: number): number {
         return b - a;
@@ -55,7 +55,7 @@ export class CompareFn {
      *
      * @param a - 比較対象の値1
      * @param b - 比較対象の値2
-     * @return `a`が`b`より"小さい"場合は負の数、等しい場合は0、"大きい"場合は正の数
+     * @returns `a`が`b`より"小さい"場合は負の数、等しい場合は0、"大きい"場合は正の数
      */
     static unicode_forward(a: unknown, b: unknown): number {
         const [A, B] = [String(a), String(b)];
@@ -75,7 +75,7 @@ export class CompareFn {
      *
      * @param a - 比較対象の値1
      * @param b - 比較対象の値2
-     * @return `a`が`b`より"大きい"場合は負の数、等しい場合は0、"小さい"場合は正の数
+     * @returns `a`が`b`より"大きい"場合は負の数、等しい場合は0、"小さい"場合は正の数
      */
     static unicode_reverse(a: unknown, b: unknown): number {
         const [A, B] = [String(a), String(b)];

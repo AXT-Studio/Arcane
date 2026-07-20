@@ -30,7 +30,6 @@ export class Combination {
      *
      * @param p - 法(素数)
      * @param max - n, kの最大値
-     * @constructor
      */
     constructor(p: bigint, max: bigint) {
         this.#modOps = new ModOps(p);

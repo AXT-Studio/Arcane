@@ -19,7 +19,7 @@ export class LinearSieve {
      * console.log(mpf); // [NaN, NaN, 2, 3, 2, 5, 2, 7, 2, 3, 2]
      * ```
      *
-     * @param N 最大値。
+     * @param N - 最大値。
      * @returns 0からNまでを添字とする長さ`N + 1`の配列。各`i` (2 ≦ `i` ≦ `N`) について`mpf[i]`は`i`の最小素因数を表します。
      */
     static getAllMPF(N: number): number[] {
@@ -53,7 +53,7 @@ export class LinearSieve {
      * console.log(primes); // [2, 3, 5, 7]
      * ```
      *
-     * @param N 最大値。
+     * @param N - 最大値。
      * @returns N以下のすべての素数を昇順で列挙した配列。
      */
     static getAllPrimes(N: number): number[] {
@@ -79,8 +79,8 @@ export class LinearSieve {
      * LinearSieve.factorize(1, LinearSieve.getAllMPF(1)); // []
      * ```
      *
-     * @param N 対象の整数。
-     * @param MPF N以下のすべての整数について、その最小素因数を列挙した配列。`MPF[i]`は`i`の最小素因数を表す。
+     * @param N - 対象の整数。
+     * @param MPF - N以下のすべての整数について、その最小素因数を列挙した配列。`MPF[i]`は`i`の最小素因数を表す。
      * @returns Nの素因数を昇順で列挙した配列。重複あり。
      */
     static factorize(N: number, MPF: number[]): number[] {
