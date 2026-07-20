@@ -26,6 +26,8 @@ export class DisjointSet {
      * console.log(ds.componentCount); // 5 (初期状態では全ての要素が別々の集合に属しているため、連結成分の数は5)
      * ```
      *
+     * @throws {Error} - `size`が正の整数でない(0以下、もしくは非整数の)場合
+     *
      * @param size - 要素の数
      */
     constructor(size: number) {
@@ -162,7 +164,6 @@ export class DisjointSet {
      * console.log(ds.componentCount); // 4 (0と1が同じ集合になったため、連結成分の数が1減る)
      * ```
      *
-     * @param componentCount - 現在の連結成分の数
      * @returns - 現在の連結成分の数
      */
     get componentCount(): number {

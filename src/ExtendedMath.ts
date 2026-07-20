@@ -27,7 +27,7 @@ export class ExtendedMath {
      * ExtendedMath.gcd(48n, 18n) // => 6n
      * ```
      *
-     * @typeParam T - 引数と返り値の型。numberまたはbigint。
+     * @template T - 引数と返り値の型。numberまたはbigint。
      * @param a - 1つ目の整数。
      * @param b - 2つ目の整数。
      * @returns aとbの最大公約数。引数と同じ型で返されます。
@@ -55,7 +55,7 @@ export class ExtendedMath {
      * ExtendedMath.lcm(12n, 18n) // => 36n
      * ```
      *
-     * @typeParam T - 引数と返り値の型。numberまたはbigint。
+     * @template T - 引数と返り値の型。numberまたはbigint。
      * @param a - 1つ目の整数。
      * @param b - 2つ目の整数。
      * @returns aとbの最小公倍数。引数と同じ型で返されます。
@@ -206,7 +206,7 @@ export class ExtendedMath {
      *
      * @example
      * ```ts
-     * BigIntMath.modPow(3n, 200n, 50n) // => 1n
+     * ExtendedMath.modPow(3n, 200n, 50n) // => 1n
      * ```
      *
      * @param a - 底 (整数)
@@ -342,7 +342,7 @@ export class ExtendedMath {
      *
      * @example
      * ```ts
-     * ExtendedMath.max(1n, 2n, 3n) // => 3n
+     * ExtendedMath.maxBigint(1n, 2n, 3n) // => 3n
      * ```
      *
      * @param first - 1つ目のbigint
@@ -366,7 +366,7 @@ export class ExtendedMath {
      *
      * @example
      * ```ts
-     * ExtendedMath.min(1n, 2n, 3n) // => 1n
+     * ExtendedMath.minBigint(1n, 2n, 3n) // => 1n
      * ```
      * @param first - 1つ目のbigint
      * @param rest - 2つ目以降のbigint
@@ -389,8 +389,8 @@ export class ExtendedMath {
      *
      * @example
      * ```ts
-     * ExtendedMath.abs(1n) // => 1n
-     * ExtendedMath.abs(-7n) // => 7n
+     * ExtendedMath.absBigint(1n) // => 1n
+     * ExtendedMath.absBigint(-7n) // => 7n
      * ```
      * @param n - 対象のbigint
      * @returns nの絶対値
@@ -406,8 +406,8 @@ export class ExtendedMath {
      *
      * @example
      * ```ts
-     * ExtendedMath.sign(1n) // => 1
-     * ExtendedMath.sign(-7n) // => -1
+     * ExtendedMath.signBigint(1n) // => 1n
+     * ExtendedMath.signBigint(-7n) // => -1n
      * ```
      * @param n - 対象のbigint
      * @returns nの符号

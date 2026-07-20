@@ -47,7 +47,6 @@ export class MaxFlow {
      * ```
      *
      * @param n - グラフの頂点数
-     * @constructor
      */
     constructor(n: number) {
         this.#graph = Array.from({ length: n }, () => []);
@@ -70,7 +69,7 @@ export class MaxFlow {
      * @param from - 辺の始点番号 (0 <= from < n)
      * @param to - 辺の終点番号 (0 <= to < n, from == toも可)
      * @param cap - 辺の容量 (0 <= cap)
-     * @return 何番目に追加された辺か (0-indexed, getEdgeやchangeEdgeの引数として使用される)
+     * @returns 何番目に追加された辺か (0-indexed, getEdgeやchangeEdgeの引数として使用される)
      */
     addEdge(from: number, to: number, cap: number): number {
         const m = this.#pos.length;
@@ -112,11 +111,12 @@ export class MaxFlow {
      * maxFlow.addEdge(2, 3, 1);
      * const flow = maxFlow.flow(0, 3);
      * console.log(flow); // => 2 (0->1->3で1、0->2->3で1の流量を流せるので、合計2)
+     * ```
      *
      * @param s - 流量の始点
      * @param t - 流量の終点
      * @param max - 流量の上限 (デフォルトはInfinity)
-     * @return 点sから点tへの最大流量
+     * @returns 点sから点tへの最大流量
      */
     flow(s: number, t: number, max: number = Infinity): number {
         let flow = 0;
@@ -194,7 +194,7 @@ export class MaxFlow {
      * ```
      *
      * @param s - 始点
-     * @return 点sから点i(0 <= i < n)について、(残余グラフにおいて)点sから点iに(残余容量0の(もう流せない)辺を通らずに)到達可能かどうかを返す配列
+     * @returns 点sから点i(0 <= i < n)について、(残余グラフにおいて)点sから点iに(残余容量0の(もう流せない)辺を通らずに)到達可能かどうかを返す配列
      */
     minCut(s: number): boolean[] {
         const visited = Array(this.#graph.length).fill(false);
@@ -230,7 +230,7 @@ export class MaxFlow {
      * ```
      *
      * @param i - 辺の番号 (0-indexed, `addEdge`の戻り値として得られる値)
-     * @return i番目に追加された辺の情報。`{from, to, cap, flow}`で、capは辺の容量、flowは現在流れている流量。
+     * @returns i番目に追加された辺の情報。`{from, to, cap, flow}`で、capは辺の容量、flowは現在流れている流量。
      */
     getEdge(i: number): PublicEdge {
         const [from, index] = this.#pos[i];

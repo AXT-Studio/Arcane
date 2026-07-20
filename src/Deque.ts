@@ -35,9 +35,7 @@ export class Deque<T> {
      * console.log(deque.toArray()); // [0, 1, 2, 3, 4]
      * ```
      *
-     * 新しいDequeインスタンスを生成する
      * @param [initialValues] - 初期値の配列
-     * @constructor
      */
     constructor(initialValues: Iterable<T> = []) {
         this.#front = [];
@@ -126,7 +124,7 @@ export class Deque<T> {
      * console.log(deque.toArray()); // [2, 3, 4]
      * ```
      *
-     * @return Dequeの先頭の値 またはDequeが空の場合は`undefined`
+     * @returns Dequeの先頭の値 またはDequeが空の場合は`undefined`
      */
     shift(): T | undefined {
         // #frontが空なら、#backから#frontに要素を移動する
@@ -153,7 +151,7 @@ export class Deque<T> {
      * console.log(deque.toArray()); // [2, 3, 4]
      * ```
      *
-     * @return Dequeの末尾の値 またはDequeが空の場合は`undefined`
+     * @returns Dequeの末尾の値 またはDequeが空の場合は`undefined`
      */
     pop(): T | undefined {
         // #backが空なら、#frontから#backに要素を移動する
@@ -178,7 +176,7 @@ export class Deque<T> {
      * console.log(deque.toArray()); // [1, 2, 3]
      * ```
      *
-     * @return Dequeの先頭の値 またはDequeが空の場合は`undefined`
+     * @returns Dequeの先頭の値 またはDequeが空の場合は`undefined`
      */
     first(): T | undefined {
         // #frontが空なら、#back[0]を返す
@@ -203,7 +201,7 @@ export class Deque<T> {
      * console.log(deque.toArray()); // [1, 2, 3]
      * ```
      *
-     * @return Dequeの末尾の値 またはDequeが空の場合は`undefined`
+     * @returns Dequeの末尾の値 またはDequeが空の場合は`undefined`
      */
     last(): T | undefined {
         // #backが空なら、#front[0]を返す
@@ -259,6 +257,8 @@ export class Deque<T> {
      * deque.set(3, 7); // RangeError: Index out of range
      * ```
      *
+     * @throws {RangeError} - `i`が0未満、あるいはDeque全体の長さ以上の場合
+     *
      * @param i - 置換する要素のインデックス (0-indexed)
      * @param value - 新しい値
      */
@@ -287,7 +287,7 @@ export class Deque<T> {
      * console.log(deque.isEmpty()); // true
      * ```
      *
-     * @return Dequeが空の場合は`true`、そうでない場合は`false`
+     * @returns Dequeが空の場合は`true`、そうでない場合は`false`
      */
     isEmpty(): boolean {
         // #frontと#backの両方が空ならtrue
@@ -306,6 +306,8 @@ export class Deque<T> {
      * deque.push(4);
      * console.log(deque.toArray()); // [0, 1, 2, 3, 4]
      * ```
+     *
+     * @returns Dequeの要素を配列として返します。
      */
     toArray(): T[] {
         // #frontを逆順にして#backと結合した配列を返す
@@ -325,7 +327,7 @@ export class Deque<T> {
      * console.log(deque.size); // 5
      * ```
      *
-     * @return Dequeの要素数
+     * @returns Dequeの要素数
      */
     get size(): number {
         // #frontと#backの長さを合計して返す

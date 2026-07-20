@@ -259,7 +259,7 @@ export class StringOperations {
      * ```
      *
      * @param s - Suffix Arrayを構築する文字列か数列。ArrayLikeでも各要素が文字列か数列であれば渡せます。
-     * @return Suffix Array。すなわち、「文字列sの接尾辞を辞書順に並べたときの、各接尾辞の開始位置」をまとめた配列。
+     * @returns Suffix Array。すなわち、「文字列sの接尾辞を辞書順に並べたときの、各接尾辞の開始位置」をまとめた配列。
      */
     static getSuffixArray<T extends string | number>(s: ArrayLike<T>): number[] {
         if (s.length === 0) return [];
@@ -318,8 +318,8 @@ export class StringOperations {
      *
      * @param s - LCP Arrayを構築する文字列か数列。ArrayLikeでも各要素が文字列か数列であれば渡せます。
      * @param sa - 文字列sのSuffix Array。`getSuffixArray(s)`で取得できます。
-     * @return LCP Array。すなわち、「文字列sの接尾辞を辞書順に並べたときの、隣り合う接尾辞同士の最長共通接頭辞の長さ」をまとめた配列。
-     * @throw Error - 列sの長さとSuffix Arrayの長さが等しくない場合。
+     * @returns LCP Array。すなわち、「文字列sの接尾辞を辞書順に並べたときの、隣り合う接尾辞同士の最長共通接頭辞の長さ」をまとめた配列。
+     * @throws {Error} - 列sの長さとSuffix Arrayの長さが等しくない場合。
      */
     static getLCPArray<T extends string | number>(s: ArrayLike<T>, sa: number[]): number[] {
         if (s.length !== sa.length) {

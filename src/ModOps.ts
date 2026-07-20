@@ -27,8 +27,9 @@ export class ModOps {
      * const mod7 = new ModOps(7n);
      * ```
      *
+     * @throws {Error} - `mod`が正の整数でない(0以下の)場合
+     *
      * @param mod - 演算の法 (1以上の整数)
-     * @constructor
      */
     constructor(mod: bigint) {
         if (mod <= 0n) {
@@ -172,6 +173,8 @@ export class ModOps {
      * const mod7 = new ModOps(7n);
      * console.log(mod7.pow(3n, 4n)); // => 4n (3^4 mod 7 = 81 mod 7 = 4)
      * ```
+     *
+     * @throws {RangeError} - `b`が負の整数である場合
      *
      * @param a - 累乗されるbigint
      * @param b - 累乗するbigint (非負整数でなければならない)

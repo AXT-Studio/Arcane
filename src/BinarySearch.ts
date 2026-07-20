@@ -23,7 +23,7 @@ export class BinarySearch {
      * @param array - ソート済み配列
      * @param target - 探索対象の値
      * @param compareFn - 比較関数
-     * @return `target`と等しい値が存在すれば`true`、そうでなければ`false`
+     * @returns `target`と等しい値が存在すれば`true`、そうでなければ`false`
      */
     static binary_search<T>(
         array: readonly T[],
@@ -58,7 +58,7 @@ export class BinarySearch {
      * @param array - ソート済み配列
      * @param target - 探索対象の値
      * @param compareFn - 比較関数
-     * @return `target`以上と判定される最初の要素のインデックス または`array.length`
+     * @returns `target`以上と判定される最初の要素のインデックス または`array.length`
      */
     static lower_bound<T>(
         array: readonly T[],
@@ -93,7 +93,7 @@ export class BinarySearch {
      * @param array - ソート済み配列
      * @param target - 探索対象の値
      * @param compareFn - 比較関数
-     * @return `target`より大きいと判定される最初の要素のインデックス または`array.length`
+     * @returns `target`より大きいと判定される最初の要素のインデックス または`array.length`
      */
     static upper_bound<T>(
         array: readonly T[],

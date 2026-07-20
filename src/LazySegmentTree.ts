@@ -45,8 +45,7 @@
  *     (s, f) => s + f,
  *     0,
  *     (newF, oldF) => newF + oldF,
- *     size,
- *     initialValues // number[]
+ *     100,
  * );
  * ```
  *
@@ -58,8 +57,7 @@
  *     (s, f) => s + f,
  *     0,
  *     (newF, oldF) => newF + oldF,
- *     size,
- *     initialValues // number[]
+ *     100,
  * );
  * ```
  *
@@ -71,8 +69,7 @@
  *     (s, f) => f === null ? s : f,
  *     null,
  *     (newF, oldF) => newF === null ? oldF : newF,
- *     size,
- *     initialValues // number[]
+ *     100,
  * );
  * ```
  *
@@ -84,8 +81,7 @@
  *     (s, f) => f === null ? s : f,
  *     null,
  *     (newF, oldF) => newF === null ? oldF : newF,
- *     size,
- *     initialValues // number[]
+ *     100,
  * );
  * ```
  *
@@ -97,8 +93,8 @@
  *     (s, f) => ({ value: s.value + f * s.size, size: s.size }),
  *     0,
  *     (newF, oldF) => newF + oldF,
- *     size,
- *     initialValues // { value: 初期値, size: 1 } の配列にする必要があります
+ *     100,
+ *     // 初期値を指定する場合は、{ value: 初期値, size: 1 } の配列にする必要があります
  * );
  * ```
  *
@@ -110,8 +106,8 @@
  *     (s, f) => f === null ? s : { value: f * s.size, size: s.size },
  *     null,
  *     (newF, oldF) => newF === null ? oldF : newF,
- *     size,
- *     initialValues // { value: 初期値, size: 1 } の配列にする必要があります
+ *     100,
+ *     // 初期値を指定する場合は、{ value: 初期値, size: 1 } の配列にする必要があります
  * );
  * ```
  *
@@ -123,8 +119,8 @@
  *     (s, f) => ({ value: f.a * s.value + f.b * s.size, size: s.size }),
  *     { a: 1, b: 0 },
  *     (newF, oldF) => ({ a: newF.a * oldF.a, b: newF.a * oldF.b + newF.b }),
- *     size,
- *     initialValues // { value: 初期値, size: 1 } の配列にする必要があります
+ *     100,
+ *     // 初期値を指定する場合は、{ value: 初期値, size: 1 } の配列にする必要があります
  * );
  * ```
  *
@@ -393,7 +389,7 @@ export class LazySegmentTree<S, F> {
      * lazySegTree.apply(15, 25, 30); // 区間[15, 25)の要素に対して、値30を適用
      * // l = 5から始めて、区間総積が20未満である最大のrを探索
      * const maxRight = lazySegTree.maxRight(5, (x) => x < 20);
-     * console.log(maxRight); // => 15 (区間[5, 15)の最大値は15未満だが、区間[5, 16)の最大値は30以上になるため)
+     * console.log(maxRight); // => 15 (区間[5, 15)の最大値は(15で)20未満であるが、区間[5, 16)の最大値は(30で)20以上になるため)
      * ```
      *
      * @param l - 区間の左端のindex (0-indexed, 含む)

@@ -37,7 +37,6 @@ export class BinaryHeap<T> {
      *
      * @param compareFn - 比較関数 (aの優先度が高いなら負、bの優先度が高いなら正、等しいなら0を返す関数)
      * @param [initialValues] - 初期値の配列 (省略可)
-     * @constructor
      */
     constructor(compareFn: (a: T, b: T) => number, initialValues: T[] = []) {
         this.#compareFn = compareFn;
@@ -87,7 +86,7 @@ export class BinaryHeap<T> {
      * 指定要素をdown-heapで再配置する (プライベートメソッド)
      * @param startIndex - down-heapを開始するインデックス
      * @param [editIndexMap=true] - indexMapも更新するかどうか (falseにするのはheapify時くらい)
-     * @return 最終的な配置先インデックス
+     * @returns 最終的な配置先インデックス
      */
     #downHeap(startIndex: number, editIndexMap: boolean = true): number {
         let currentIndex = startIndex;
@@ -153,7 +152,7 @@ export class BinaryHeap<T> {
      * @private
      * 指定要素をup-heapで再配置する (プライベートメソッド)
      * @param startIndex - up-heapを開始するインデックス
-     * @return 最終的な配置先インデックス
+     * @returns 最終的な配置先インデックス
      */
     #upHeap(startIndex: number): number {
         let currentIndex = startIndex;
@@ -441,7 +440,6 @@ export class BinaryHeapLite<T> {
      *
      * @param compareFn - 比較関数 (aの優先度が高いなら負、bの優先度が高いなら正、等しいなら0を返す関数)
      * @param [initialValues] - 初期値の配列 (省略可)
-     * @constructor
      */
     constructor(compareFn: (a: T, b: T) => number, initialValues: T[] = []) {
         this.#compareFn = compareFn;
