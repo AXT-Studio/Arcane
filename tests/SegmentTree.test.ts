@@ -58,3 +58,27 @@ describe("SegmentTree の @example", () => {
         expect(segTree.minLeft(2, (x) => x > 15)).toBe(1);
     });
 });
+
+describe("SegmentTree のエラー", () => {
+    it("maxRight は l が範囲外のとき RangeError", () => {
+        const segTree = new SegmentTree(-Infinity, (a, b) => Math.max(a, b), 100);
+        expect(() => segTree.maxRight(-1, () => true)).toThrow(RangeError);
+        expect(() => segTree.maxRight(101, () => true)).toThrow(RangeError);
+    });
+
+    it("maxRight は fn(e) が false のとき Error", () => {
+        const segTree = new SegmentTree(-Infinity, (a, b) => Math.max(a, b), 100);
+        expect(() => segTree.maxRight(0, () => false)).toThrow(Error);
+    });
+
+    it("minLeft は r が範囲外のとき RangeError", () => {
+        const segTree = new SegmentTree(Infinity, (a, b) => Math.min(a, b), 100);
+        expect(() => segTree.minLeft(-1, () => true)).toThrow(RangeError);
+        expect(() => segTree.minLeft(101, () => true)).toThrow(RangeError);
+    });
+
+    it("minLeft は fn(e) が false のとき Error", () => {
+        const segTree = new SegmentTree(Infinity, (a, b) => Math.min(a, b), 100);
+        expect(() => segTree.minLeft(2, () => false)).toThrow(Error);
+    });
+});

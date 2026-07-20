@@ -57,3 +57,39 @@ describe("ModOps の @example", () => {
         expect(mod7.div(3n, 2n)).toBe(5n);
     });
 });
+
+describe("ModOps のエラー", () => {
+    it("constructor は mod が正でないとき Error", () => {
+        expect(() => new ModOps(0n)).toThrow(Error);
+        expect(() => new ModOps(-1n)).toThrow(Error);
+    });
+
+    it("pow は指数が負のとき RangeError", () => {
+        const mod7 = new ModOps(7n);
+        expect(() => mod7.pow(3n, -1n)).toThrow(RangeError);
+    });
+
+    it("inv は逆元が存在しないとき Error", () => {
+        const mod10 = new ModOps(10n);
+        expect(() => mod10.inv(2n)).toThrow(Error);
+    });
+
+    it("div は除数の逆元が存在しないとき Error", () => {
+        const mod10 = new ModOps(10n);
+        expect(() => mod10.div(3n, 2n)).toThrow(Error);
+    });
+});
+
+describe("ModOps の境界・特例", () => {
+    it("空の sum / prod は単位元", () => {
+        const mod7 = new ModOps(7n);
+        expect(mod7.sum()).toBe(0n);
+        expect(mod7.prod()).toBe(1n);
+    });
+
+    it("pow は法が 1 のとき常に 0n", () => {
+        const mod1 = new ModOps(1n);
+        expect(mod1.pow(3n, 4n)).toBe(0n);
+        expect(mod1.pow(0n, 0n)).toBe(0n);
+    });
+});

@@ -126,3 +126,19 @@ describe("Vector2DInt の @example", () => {
         expect(Vector2DInt.areSegmentsIntersecting(a1, a2, b1, b2)).toBe(true);
     });
 });
+
+describe("Vector2D の境界・特例", () => {
+    it("CCW は共線のとき 0（Float）", () => {
+        const p0 = new Vector2DFloat(0, 0);
+        const p1 = new Vector2DFloat(1, 1);
+        const p2 = new Vector2DFloat(2, 2);
+        expect(Vector2DFloat.CCW(p0, p1, p2)).toBe(0);
+    });
+
+    it("CCW は共線のとき 0（Int）", () => {
+        const p0 = new Vector2DInt(0n, 0n);
+        const p1 = new Vector2DInt(1n, 1n);
+        const p2 = new Vector2DInt(2n, 2n);
+        expect(Vector2DInt.CCW(p0, p1, p2)).toBe(0);
+    });
+});

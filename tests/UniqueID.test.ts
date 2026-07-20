@@ -14,3 +14,11 @@ describe("UniqueID の @example", () => {
         expect(uuid2).toMatch(/^01856aa0-c418-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/);
     });
 });
+
+describe("UniqueID のエラー", () => {
+    it("generateUUIDv7 は不正な timestamp のとき TypeError", () => {
+        expect(() => UniqueID.generateUUIDv7(-1)).toThrow(TypeError);
+        expect(() => UniqueID.generateUUIDv7(1.5)).toThrow(TypeError);
+        expect(() => UniqueID.generateUUIDv7(2 ** 48)).toThrow(TypeError);
+    });
+});

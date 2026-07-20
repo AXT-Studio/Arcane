@@ -173,3 +173,27 @@ describe("LazySegmentTree の @example", () => {
         expect(lazySegTree.size).toBe(100);
     });
 });
+
+describe("LazySegmentTree のエラー", () => {
+    it("maxRight は l が範囲外のとき Error", () => {
+        const lazySegTree = maxChmaxTree();
+        expect(() => lazySegTree.maxRight(-1, () => true)).toThrow(Error);
+        expect(() => lazySegTree.maxRight(101, () => true)).toThrow(Error);
+    });
+
+    it("maxRight は fn(e) が false のとき Error", () => {
+        const lazySegTree = maxChmaxTree();
+        expect(() => lazySegTree.maxRight(0, () => false)).toThrow(Error);
+    });
+
+    it("minLeft は r が範囲外のとき Error", () => {
+        const lazySegTree = maxChmaxTree();
+        expect(() => lazySegTree.minLeft(-1, () => true)).toThrow(Error);
+        expect(() => lazySegTree.minLeft(101, () => true)).toThrow(Error);
+    });
+
+    it("minLeft は fn(e) が false のとき Error", () => {
+        const lazySegTree = maxChmaxTree();
+        expect(() => lazySegTree.minLeft(30, () => false)).toThrow(Error);
+    });
+});

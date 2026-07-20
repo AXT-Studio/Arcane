@@ -74,3 +74,21 @@ describe("Deque の @example", () => {
         expect(deque.size).toBe(5);
     });
 });
+
+describe("Deque のエラー", () => {
+    it("set はインデックスが範囲外のとき RangeError", () => {
+        const deque = new Deque<number>([1, 2, 3]);
+        expect(() => deque.set(-1, 0)).toThrow(RangeError);
+        expect(() => deque.set(3, 0)).toThrow(RangeError);
+    });
+});
+
+describe("Deque の境界・特例", () => {
+    it("空のとき shift / pop / first / last は undefined", () => {
+        const deque = new Deque<number>();
+        expect(deque.shift()).toBeUndefined();
+        expect(deque.pop()).toBeUndefined();
+        expect(deque.first()).toBeUndefined();
+        expect(deque.last()).toBeUndefined();
+    });
+});

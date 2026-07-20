@@ -56,3 +56,17 @@ describe("MaxFlow の @example", () => {
         expect(maxFlow.getEdge(edgeId)).toEqual({ from: 0, to: 1, cap: 10, flow: 3 });
     });
 });
+
+describe("MaxFlow の境界・特例", () => {
+    it("非連結な s-t の流量は 0", () => {
+        const maxFlow = new MaxFlow(3);
+        maxFlow.addEdge(0, 1, 5);
+        expect(maxFlow.flow(0, 2)).toBe(0);
+    });
+
+    it("容量 0 の辺だけでは流れない", () => {
+        const maxFlow = new MaxFlow(2);
+        maxFlow.addEdge(0, 1, 0);
+        expect(maxFlow.flow(0, 1)).toBe(0);
+    });
+});

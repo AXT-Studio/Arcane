@@ -32,3 +32,20 @@ describe("StringOperations の @example", () => {
         expect(StringOperations.getLCPArray(s, sa)).toEqual([1, 2, 0, 1, 0]);
     });
 });
+
+describe("StringOperations のエラー", () => {
+    it("getLCPArray は s と sa の長さが異なるとき Error", () => {
+        expect(() => StringOperations.getLCPArray("abc", [0, 1])).toThrow(Error);
+    });
+});
+
+describe("StringOperations の境界・特例", () => {
+    it("空入力は空配列を返す", () => {
+        expect(StringOperations.zArray("")).toEqual([]);
+        expect(StringOperations.zArray([])).toEqual([]);
+        expect(StringOperations.getSuffixArray("")).toEqual([]);
+        expect(StringOperations.getSuffixArray([])).toEqual([]);
+        expect(StringOperations.getLCPArray("", [])).toEqual([]);
+        expect(StringOperations.getLCPArray([], [])).toEqual([]);
+    });
+});

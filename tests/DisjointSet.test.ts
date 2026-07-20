@@ -42,3 +42,11 @@ describe("DisjointSet の @example", () => {
         expect(ds.componentCount).toBe(4);
     });
 });
+
+describe("DisjointSet のエラー", () => {
+    it("constructor は size が正の整数でないとき Error", () => {
+        expect(() => new DisjointSet(0)).toThrow(Error);
+        expect(() => new DisjointSet(-1)).toThrow(Error);
+        expect(() => new DisjointSet(1.5)).toThrow(Error);
+    });
+});

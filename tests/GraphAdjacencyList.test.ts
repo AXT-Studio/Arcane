@@ -75,3 +75,13 @@ describe("GraphAdjacencyList の @example", () => {
         expect(graph.vertexCount).toBe(3);
     });
 });
+
+describe("GraphAdjacencyList のエラー", () => {
+    it("constructor は頂点数が 1 未満のとき RangeError", () => {
+        expect(() => new GraphAdjacencyList(0)).toThrow(RangeError);
+    });
+
+    it("fromRaw は頂点数が 1 未満のとき RangeError", () => {
+        expect(() => GraphAdjacencyList.fromRaw([])).toThrow(RangeError);
+    });
+});

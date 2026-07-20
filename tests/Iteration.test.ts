@@ -58,3 +58,24 @@ describe("Iteration の @example", () => {
         expect(products).toEqual([[]]);
     });
 });
+
+describe("Iteration の境界・特例", () => {
+    it("next_product は 0 以下を含むとき何も返さない", () => {
+        expect(Array.from(Iteration.next_product([2, 0]))).toEqual([]);
+        expect(Array.from(Iteration.next_product([-1]))).toEqual([]);
+    });
+
+    it("next_permutation の長さ 0 / 1", () => {
+        expect(Array.from(Iteration.next_permutation([], (a, b) => a - b))).toEqual([[]]);
+        expect(Array.from(Iteration.next_permutation([42], (a, b) => a - b))).toEqual([[42]]);
+    });
+
+    it("next_permutation の重複要素", () => {
+        const permutations = Array.from(Iteration.next_permutation([1, 1, 2], (a, b) => a - b));
+        expect(permutations).toEqual([
+            [1, 1, 2],
+            [1, 2, 1],
+            [2, 1, 1],
+        ]);
+    });
+});

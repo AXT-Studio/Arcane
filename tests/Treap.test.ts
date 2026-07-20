@@ -88,4 +88,43 @@ describe("Treap の @example", () => {
         treap.delete(1);
         expect(treap.size).toBe(1);
     });
+
+    it("[Symbol.iterator] を for...of で走査", () => {
+        const treap = new Treap<number, string>((a, b) => a - b);
+        treap.set(3, "three");
+        treap.set(1, "one");
+        treap.set(2, "two");
+
+        const entries: { key: number; value: string }[] = [];
+        for (const { key, value } of treap) {
+            entries.push({ key, value });
+        }
+        expect(entries).toEqual([
+            { key: 1, value: "one" },
+            { key: 2, value: "two" },
+            { key: 3, value: "three" },
+        ]);
+    });
+
+    it("[Symbol.iterator] を手動で手繰る", () => {
+        const treap = new Treap<number, string>((a, b) => a - b);
+        treap.set(3, "three");
+        treap.set(1, "one");
+        treap.set(2, "two");
+
+        const iterator = treap[Symbol.iterator]();
+        expect(iterator.next().value).toEqual({ key: 1, value: "one" });
+        expect(iterator.next().value).toEqual({ key: 2, value: "two" });
+        expect(iterator.next().value).toEqual({ key: 3, value: "three" });
+        expect(iterator.next().done).toBe(true);
+        expect(iterator.next().value).toBeUndefined();
+    });
+});
+
+describe("Treap のエラー", () => {
+    it("kthElement は k が負のとき RangeError", () => {
+        const treap = new Treap<number, string>((a, b) => a - b);
+        treap.set(1, "one");
+        expect(() => treap.kthElement(-1)).toThrow(RangeError);
+    });
 });
