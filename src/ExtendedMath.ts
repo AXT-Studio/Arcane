@@ -332,4 +332,85 @@ export class ExtendedMath {
         n = (n & 0x33333333) + ((n >>> 2) & 0x33333333);
         return (((n + (n >>> 4)) & 0x0f0f0f0f) * 0x01010101) >>> 24;
     }
+
+    /**
+     * 1つ以上のbigintを受け取り、そのうち最大のものを返します。
+     *
+     * 時間計算量: O(n) (nは引数の個数)
+     *
+     * @example
+     * ```ts
+     * ExtendedMath.max(1n, 2n, 3n) // => 3n
+     * ```
+     *
+     * @param first - 1つ目のbigint
+     * @param rest - 2つ目以降のbigint
+     * @returns 最大のbigint
+     */
+    static maxBigint(first: bigint, ...rest: bigint[]): bigint {
+        let max = first;
+        for (const value of rest) {
+            if (value > max) {
+                max = value;
+            }
+        }
+        return max;
+    }
+
+    /**
+     * 1つ以上のbigintを受け取り、そのうち最小のものを返します。
+     *
+     * 時間計算量: O(n) (nは引数の個数)
+     *
+     * @example
+     * ```ts
+     * ExtendedMath.min(1n, 2n, 3n) // => 1n
+     * ```
+     * @param first - 1つ目のbigint
+     * @param rest - 2つ目以降のbigint
+     * @returns 最小のbigint
+     */
+    static minBigint(first: bigint, ...rest: bigint[]): bigint {
+        let min = first;
+        for (const value of rest) {
+            if (value < min) {
+                min = value;
+            }
+        }
+        return min;
+    }
+
+    /**
+     * bigintを受け取り、その絶対値を返します。
+     *
+     * 時間計算量: O(1)
+     *
+     * @example
+     * ```ts
+     * ExtendedMath.abs(1n) // => 1n
+     * ExtendedMath.abs(-7n) // => 7n
+     * ```
+     * @param n - 対象のbigint
+     * @returns nの絶対値
+     */
+    static absBigint(n: bigint): bigint {
+        return n < 0n ? -n : n;
+    }
+
+    /**
+     * bigintを受け取り、その符号を返します。
+     *
+     * 時間計算量: O(1)
+     *
+     * @example
+     * ```ts
+     * ExtendedMath.sign(1n) // => 1
+     * ExtendedMath.sign(-7n) // => -1
+     * ```
+     * @param n - 対象のbigint
+     * @returns nの符号
+     */
+    static signBigint(n: bigint): 0n | 1n | -1n {
+        return n === 0n ? 0n : n < 0n ? -1n : 1n;
+    }
 }
