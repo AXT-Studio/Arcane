@@ -15,4 +15,4 @@ export { SegmentTree } from "./src/SegmentTree.ts";
 export { StringOperations } from "./src/StringOperations.ts";
 export { Treap } from "./src/Treap.ts";
 export { UniqueID } from "./src/UniqueID.ts";
-export { Vector2D } from "./src/Vector2D.ts";
+export { Vector2DFloat, Vector2DInt } from "./src/Vector2D.ts";
