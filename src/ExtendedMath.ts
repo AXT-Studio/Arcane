@@ -156,7 +156,7 @@ export class ExtendedMath {
     /**
      * 整数`n`の整数平方根を求めます。すなわち、`x ** 2 <= n < (x + 1) ** 2`を満たす唯一の整数`x`を返します。
      *
-     * 時間計算量: O(M(log_2(n)))
+     * 時間計算量: nが2^104未満の場合はO(1)、それ以上の場合はO(M(log_2(n)))
      * ここで M(k) はkビット整数の乗算の時間計算量で、これは実行エンジンに依存します。一般に M(k) は O(k^(log_2(3))) もしくは O(k log k log log k) となります。
      *
      * @example
@@ -175,10 +175,12 @@ export class ExtendedMath {
         if (n < 0n) {
             throw new RangeError("n must be non-negative");
         }
-        // numberで正確に扱える範囲ならば、Math.sqrtを利用する
-        if (n < 4294967296n) {
-            // 2n ** 32n
-            return BigInt(Math.floor(Math.sqrt(Number(n))));
+        // f64 で扱える範囲ならば、Math.sqrt + 1段階の補正を利用する
+        // n <= 2^104 では floor(sqrt) が高々 +1 しかずれないことが示されている
+        if (n < 20282409603651670423947251286016n /* 2n ** 104n */) {
+            let s = BigInt(Math.floor(Math.sqrt(Number(n))));
+            if (s * s > n) s--;
+            return s;
         }
         // 漸化式の初期値
         // 効率的なビット長の近似計算: 16進数文字列長 * 4
