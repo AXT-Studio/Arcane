@@ -4,11 +4,14 @@
 
 /**
  * 数学的な関数のうち、JavaScript標準の`Math`にないものを提供するユーティリティクラスです。
- * - 最大公約数(gcd), 最小公倍数(lcm)
- * - 約数の列挙
- * - 整数平方根
- * - 冪乗の余剰計算
- * - ミラー・ラビン素数判定法
+ * - 最大公約数(gcd)、最小公倍数(lcm) (number, bigint)
+ * - 拡張ユークリッドの互除法 (bigint)
+ * - 約数の列挙 (number)
+ * - 整数平方根 (bigint)
+ * - 冪乗の余剰計算 (bigint)
+ * - ミラー・ラビン素数判定法 (bigint)
+ * - popcount (number)
+ * - min, max, abs, sign (bigint)
  */
 export class ExtendedMath {
     /**
@@ -414,5 +417,35 @@ export class ExtendedMath {
      */
     static signBigint(n: bigint): 0n | 1n | -1n {
         return n === 0n ? 0n : n < 0n ? -1n : 1n;
+    }
+
+    /**
+     * ソート済みの数列に対して、中央値を返します。
+     * 空配列に対してはNaNを返します。
+     *
+     * 時間計算量: O(1)
+     *
+     * @example
+     * ```ts
+     * ExtendedMath.medianOfSorted([1, 2, 3]) // => 2
+     * ExtendedMath.medianOfSorted([1, 2, 3, 4]) // => 2.5
+     * ExtendedMath.medianOfSorted([1, 3, 3, 6]) // => 3
+     * ExtendedMath.medianOfSorted([]) // => NaN
+     * ```
+     *
+     * @param sequence - ソート済みの数列
+     * @returns 中央値
+     */
+    static medianOfSorted(sequence: Readonly<ArrayLike<number>>): number {
+        if (sequence.length <= 0 || !Number.isSafeInteger(sequence.length)) {
+            return NaN;
+        }
+        if (sequence.length % 2 === 1) {
+            return sequence[(sequence.length - 1) / 2];
+        } else {
+            const a = sequence[sequence.length / 2 - 1];
+            const b = sequence[sequence.length / 2];
+            return (a + b) / 2;
+        }
     }
 }

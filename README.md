@@ -65,3 +65,9 @@ Released under the [MIT License](LICENSE).
 
 - バグ報告: [GitHub Issues](https://github.com/AXT-Studio/Arcane/issues)
 - Pull Request: このリポジトリは作者の学習を兼ねたプロジェクトです。原則としてPull Requestは受け付けていません。ご了承ください。
+
+### Developing
+
+- Format: `pnpm run fmt` (`pnpm run fmt:check`)
+- Lint: `pnpm run lint:fix` (`pnpm run lint`)
+- Test: `pnpm run test`
