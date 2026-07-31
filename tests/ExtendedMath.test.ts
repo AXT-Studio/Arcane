@@ -75,6 +75,13 @@ describe("ExtendedMath の @example", () => {
         expect(ExtendedMath.signBigint(1n)).toBe(1n);
         expect(ExtendedMath.signBigint(-7n)).toBe(-1n);
     });
+
+    it("medianOfSorted", () => {
+        expect(ExtendedMath.medianOfSorted([1, 2, 3])).toBe(2);
+        expect(ExtendedMath.medianOfSorted([1, 2, 3, 4])).toBe(2.5);
+        expect(ExtendedMath.medianOfSorted([1, 3, 3, 6])).toBe(3);
+        expect(ExtendedMath.medianOfSorted([])).toBeNaN();
+    });
 });
 
 describe("ExtendedMath のエラー", () => {
@@ -117,5 +124,29 @@ describe("ExtendedMath の境界・特例", () => {
     it("modPow は法が 1 のとき常に 0n", () => {
         expect(ExtendedMath.modPow(3n, 200n, 1n)).toBe(0n);
         expect(ExtendedMath.modPow(0n, 0n, 1n)).toBe(0n);
+    });
+
+    it("medianOfSorted の長さ 1 / 2", () => {
+        expect(ExtendedMath.medianOfSorted([42])).toBe(42);
+        expect(ExtendedMath.medianOfSorted([1, 2])).toBe(1.5);
+    });
+
+    it("medianOfSorted は負数・小数でも中央値を返す", () => {
+        expect(ExtendedMath.medianOfSorted([-5, -1, 0, 2, 10])).toBe(0);
+        expect(ExtendedMath.medianOfSorted([-4, -2, 0, 2])).toBe(-1);
+        expect(ExtendedMath.medianOfSorted([0.5, 1.5, 2.5])).toBe(1.5);
+        expect(ExtendedMath.medianOfSorted([0.5, 1.5, 2.5, 3.5])).toBe(2);
+    });
+
+    it("medianOfSorted は ArrayLike を受け付ける", () => {
+        expect(ExtendedMath.medianOfSorted(new Float64Array([1, 2, 3, 4]))).toBe(2.5);
+        expect(ExtendedMath.medianOfSorted({ length: 3, 0: 10, 1: 20, 2: 30 })).toBe(20);
+    });
+
+    it("medianOfSorted は不正な length のとき NaN", () => {
+        expect(ExtendedMath.medianOfSorted({ length: -1 })).toBeNaN();
+        expect(ExtendedMath.medianOfSorted({ length: 1.5, 0: 1, 1: 2 })).toBeNaN();
+        expect(ExtendedMath.medianOfSorted({ length: Number.POSITIVE_INFINITY, 0: 1 })).toBeNaN();
+        expect(ExtendedMath.medianOfSorted({ length: Number.NaN })).toBeNaN();
     });
 });
