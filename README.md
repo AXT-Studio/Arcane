@@ -1,6 +1,6 @@
 # AyaExpTech Arcane
 
-主に競技プログラミングに向けた、データ構造やアルゴリズムを提供するTypeScriptライブラリです。
+AyaExpTech Arcane (`/éɪéksték ɑːkéin/`のように発音)は、主に競技プログラミングに向けた、データ構造やアルゴリズムを提供するTypeScriptライブラリです。
 
 ## License
 
