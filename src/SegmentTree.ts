@@ -11,15 +11,15 @@
  */
 export class SegmentTree<T> {
     /** 単位元 */
-    #e: T;
+    private e: T;
     /**モノイド演算を表す関数 */
-    #op: (a: T, b: T) => T;
+    private op: (a: T, b: T) => T;
     /** セグメント木のサイズ */
-    #size: number;
+    private n: number;
     /** セグメント木のコンストラクタに渡されたサイズ */
-    #originalSize: number;
+    private originalSize: number;
     /** セグメント木の内部配列 */
-    #tree: T[];
+    private tree: T[];
 
     /**
      * 新しいSegmentTreeインスタンスを生成します。
@@ -40,21 +40,21 @@ export class SegmentTree<T> {
      */
     constructor(e: T, op: (a: T, b: T) => T, size: number, initialValues?: T[]) {
         // eとopはそのまま保存
-        this.#e = e;
-        this.#op = op;
-        this.#originalSize = size;
+        this.e = e;
+        this.op = op;
+        this.originalSize = size;
         // sizeは与えられたsize以上の最小の2冪に設定
-        this.#size = 2 ** Math.ceil(Math.log2(size));
+        this.n = 2 ** Math.ceil(Math.log2(size));
         // data配列を初期化
-        this.#tree = Array.from({ length: this.#size * 2 }, () => e);
+        this.tree = Array.from({ length: this.n * 2 }, () => e);
         // initialValuesが与えられた場合、data配列の後半にセット
         if (initialValues) {
             for (let i = 0; i < initialValues.length; i++) {
-                this.#tree[this.#size + i] = initialValues[i];
+                this.tree[this.n + i] = initialValues[i];
             }
             // 前半を構築 (initialValuesが与えられなかった場合はeのままなので飛ばされる)
-            for (let i = this.#size - 1; i > 0; i--) {
-                this.#tree[i] = this.#op(this.#tree[i * 2], this.#tree[i * 2 + 1]);
+            for (let i = this.n - 1; i > 0; i--) {
+                this.tree[i] = this.op(this.tree[i * 2], this.tree[i * 2 + 1]);
             }
         }
     }
@@ -76,12 +76,12 @@ export class SegmentTree<T> {
      */
     set(index: number, value: T): void {
         // 葉ノードを更新
-        let pos = index + this.#size;
-        this.#tree[pos] = value;
+        let pos = index + this.n;
+        this.tree[pos] = value;
         // 親ノードに駆け上がりながら値の更新を繰り返す
         while (pos > 1) {
             pos = Math.floor(pos / 2);
-            this.#tree[pos] = this.#op(this.#tree[pos * 2], this.#tree[pos * 2 + 1]);
+            this.tree[pos] = this.op(this.tree[pos * 2], this.tree[pos * 2 + 1]);
         }
     }
     /**
@@ -103,7 +103,7 @@ export class SegmentTree<T> {
      * @returns 指定されたインデックスの要素
      */
     get(index: number): T {
-        return this.#tree[index + this.#size];
+        return this.tree[index + this.n];
     }
     /**
      * 半開区間[left, right)のモノイド積を計算して返します。
@@ -125,23 +125,23 @@ export class SegmentTree<T> {
      * @returns 指定された区間のモノイド積
      */
     query(left: number, right: number): T {
-        let sum_left = this.#e;
-        let sum_right = this.#e;
-        let l = left + this.#size;
-        let r = right + this.#size;
+        let sum_left = this.e;
+        let sum_right = this.e;
+        let l = left + this.n;
+        let r = right + this.n;
         while (l < r) {
             if (l % 2 === 1) {
-                sum_left = this.#op(sum_left, this.#tree[l]);
+                sum_left = this.op(sum_left, this.tree[l]);
                 l++;
             }
             if (r % 2 === 1) {
                 r--;
-                sum_right = this.#op(this.#tree[r], sum_right);
+                sum_right = this.op(this.tree[r], sum_right);
             }
             l = Math.floor(l / 2);
             r = Math.floor(r / 2);
         }
-        return this.#op(sum_left, sum_right);
+        return this.op(sum_left, sum_right);
     }
     /**
      * 半開区間[0, n)のモノイド積(すなわち、全要素のモノイド積)を返します。
@@ -160,7 +160,7 @@ export class SegmentTree<T> {
      * @returns 全要素のモノイド積
      */
     queryAll(): T {
-        return this.#tree[1];
+        return this.tree[1];
     }
     /**
      * セグメント木のサイズを返します。
@@ -176,7 +176,7 @@ export class SegmentTree<T> {
      * @returns セグメント木のサイズ
      */
     get size(): number {
-        return this.#originalSize;
+        return this.originalSize;
     }
     /**
      * 半開区間[l, r)のモノイド積について、条件fnを満たす最大のrを返します。
@@ -203,40 +203,40 @@ export class SegmentTree<T> {
      * @throws Error - fn(e)がfalseの場合
      */
     maxRight(l: number, fn: (product: T) => boolean): number {
-        if (l < 0 || l > this.#originalSize) {
+        if (l < 0 || l > this.originalSize) {
             throw new RangeError("Index out of bounds");
         }
-        if (!fn(this.#e)) {
+        if (!fn(this.e)) {
             throw new Error("fn(e) must be true");
         }
-        if (l === this.#originalSize) {
-            return this.#originalSize;
+        if (l === this.originalSize) {
+            return this.originalSize;
         }
-        let pos = l + this.#size;
-        let product = this.#e;
+        let pos = l + this.n;
+        let product = this.e;
         do {
             while (pos % 2 === 0) pos >>= 1;
             // 今のブロック (tree[pos]) を足すと条件を満たさなくなるかチェックする
-            if (!fn(this.#op(product, this.#tree[pos]))) {
+            if (!fn(this.op(product, this.tree[pos]))) {
                 // 満たさない -> 境界はこのブロックの範囲にある -> 葉に降りていく
-                while (pos < this.#size) {
+                while (pos < this.n) {
                     // 左の子に降りる
                     pos = pos * 2;
                     // 左の子を足しても大丈夫なら、左の子を採用して右の子に進む
-                    if (fn(this.#op(product, this.#tree[pos]))) {
-                        product = this.#op(product, this.#tree[pos]);
+                    if (fn(this.op(product, this.tree[pos]))) {
+                        product = this.op(product, this.tree[pos]);
                         pos++; // 右の子へ
                     }
                 }
                 // 葉ノードに到達したら、そのインデックスを返す
-                return pos - this.#size;
+                return pos - this.n;
             }
             // 今のブロックを足しても条件を満たすなら、足して次へ
-            product = this.#op(product, this.#tree[pos]);
+            product = this.op(product, this.tree[pos]);
             pos++;
         } while ((pos & -pos) !== pos); // posが2冪のときまで繰り返す
         // 最後まで行ったらサイズを返す
-        return this.#originalSize;
+        return this.originalSize;
     }
     /**
      * 半開区間[l, r)のモノイド積について、条件fnを満たす最小のlを返します。
@@ -263,17 +263,17 @@ export class SegmentTree<T> {
      * @throws Error - fn(e)がfalseの場合
      */
     minLeft(r: number, fn: (product: T) => boolean): number {
-        if (r < 0 || r > this.#originalSize) {
+        if (r < 0 || r > this.originalSize) {
             throw new RangeError("Index out of bounds");
         }
-        if (!fn(this.#e)) {
+        if (!fn(this.e)) {
             throw new Error("fn(e) must be true");
         }
         if (r === 0) {
             return 0;
         }
-        let pos = r + this.#size;
-        let product = this.#e;
+        let pos = r + this.n;
+        let product = this.e;
 
         do {
             pos--; // 半開区間なので左にずらす
@@ -282,22 +282,22 @@ export class SegmentTree<T> {
                 pos >>= 1;
             }
             // 今のブロック (tree[pos]) を足すと条件を満たさなくなるかチェックする
-            if (!fn(this.#op(this.#tree[pos], product))) {
+            if (!fn(this.op(this.tree[pos], product))) {
                 // 満たさない -> 境界はこのブロックの範囲にある -> 葉に降りていく
-                while (pos < this.#size) {
+                while (pos < this.n) {
                     pos = pos * 2 + 1; // 右の子に降りる
                     // 右の子なら結合しても大丈夫か？をチェック
-                    if (fn(this.#op(this.#tree[pos], product))) {
+                    if (fn(this.op(this.tree[pos], product))) {
                         // 大丈夫なら結合して、左の子へ (さらに左を探る)
-                        product = this.#op(this.#tree[pos], product);
+                        product = this.op(this.tree[pos], product);
                         pos--; // 左の子へ
                     }
                 }
                 // 葉ノードに到達したら、そのインデックスを返す
-                return pos + 1 - this.#size;
+                return pos + 1 - this.n;
             }
             // 今のブロックを足しても条件を満たすなら、足して次へ
-            product = this.#op(this.#tree[pos], product);
+            product = this.op(this.tree[pos], product);
         } while ((pos & -pos) !== pos); // posが2冪のときまで繰り返す
         // 最後まで行ったら0を返す
         return 0;
