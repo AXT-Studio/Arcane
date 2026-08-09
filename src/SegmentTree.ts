@@ -24,6 +24,7 @@ export class SegmentTree<T> {
     /**
      * 新しいSegmentTreeインスタンスを生成します。
      * 初期値として配列を与えることができます。初期値の長さが`size`に満たない場合、残りの要素は単位元`e`で埋められます。
+     * (`e`がオブジェクトで初期化時に各要素が同じオブジェクトへの参照となってほしくない場合は、自力で初期化する必要があります。)
      *
      * 時間計算量: O(N) (Nは`size`の値)
      *
@@ -46,7 +47,8 @@ export class SegmentTree<T> {
         // sizeは与えられたsize以上の最小の2冪に設定
         this.n = 2 ** Math.ceil(Math.log2(size));
         // data配列を初期化
-        this.tree = Array.from({ length: this.n * 2 }, () => e);
+        // oxlint-disable-next-line unicorn/no-new-array
+        this.tree = new Array(this.n * 2).fill(e);
         // initialValuesが与えられた場合、data配列の後半にセット
         if (initialValues) {
             for (let i = 0; i < initialValues.length; i++) {

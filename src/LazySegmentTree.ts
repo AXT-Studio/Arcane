@@ -152,6 +152,7 @@ export class LazySegmentTree<S, F> {
     /**
      * 新しいLazySegmentTreeインスタンスを生成します。
      * 初期値として配列を与えることができます。初期値の長さが`size`に満たない場合、残りの要素はすべて`e`で初期化されます。
+     * (`e`がオブジェクトで初期化時に各要素が同じオブジェクトへの参照となってほしくない場合は、自力で初期化する必要があります。)
      *
      * 時間計算量: O(N) (Nはセグメント木のサイズ`size`)
      *
@@ -193,18 +194,20 @@ export class LazySegmentTree<S, F> {
         this.originalSize = size;
         // sizeは与えられたsize以上の最小の2冪に設定
         this.log = Math.ceil(Math.log2(size));
-        this.n = 2 ** this.log;
+        const n = (this.n = 2 ** this.log);
         // lazyを初期化
-        this.lazy = Array.from({ length: this.n * 2 }, () => id);
+        // oxlint-disable-next-line unicorn/no-new-array
+        this.lazy = new Array(n * 2).fill(id);
         // data配列を初期化
-        this.data = Array.from({ length: this.n * 2 }, () => e);
+        // oxlint-disable-next-line unicorn/no-new-array
+        this.data = new Array(n * 2).fill(e);
         // initialValuesが与えられた場合、data配列の後半にセット
         if (initialValues) {
             for (let i = 0; i < initialValues.length; i++) {
-                this.data[this.n + i] = initialValues[i];
+                this.data[n + i] = initialValues[i];
             }
             // 前半を構築 (initialValuesが与えられなかった場合はeのままなので飛ばされる)
-            for (let i = this.n - 1; i > 0; i--) {
+            for (let i = n - 1; i > 0; i--) {
                 this.data[i] = this.op(this.data[i << 1], this.data[(i << 1) | 1]);
             }
         }
