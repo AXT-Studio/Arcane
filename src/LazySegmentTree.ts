@@ -584,7 +584,12 @@ export class LazySegmentTree<S, F> {
      * @returns index番目の要素
      */
     get(index: number): S {
-        return this.query(index, index + 1);
+        const n = this.n;
+        const pos = index + n;
+        for (let i = this.log; i > 0; i--) {
+            this.pushNode(pos >> i);
+        }
+        return this.data[pos];
     }
 
     /**
@@ -604,14 +609,15 @@ export class LazySegmentTree<S, F> {
      * @param value - 新しい値
      */
     set(index: number, value: S): void {
-        // indexに対応する葉ノードの位置を求める
-        const leaf = index + this.n;
-        // 前処理: 上にある遅延を邪魔にならないように全部落とす
-        this.pushToLeaves(index, index + 1);
-        // 値を上書き (遅延タグlazyはここには溜まっていないはずなのでdataだけでOK)
-        this.data[leaf] = value;
-        // 後処理: 親を再計算
-        this.updateFromLeaves(index, index + 1);
+        const n = this.n;
+        const pos = index + n;
+        for (let i = this.log; i > 0; i--) {
+            this.pushNode(pos >> i);
+        }
+        this.data[pos] = value;
+        for (let i = 1; i <= this.log; i++) {
+            this.updateNode(pos >> i);
+        }
     }
 
     /**
