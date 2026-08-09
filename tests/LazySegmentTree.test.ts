@@ -197,3 +197,59 @@ describe("LazySegmentTree のエラー", () => {
         expect(() => lazySegTree.minLeft(30, () => false)).toThrow(Error);
     });
 });
+
+function solveLongBricks(W: number, N: number, L: number[], R: number[]): number[] {
+    const lazysegtree = new LazySegmentTree<number, number>(
+        -Infinity,
+        (a, b) => Math.max(a, b),
+        (s, f) => Math.max(s, f),
+        -Infinity,
+        (newF, oldF) => Math.max(newF, oldF),
+        W + 1,
+        Array.from({ length: W + 1 }, () => 0),
+    );
+    const answers: number[] = [];
+    for (let i = 0; i < N; i++) {
+        const Li = L[i];
+        const Ri = R[i];
+        const rangeMax = lazysegtree.query(Li, Ri + 1);
+        lazysegtree.apply(Li, Ri + 1, rangeMax + 1);
+        answers.push(rangeMax + 1);
+    }
+    return answers;
+}
+
+describe("競プロ典型90問 029 - Long Bricks サンプル通過確認", () => {
+    it("入出力例1", () => {
+        const [W, N] = [100, 4];
+        const L = [27, 8, 83, 24];
+        const R = [100, 39, 97, 75];
+        const expected = [1, 2, 2, 3];
+        const actual = solveLongBricks(W, N, L, R);
+        expect(actual).toEqual(expected);
+    });
+    it("入出力例2", () => {
+        const [W, N] = [3, 5];
+        const L = [1, 2, 2, 3, 1];
+        const R = [2, 2, 3, 3, 2];
+        const expected = [1, 2, 3, 4, 4];
+        const actual = solveLongBricks(W, N, L, R);
+        expect(actual).toEqual(expected);
+    });
+    it("入出力例3", () => {
+        const [W, N] = [10, 10];
+        const L = [1, 3, 5, 7, 2, 4, 6, 3, 5, 4];
+        const R = [3, 5, 7, 9, 4, 6, 8, 5, 7, 6];
+        const expected = [1, 2, 3, 4, 3, 4, 5, 5, 6, 7];
+        const actual = solveLongBricks(W, N, L, R);
+        expect(actual).toEqual(expected);
+    });
+    it("入出力例4", () => {
+        const [W, N] = [500000, 7];
+        const L = [1, 500000, 1, 1, 1, 500000, 1];
+        const R = [500000, 500000, 500000, 1, 500000, 500000, 500000];
+        const expected = [1, 2, 3, 4, 5, 6, 7];
+        const actual = solveLongBricks(W, N, L, R);
+        expect(actual).toEqual(expected);
+    });
+});
