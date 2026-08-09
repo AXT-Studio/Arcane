@@ -217,9 +217,12 @@ export class LazySegmentTree<S, F> {
      * @param f - 作用
      */
     private allApply(index: number, f: F): void {
-        this.data[index] = this.mapping(this.data[index], f);
+        // 複数回アクセスが発生するdata・lazyをキャッシュ
+        const data = this.data;
+        const lazy = this.lazy;
+        data[index] = this.mapping(data[index], f);
         if (index < this.n) {
-            this.lazy[index] = this.composition(f, this.lazy[index]);
+            lazy[index] = this.composition(f, lazy[index]);
         }
     }
 
@@ -228,13 +231,14 @@ export class LazySegmentTree<S, F> {
      * lazyの`index`番目に格納されている遅延タグを子ノードに伝播させ、lazy[index]を初期化します。
      * @param index - ノードのインデックス (0-indexed)
      */
-    private push(index: number): void {
+    private pushNode(index: number): void {
         const l = index * 2;
         const r = index * 2 + 1;
+        const g = this.lazy[index];
         // lに伝播
-        this.allApply(l, this.lazy[index]);
+        this.allApply(l, g);
         // rに伝播
-        this.allApply(r, this.lazy[index]);
+        this.allApply(r, g);
         // lazy[index]を初期化
         this.lazy[index] = this.id;
     }
@@ -244,7 +248,7 @@ export class LazySegmentTree<S, F> {
      * treeの`index`番目のノードを、treeの2つの子ノードから計算し更新します。
      * @param index - ノードのインデックス
      */
-    private update(index: number): void {
+    private updateNode(index: number): void {
         this.data[index] = this.op(this.data[index * 2], this.data[index * 2 + 1]);
     }
 
@@ -263,12 +267,12 @@ export class LazySegmentTree<S, F> {
             // left側のノードを伝播
             if ((left >> i) << i !== left) {
                 const leftNode = left >> i;
-                this.push(leftNode);
+                this.pushNode(leftNode);
             }
             // right側のノードを伝播
             if ((right >> i) << i !== right) {
                 const rightNode = (right - 1) >> i;
-                this.push(rightNode);
+                this.pushNode(rightNode);
             }
         }
     }
@@ -287,12 +291,12 @@ export class LazySegmentTree<S, F> {
             // left側のノードを更新
             if ((left >> i) << i !== left) {
                 const leftNode = left >> i;
-                this.update(leftNode);
+                this.updateNode(leftNode);
             }
             // right側のノードを更新
             if ((right >> i) << i !== right) {
                 const rightNode = (right - 1) >> i;
-                this.update(rightNode);
+                this.updateNode(rightNode);
             }
         }
     }
@@ -353,6 +357,9 @@ export class LazySegmentTree<S, F> {
      * @returns 指定された区間の総モノイド積
      */
     query(l: number, r: number): S {
+        // 複数回アクセスするものをキャッシュ
+        const data = this.data;
+        const op = this.op;
         // lとrに対応する葉ノードの位置を求める
         let left = l + this.n;
         let right = r + this.n;
@@ -363,18 +370,18 @@ export class LazySegmentTree<S, F> {
         let res_right = this.e;
         while (left < right) {
             if (left % 2 === 1) {
-                res_left = this.op(res_left, this.data[left]);
+                res_left = op(res_left, data[left]);
                 left++;
             }
             if (right % 2 === 1) {
                 right--;
-                res_right = this.op(this.data[right], res_right);
+                res_right = op(data[right], res_right);
             }
             left = Math.floor(left / 2);
             right = Math.floor(right / 2);
         }
         // 3. 結果を返す
-        return this.op(res_left, res_right);
+        return op(res_left, res_right);
     }
 
     /**
@@ -426,7 +433,7 @@ export class LazySegmentTree<S, F> {
                 // 満たさない -> 境界はこのブロックの範囲 -> 葉まで降りていく
                 while (pos < this.n) {
                     // 遅延タグを伝播させる
-                    this.push(pos);
+                    this.pushNode(pos);
                     // 左の子に降りる
                     pos = pos * 2;
                     // 今のブロックを足しても条件を満たすなら、足して右の子へ
@@ -499,7 +506,7 @@ export class LazySegmentTree<S, F> {
                 // 満たさない -> 境界はこのブロックの範囲 -> 葉まで降りていく
                 while (pos < this.n) {
                     // 遅延タグを伝播させる
-                    this.push(pos);
+                    this.pushNode(pos);
                     // 右の子に降りる
                     pos = pos * 2 + 1;
                     // 右の子なら結合しても大丈夫か？をチェック

@@ -75,13 +75,16 @@ export class SegmentTree<T> {
      * @param value - 新しい値
      */
     set(index: number, value: T): void {
+        // 複数回アクセスするオブジェクトをローカル変数にキャッシュ
+        const tree = this.tree;
+        const op = this.op;
         // 葉ノードを更新
         let pos = index + this.n;
-        this.tree[pos] = value;
+        tree[pos] = value;
         // 親ノードに駆け上がりながら値の更新を繰り返す
         while (pos > 1) {
             pos = Math.floor(pos / 2);
-            this.tree[pos] = this.op(this.tree[pos * 2], this.tree[pos * 2 + 1]);
+            tree[pos] = op(tree[pos * 2], tree[pos * 2 + 1]);
         }
     }
     /**
@@ -125,23 +128,26 @@ export class SegmentTree<T> {
      * @returns 指定された区間のモノイド積
      */
     query(left: number, right: number): T {
+        // 複数回アクセスするオブジェクトをローカル変数にキャッシュ
+        const tree = this.tree;
+        const op = this.op;
         let sum_left = this.e;
         let sum_right = this.e;
         let l = left + this.n;
         let r = right + this.n;
         while (l < r) {
             if (l % 2 === 1) {
-                sum_left = this.op(sum_left, this.tree[l]);
+                sum_left = op(sum_left, tree[l]);
                 l++;
             }
             if (r % 2 === 1) {
                 r--;
-                sum_right = this.op(this.tree[r], sum_right);
+                sum_right = op(tree[r], sum_right);
             }
             l = Math.floor(l / 2);
             r = Math.floor(r / 2);
         }
-        return this.op(sum_left, sum_right);
+        return op(sum_left, sum_right);
     }
     /**
      * 半開区間[0, n)のモノイド積(すなわち、全要素のモノイド積)を返します。
@@ -203,6 +209,10 @@ export class SegmentTree<T> {
      * @throws Error - fn(e)がfalseの場合
      */
     maxRight(l: number, fn: (product: T) => boolean): number {
+        // 複数回アクセスするtree, op, nをローカル変数にキャッシュ
+        const tree = this.tree;
+        const op = this.op;
+        const n = this.n;
         if (l < 0 || l > this.originalSize) {
             throw new RangeError("Index out of bounds");
         }
@@ -212,27 +222,27 @@ export class SegmentTree<T> {
         if (l === this.originalSize) {
             return this.originalSize;
         }
-        let pos = l + this.n;
+        let pos = l + n;
         let product = this.e;
         do {
             while (pos % 2 === 0) pos >>= 1;
             // 今のブロック (tree[pos]) を足すと条件を満たさなくなるかチェックする
-            if (!fn(this.op(product, this.tree[pos]))) {
+            if (!fn(op(product, tree[pos]))) {
                 // 満たさない -> 境界はこのブロックの範囲にある -> 葉に降りていく
-                while (pos < this.n) {
+                while (pos < n) {
                     // 左の子に降りる
                     pos = pos * 2;
                     // 左の子を足しても大丈夫なら、左の子を採用して右の子に進む
-                    if (fn(this.op(product, this.tree[pos]))) {
-                        product = this.op(product, this.tree[pos]);
+                    if (fn(op(product, tree[pos]))) {
+                        product = op(product, tree[pos]);
                         pos++; // 右の子へ
                     }
                 }
                 // 葉ノードに到達したら、そのインデックスを返す
-                return pos - this.n;
+                return pos - n;
             }
             // 今のブロックを足しても条件を満たすなら、足して次へ
-            product = this.op(product, this.tree[pos]);
+            product = op(product, tree[pos]);
             pos++;
         } while ((pos & -pos) !== pos); // posが2冪のときまで繰り返す
         // 最後まで行ったらサイズを返す
@@ -263,6 +273,10 @@ export class SegmentTree<T> {
      * @throws Error - fn(e)がfalseの場合
      */
     minLeft(r: number, fn: (product: T) => boolean): number {
+        // 複数回アクセスするtree, op, nをローカル変数にキャッシュ
+        const tree = this.tree;
+        const op = this.op;
+        const n = this.n;
         if (r < 0 || r > this.originalSize) {
             throw new RangeError("Index out of bounds");
         }
@@ -272,7 +286,7 @@ export class SegmentTree<T> {
         if (r === 0) {
             return 0;
         }
-        let pos = r + this.n;
+        let pos = r + n;
         let product = this.e;
 
         do {
@@ -282,22 +296,22 @@ export class SegmentTree<T> {
                 pos >>= 1;
             }
             // 今のブロック (tree[pos]) を足すと条件を満たさなくなるかチェックする
-            if (!fn(this.op(this.tree[pos], product))) {
+            if (!fn(op(tree[pos], product))) {
                 // 満たさない -> 境界はこのブロックの範囲にある -> 葉に降りていく
-                while (pos < this.n) {
+                while (pos < n) {
                     pos = pos * 2 + 1; // 右の子に降りる
                     // 右の子なら結合しても大丈夫か？をチェック
-                    if (fn(this.op(this.tree[pos], product))) {
+                    if (fn(op(tree[pos], product))) {
                         // 大丈夫なら結合して、左の子へ (さらに左を探る)
-                        product = this.op(this.tree[pos], product);
+                        product = op(tree[pos], product);
                         pos--; // 左の子へ
                     }
                 }
                 // 葉ノードに到達したら、そのインデックスを返す
-                return pos + 1 - this.n;
+                return pos + 1 - n;
             }
             // 今のブロックを足しても条件を満たすなら、足して次へ
-            product = this.op(this.tree[pos], product);
+            product = op(tree[pos], product);
         } while ((pos & -pos) !== pos); // posが2冪のときまで繰り返す
         // 最後まで行ったら0を返す
         return 0;
