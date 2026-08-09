@@ -11,15 +11,15 @@
  */
 export class SegmentTree<T> {
     /** 単位元 */
-    private e: T;
+    #e: T;
     /**モノイド演算を表す関数 */
-    private op: (a: T, b: T) => T;
+    #op: (a: T, b: T) => T;
     /** セグメント木のサイズ */
-    private n: number;
+    #size: number;
     /** セグメント木のコンストラクタに渡されたサイズ */
-    private originalSize: number;
+    #originalSize: number;
     /** セグメント木の内部配列 */
-    private tree: T[];
+    #tree: T[];
 
     /**
      * 新しいSegmentTreeインスタンスを生成します。
@@ -41,22 +41,22 @@ export class SegmentTree<T> {
      */
     constructor(e: T, op: (a: T, b: T) => T, size: number, initialValues?: T[]) {
         // eとopはそのまま保存
-        this.e = e;
-        this.op = op;
-        this.originalSize = size;
+        this.#e = e;
+        this.#op = op;
+        this.#originalSize = size;
         // sizeは与えられたsize以上の最小の2冪に設定
-        this.n = 2 ** Math.ceil(Math.log2(size));
+        this.#size = 2 ** Math.ceil(Math.log2(size));
         // data配列を初期化
         // oxlint-disable-next-line unicorn/no-new-array
-        this.tree = new Array(this.n * 2).fill(e);
+        this.#tree = new Array(this.#size * 2).fill(e);
         // initialValuesが与えられた場合、data配列の後半にセット
         if (initialValues) {
             for (let i = 0; i < initialValues.length; i++) {
-                this.tree[this.n + i] = initialValues[i];
+                this.#tree[this.#size + i] = initialValues[i];
             }
             // 前半を構築 (initialValuesが与えられなかった場合はeのままなので飛ばされる)
-            for (let i = this.n - 1; i > 0; i--) {
-                this.tree[i] = this.op(this.tree[i << 1], this.tree[(i << 1) | 1]);
+            for (let i = this.#size - 1; i > 0; i--) {
+                this.#tree[i] = this.#op(this.#tree[i << 1], this.#tree[(i << 1) | 1]);
             }
         }
     }
@@ -77,16 +77,13 @@ export class SegmentTree<T> {
      * @param value - 新しい値
      */
     set(index: number, value: T): void {
-        // 複数回アクセスするオブジェクトをローカル変数にキャッシュ
-        const tree = this.tree;
-        const op = this.op;
         // 葉ノードを更新
-        let pos = index + this.n;
-        tree[pos] = value;
+        let pos = index + this.#size;
+        this.#tree[pos] = value;
         // 親ノードに駆け上がりながら値の更新を繰り返す
         while (pos > 1) {
             pos >>= 1;
-            tree[pos] = op(tree[pos << 1], tree[(pos << 1) | 1]);
+            this.#tree[pos] = this.#op(this.#tree[pos << 1], this.#tree[(pos << 1) | 1]);
         }
     }
     /**
@@ -108,7 +105,7 @@ export class SegmentTree<T> {
      * @returns 指定されたインデックスの要素
      */
     get(index: number): T {
-        return this.tree[index + this.n];
+        return this.#tree[index + this.#size];
     }
     /**
      * 半開区間[left, right)のモノイド積を計算して返します。
@@ -130,26 +127,23 @@ export class SegmentTree<T> {
      * @returns 指定された区間のモノイド積
      */
     query(left: number, right: number): T {
-        // 複数回アクセスするオブジェクトをローカル変数にキャッシュ
-        const tree = this.tree;
-        const op = this.op;
-        let sum_left = this.e;
-        let sum_right = this.e;
-        let l = left + this.n;
-        let r = right + this.n;
+        let sum_left = this.#e;
+        let sum_right = this.#e;
+        let l = left + this.#size;
+        let r = right + this.#size;
         while (l < r) {
             if (l & 1) {
-                sum_left = op(sum_left, tree[l]);
+                sum_left = this.#op(sum_left, this.#tree[l]);
                 l++;
             }
             if (r & 1) {
                 r--;
-                sum_right = op(tree[r], sum_right);
+                sum_right = this.#op(this.#tree[r], sum_right);
             }
             l >>= 1;
             r >>= 1;
         }
-        return op(sum_left, sum_right);
+        return this.#op(sum_left, sum_right);
     }
     /**
      * 半開区間[0, n)のモノイド積(すなわち、全要素のモノイド積)を返します。
@@ -168,7 +162,7 @@ export class SegmentTree<T> {
      * @returns 全要素のモノイド積
      */
     queryAll(): T {
-        return this.tree[1];
+        return this.#tree[1];
     }
     /**
      * セグメント木のサイズを返します。
@@ -184,7 +178,7 @@ export class SegmentTree<T> {
      * @returns セグメント木のサイズ
      */
     get size(): number {
-        return this.originalSize;
+        return this.#originalSize;
     }
     /**
      * 半開区間[l, r)のモノイド積について、条件fnを満たす最大のrを返します。
@@ -211,44 +205,40 @@ export class SegmentTree<T> {
      * @throws Error - fn(e)がfalseの場合
      */
     maxRight(l: number, fn: (product: T) => boolean): number {
-        // 複数回アクセスするtree, op, nをローカル変数にキャッシュ
-        const tree = this.tree;
-        const op = this.op;
-        const n = this.n;
-        if (l < 0 || l > this.originalSize) {
+        if (l < 0 || l > this.#originalSize) {
             throw new RangeError("Index out of bounds");
         }
-        if (!fn(this.e)) {
+        if (!fn(this.#e)) {
             throw new Error("fn(e) must be true");
         }
-        if (l === this.originalSize) {
-            return this.originalSize;
+        if (l === this.#originalSize) {
+            return this.#originalSize;
         }
-        let pos = l + n;
-        let product = this.e;
+        let pos = l + this.#size;
+        let product = this.#e;
         do {
             while ((pos & 1) === 0) pos >>= 1;
             // 今のブロック (tree[pos]) を足すと条件を満たさなくなるかチェックする
-            if (!fn(op(product, tree[pos]))) {
+            if (!fn(this.#op(product, this.#tree[pos]))) {
                 // 満たさない -> 境界はこのブロックの範囲にある -> 葉に降りていく
-                while (pos < n) {
+                while (pos < this.#size) {
                     // 左の子に降りる
                     pos <<= 1;
                     // 左の子を足しても大丈夫なら、左の子を採用して右の子に進む
-                    if (fn(op(product, tree[pos]))) {
-                        product = op(product, tree[pos]);
+                    if (fn(this.#op(product, this.#tree[pos]))) {
+                        product = this.#op(product, this.#tree[pos]);
                         pos++; // 右の子へ
                     }
                 }
                 // 葉ノードに到達したら、そのインデックスを返す
-                return pos - n;
+                return pos - this.#size;
             }
             // 今のブロックを足しても条件を満たすなら、足して次へ
-            product = op(product, tree[pos]);
+            product = this.#op(product, this.#tree[pos]);
             pos++;
         } while ((pos & -pos) !== pos); // posが2冪のときまで繰り返す
         // 最後まで行ったらサイズを返す
-        return this.originalSize;
+        return this.#originalSize;
     }
     /**
      * 半開区間[l, r)のモノイド積について、条件fnを満たす最小のlを返します。
@@ -275,21 +265,17 @@ export class SegmentTree<T> {
      * @throws Error - fn(e)がfalseの場合
      */
     minLeft(r: number, fn: (product: T) => boolean): number {
-        // 複数回アクセスするtree, op, nをローカル変数にキャッシュ
-        const tree = this.tree;
-        const op = this.op;
-        const n = this.n;
-        if (r < 0 || r > this.originalSize) {
+        if (r < 0 || r > this.#originalSize) {
             throw new RangeError("Index out of bounds");
         }
-        if (!fn(this.e)) {
+        if (!fn(this.#e)) {
             throw new Error("fn(e) must be true");
         }
         if (r === 0) {
             return 0;
         }
-        let pos = r + n;
-        let product = this.e;
+        let pos = r + this.#size;
+        let product = this.#e;
 
         do {
             pos--; // 半開区間なので左にずらす
@@ -298,22 +284,22 @@ export class SegmentTree<T> {
                 pos >>= 1;
             }
             // 今のブロック (tree[pos]) を足すと条件を満たさなくなるかチェックする
-            if (!fn(op(tree[pos], product))) {
+            if (!fn(this.#op(this.#tree[pos], product))) {
                 // 満たさない -> 境界はこのブロックの範囲にある -> 葉に降りていく
-                while (pos < n) {
+                while (pos < this.#size) {
                     pos = (pos << 1) | 1; // 右の子に降りる
                     // 右の子なら結合しても大丈夫か？をチェック
-                    if (fn(op(tree[pos], product))) {
+                    if (fn(this.#op(this.#tree[pos], product))) {
                         // 大丈夫なら結合して、左の子へ (さらに左を探る)
-                        product = op(tree[pos], product);
+                        product = this.#op(this.#tree[pos], product);
                         pos--; // 左の子へ
                     }
                 }
                 // 葉ノードに到達したら、そのインデックスを返す
-                return pos + 1 - n;
+                return pos + 1 - this.#size;
             }
             // 今のブロックを足しても条件を満たすなら、足して次へ
-            product = op(tree[pos], product);
+            product = this.#op(this.#tree[pos], product);
         } while ((pos & -pos) !== pos); // posが2冪のときまで繰り返す
         // 最後まで行ったら0を返す
         return 0;
