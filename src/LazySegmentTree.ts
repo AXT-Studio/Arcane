@@ -205,7 +205,7 @@ export class LazySegmentTree<S, F> {
             }
             // 前半を構築 (initialValuesが与えられなかった場合はeのままなので飛ばされる)
             for (let i = this.n - 1; i > 0; i--) {
-                this.data[i] = this.op(this.data[i * 2], this.data[i * 2 + 1]);
+                this.data[i] = this.op(this.data[i << 1], this.data[(i << 1) | 1]);
             }
         }
     }
@@ -232,8 +232,8 @@ export class LazySegmentTree<S, F> {
      * @param index - ノードのインデックス (0-indexed)
      */
     private pushNode(index: number): void {
-        const l = index * 2;
-        const r = index * 2 + 1;
+        const l = index << 1;
+        const r = (index << 1) | 1;
         const g = this.lazy[index];
         // lに伝播
         this.allApply(l, g);
@@ -249,7 +249,7 @@ export class LazySegmentTree<S, F> {
      * @param index - ノードのインデックス
      */
     private updateNode(index: number): void {
-        this.data[index] = this.op(this.data[index * 2], this.data[index * 2 + 1]);
+        this.data[index] = this.op(this.data[index << 1], this.data[(index << 1) | 1]);
     }
 
     /**
@@ -324,16 +324,16 @@ export class LazySegmentTree<S, F> {
         this.pushToLeaves(l, r);
         // 2. 区間[l, r)に作用fを作用させる
         while (left < right) {
-            if (left % 2 === 1) {
+            if (left & 1) {
                 this.allApply(left, f);
                 left++;
             }
-            if (right % 2 === 1) {
+            if (right & 1) {
                 right--;
                 this.allApply(right, f);
             }
-            left = Math.floor(left / 2);
-            right = Math.floor(right / 2);
+            left >>= 1;
+            right >>= 1;
         }
         // 3. 後処理: 変更があった部分の親ノードを再計算する
         this.updateFromLeaves(l, r);
@@ -369,16 +369,16 @@ export class LazySegmentTree<S, F> {
         let res_left = this.e;
         let res_right = this.e;
         while (left < right) {
-            if (left % 2 === 1) {
+            if (left & 1) {
                 res_left = op(res_left, data[left]);
                 left++;
             }
-            if (right % 2 === 1) {
+            if (right & 1) {
                 right--;
                 res_right = op(data[right], res_right);
             }
-            left = Math.floor(left / 2);
-            right = Math.floor(right / 2);
+            left >>= 1;
+            right >>= 1;
         }
         // 3. 結果を返す
         return op(res_left, res_right);
@@ -427,7 +427,7 @@ export class LazySegmentTree<S, F> {
         let pos = left;
         do {
             // posが右の子ノードである場合、親ノードに移動
-            while (pos % 2 === 0) pos = Math.floor(pos / 2);
+            while ((pos & 1) === 0) pos >>= 1;
             // 今のブロック(tree[pos])を足すと条件を満たさなくなるかチェックする
             if (!fn(this.op(product, this.data[pos]))) {
                 // 満たさない -> 境界はこのブロックの範囲 -> 葉まで降りていく
@@ -435,7 +435,7 @@ export class LazySegmentTree<S, F> {
                     // 遅延タグを伝播させる
                     this.pushNode(pos);
                     // 左の子に降りる
-                    pos = pos * 2;
+                    pos = pos << 1;
                     // 今のブロックを足しても条件を満たすなら、足して右の子へ
                     if (fn(this.op(product, this.data[pos]))) {
                         product = this.op(product, this.data[pos]);
@@ -498,8 +498,8 @@ export class LazySegmentTree<S, F> {
             // 半開区間なので、とりあえず一個左に移動
             pos--;
             // 登れるだけ親に登る
-            while (pos > 1 && pos % 2 === 1) {
-                pos = Math.floor(pos / 2);
+            while (pos > 1 && pos & 1) {
+                pos >>= 1;
             }
             // 今のブロック(tree[pos])を足すと条件を満たさなくなるかチェックする
             if (!fn(this.op(this.data[pos], product))) {
@@ -508,7 +508,7 @@ export class LazySegmentTree<S, F> {
                     // 遅延タグを伝播させる
                     this.pushNode(pos);
                     // 右の子に降りる
-                    pos = pos * 2 + 1;
+                    pos = (pos << 1) | 1;
                     // 右の子なら結合しても大丈夫か？をチェック
                     if (fn(this.op(this.data[pos], product))) {
                         // 大丈夫なら結合して、左の子へ (さらに左を探る)

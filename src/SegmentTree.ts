@@ -54,7 +54,7 @@ export class SegmentTree<T> {
             }
             // 前半を構築 (initialValuesが与えられなかった場合はeのままなので飛ばされる)
             for (let i = this.n - 1; i > 0; i--) {
-                this.tree[i] = this.op(this.tree[i * 2], this.tree[i * 2 + 1]);
+                this.tree[i] = this.op(this.tree[i << 1], this.tree[(i << 1) | 1]);
             }
         }
     }
@@ -83,8 +83,8 @@ export class SegmentTree<T> {
         tree[pos] = value;
         // 親ノードに駆け上がりながら値の更新を繰り返す
         while (pos > 1) {
-            pos = Math.floor(pos / 2);
-            tree[pos] = op(tree[pos * 2], tree[pos * 2 + 1]);
+            pos >>= 1;
+            tree[pos] = op(tree[pos << 1], tree[(pos << 1) | 1]);
         }
     }
     /**
@@ -136,16 +136,16 @@ export class SegmentTree<T> {
         let l = left + this.n;
         let r = right + this.n;
         while (l < r) {
-            if (l % 2 === 1) {
+            if (l & 1) {
                 sum_left = op(sum_left, tree[l]);
                 l++;
             }
-            if (r % 2 === 1) {
+            if (r & 1) {
                 r--;
                 sum_right = op(tree[r], sum_right);
             }
-            l = Math.floor(l / 2);
-            r = Math.floor(r / 2);
+            l >>= 1;
+            r >>= 1;
         }
         return op(sum_left, sum_right);
     }
@@ -225,13 +225,13 @@ export class SegmentTree<T> {
         let pos = l + n;
         let product = this.e;
         do {
-            while (pos % 2 === 0) pos >>= 1;
+            while ((pos & 1) === 0) pos >>= 1;
             // 今のブロック (tree[pos]) を足すと条件を満たさなくなるかチェックする
             if (!fn(op(product, tree[pos]))) {
                 // 満たさない -> 境界はこのブロックの範囲にある -> 葉に降りていく
                 while (pos < n) {
                     // 左の子に降りる
-                    pos = pos * 2;
+                    pos <<= 1;
                     // 左の子を足しても大丈夫なら、左の子を採用して右の子に進む
                     if (fn(op(product, tree[pos]))) {
                         product = op(product, tree[pos]);
@@ -292,14 +292,14 @@ export class SegmentTree<T> {
         do {
             pos--; // 半開区間なので左にずらす
             // 登れるだけ親に登る
-            while (pos > 1 && pos % 2 === 1) {
+            while (pos > 1 && pos & 1) {
                 pos >>= 1;
             }
             // 今のブロック (tree[pos]) を足すと条件を満たさなくなるかチェックする
             if (!fn(op(tree[pos], product))) {
                 // 満たさない -> 境界はこのブロックの範囲にある -> 葉に降りていく
                 while (pos < n) {
-                    pos = pos * 2 + 1; // 右の子に降りる
+                    pos = (pos << 1) | 1; // 右の子に降りる
                     // 右の子なら結合しても大丈夫か？をチェック
                     if (fn(op(tree[pos], product))) {
                         // 大丈夫なら結合して、左の子へ (さらに左を探る)
