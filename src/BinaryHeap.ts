@@ -497,6 +497,8 @@ export class BinaryHeapLite<T> {
      */
     #downHeap(startIndex: number): number {
         let currentIndex = startIndex;
+        // valueをずらしていくので一旦退避
+        const value = this.#elements[currentIndex];
         while (true) {
             const leftChildIndex = currentIndex * 2;
             const rightChildIndex = currentIndex * 2 + 1;
@@ -515,20 +517,18 @@ export class BinaryHeapLite<T> {
                     compareTargetChildIndex = rightChildIndex;
                 }
             }
-            // 親より子の方が優先度高ければ交換
-            if (this.#compareFn(this.#elements[compareTargetChildIndex] as T, this.#elements[currentIndex] as T) < 0) {
-                // indexMapを先に更新
-                const currentElement = this.#elements[currentIndex];
-                const childElement = this.#elements[compareTargetChildIndex];
-                // 交換
-                [this.#elements[currentIndex], this.#elements[compareTargetChildIndex]] = [
-                    childElement,
-                    currentElement,
-                ];
+            // 親より子の方が優先度高ければずらす
+            if (this.#compareFn(this.#elements[compareTargetChildIndex] as T, value as T) < 0) {
+                // ずらす
+                this.#elements[currentIndex] = this.#elements[compareTargetChildIndex];
                 currentIndex = compareTargetChildIndex;
             } else {
                 break;
             }
+        }
+        // ずらした先にvalueを移す
+        if (currentIndex !== startIndex) {
+            this.#elements[currentIndex] = value;
         }
         return currentIndex;
     }
@@ -541,19 +541,22 @@ export class BinaryHeapLite<T> {
      */
     #upHeap(startIndex: number): number {
         let currentIndex = startIndex;
+        // valueをずらしていくので一旦退避
+        const value = this.#elements[currentIndex];
         while (currentIndex > 1) {
             const parentIndex = Math.floor(currentIndex / 2);
-            // 子の方が優先度高ければ交換
-            if (this.#compareFn(this.#elements[currentIndex] as T, this.#elements[parentIndex] as T) < 0) {
-                // indexMapを先に更新
-                const currentElement = this.#elements[currentIndex];
-                const parentElement = this.#elements[parentIndex];
-                // 交換
-                [this.#elements[currentIndex], this.#elements[parentIndex]] = [parentElement, currentElement];
+            // 子の方が優先度高ければずらす
+            if (this.#compareFn(value as T, this.#elements[parentIndex] as T) < 0) {
+                // ずらす
+                this.#elements[currentIndex] = this.#elements[parentIndex];
                 currentIndex = parentIndex;
             } else {
                 break;
             }
+        }
+        // ずらした先にvalueを移す
+        if (currentIndex !== startIndex) {
+            this.#elements[currentIndex] = value;
         }
         return currentIndex;
     }
