@@ -90,6 +90,8 @@ export class BinaryHeap<T> {
      */
     #downHeap(startIndex: number, editIndexMap: boolean = true): number {
         let currentIndex = startIndex;
+        // valueをずらしていくので一旦退避
+        const value = this.#elements[currentIndex];
         while (true) {
             const leftChildIndex = currentIndex * 2;
             const rightChildIndex = currentIndex * 2 + 1;
@@ -108,32 +110,34 @@ export class BinaryHeap<T> {
                     compareTargetChildIndex = rightChildIndex;
                 }
             }
-            // 親より子の方が優先度高ければ交換
-            if (this.#compareFn(this.#elements[compareTargetChildIndex] as T, this.#elements[currentIndex] as T) < 0) {
-                // indexMapを先に更新
-                const currentElement = this.#elements[currentIndex];
+            // 親より子の方が優先度高ければずらす
+            if (this.#compareFn(this.#elements[compareTargetChildIndex] as T, value as T) < 0) {
+                // indexMapを先にずらす
                 const childElement = this.#elements[compareTargetChildIndex];
                 if (editIndexMap) {
-                    const currentIndexSet = this.#indexMap.get(currentElement as T);
                     const childIndexSet = this.#indexMap.get(childElement as T);
-                    if (currentIndexSet) {
-                        currentIndexSet.delete(currentIndex);
-                        currentIndexSet.add(compareTargetChildIndex);
-                    }
                     if (childIndexSet) {
                         childIndexSet.delete(compareTargetChildIndex);
                         childIndexSet.add(currentIndex);
                     }
                 }
-                // 交換
-                [this.#elements[currentIndex], this.#elements[compareTargetChildIndex]] = [
-                    childElement,
-                    currentElement,
-                ];
+                // ずらす
+                this.#elements[currentIndex] = childElement;
                 currentIndex = compareTargetChildIndex;
             } else {
                 break;
             }
+        }
+        // ずらした先にvalueとindexMapを移す
+        if (currentIndex !== startIndex) {
+            if (editIndexMap) {
+                const valueIndexSet = this.#indexMap.get(value as T);
+                if (valueIndexSet) {
+                    valueIndexSet.delete(startIndex);
+                    valueIndexSet.add(currentIndex);
+                }
+            }
+            this.#elements[currentIndex] = value;
         }
         return currentIndex;
     }
@@ -146,29 +150,34 @@ export class BinaryHeap<T> {
      */
     #upHeap(startIndex: number): number {
         let currentIndex = startIndex;
+        // valueをずらしていくので一旦退避
+        const value = this.#elements[currentIndex];
         while (currentIndex > 1) {
             const parentIndex = Math.floor(currentIndex / 2);
-            // 子の方が優先度高ければ交換
-            if (this.#compareFn(this.#elements[currentIndex] as T, this.#elements[parentIndex] as T) < 0) {
+            // 子の方が優先度高ければずらす
+            if (this.#compareFn(value as T, this.#elements[parentIndex] as T) < 0) {
                 // indexMapを先に更新
-                const currentElement = this.#elements[currentIndex];
                 const parentElement = this.#elements[parentIndex];
-                const currentIndexSet = this.#indexMap.get(currentElement as T);
                 const parentIndexSet = this.#indexMap.get(parentElement as T);
-                if (currentIndexSet) {
-                    currentIndexSet.delete(currentIndex);
-                    currentIndexSet.add(parentIndex);
-                }
                 if (parentIndexSet) {
                     parentIndexSet.delete(parentIndex);
                     parentIndexSet.add(currentIndex);
                 }
-                // 交換
-                [this.#elements[currentIndex], this.#elements[parentIndex]] = [parentElement, currentElement];
+                // ずらす
+                this.#elements[currentIndex] = parentElement;
                 currentIndex = parentIndex;
             } else {
                 break;
             }
+        }
+        // ずらした先にvalueとindexMapを移す
+        if (currentIndex !== startIndex) {
+            const valueIndexSet = this.#indexMap.get(value as T);
+            if (valueIndexSet) {
+                valueIndexSet.delete(startIndex);
+                valueIndexSet.add(currentIndex);
+            }
+            this.#elements[currentIndex] = value;
         }
         return currentIndex;
     }
@@ -333,9 +342,10 @@ export class BinaryHeap<T> {
         } else {
             this.#indexMap.set(lastElement, new Set([removeTargetIndex]));
         }
-        // up-heapとdown-heapの両方を試みる その必要がなければ何もしないように作ったので簡単にかける
-        const finalIndex = this.#upHeap(removeTargetIndex);
-        if (finalIndex === removeTargetIndex) {
+        // up-heapとdown-heapを試みる
+        if (removeTargetIndex > 1 && this.#compareFn(lastElement, this.#elements[removeTargetIndex >> 1] as T) < 0) {
+            this.#upHeap(removeTargetIndex);
+        } else {
             this.#downHeap(removeTargetIndex);
         }
         return true;
@@ -363,11 +373,35 @@ export class BinaryHeap<T> {
      * @returns 更新に成功した場合は`true`、`oldValue`が見つからなかった場合は`false`
      */
     update(oldValue: T, newValue: T): boolean {
-        if (this.remove(oldValue)) {
-            this.push(newValue);
-            return true;
+        // remove→pushで実現できるが、個別に実装したほうが早い！
+        const indexSet = this.#indexMap.get(oldValue);
+        if (!indexSet || indexSet.size === 0) {
+            return false;
         }
-        return false;
+        const targetIndex = indexSet.values().next().value;
+        if (targetIndex === undefined) {
+            return false;
+        }
+        // indexMapの張り替え (oldValue -> newValue, 位置は不変)
+        indexSet.delete(targetIndex);
+        if (indexSet.size === 0) {
+            this.#indexMap.delete(oldValue);
+        }
+        const newIndexSet = this.#indexMap.get(newValue);
+        if (newIndexSet) {
+            newIndexSet.add(targetIndex);
+        } else {
+            this.#indexMap.set(newValue, new Set([targetIndex]));
+        }
+        // 値をその場で差し替え
+        this.#elements[targetIndex] = newValue;
+        // 親と1回比較してupHeapするかdownHeapするかを決定する
+        if (targetIndex > 1 && this.#compareFn(newValue, this.#elements[targetIndex >> 1] as T) < 0) {
+            this.#upHeap(targetIndex);
+        } else {
+            this.#downHeap(targetIndex);
+        }
+        return true;
     }
 
     /**
