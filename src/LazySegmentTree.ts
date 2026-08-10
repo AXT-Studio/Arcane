@@ -152,6 +152,7 @@ export class LazySegmentTree<S, F> {
     /**
      * 新しいLazySegmentTreeインスタンスを生成します。
      * 初期値として配列を与えることができます。初期値の長さが`size`に満たない場合、残りの要素はすべて`e`で初期化されます。
+     * (`e`がオブジェクトで初期化時に各要素が同じオブジェクトへの参照となってほしくない場合は、自力で初期化する必要があります。)
      *
      * 時間計算量: O(N) (Nはセグメント木のサイズ`size`)
      *
@@ -195,9 +196,11 @@ export class LazySegmentTree<S, F> {
         this.#log = Math.ceil(Math.log2(size));
         this.#size = 2 ** this.#log;
         // lazyを初期化
-        this.#lazy = Array.from({ length: this.#size * 2 }, () => id);
+        // oxlint-disable-next-line unicorn/no-new-array
+        this.#lazy = new Array(this.#size * 2).fill(id);
         // data配列を初期化
-        this.#data = Array.from({ length: this.#size * 2 }, () => e);
+        // oxlint-disable-next-line unicorn/no-new-array
+        this.#data = new Array(this.#size * 2).fill(e);
         // initialValuesが与えられた場合、data配列の後半にセット
         if (initialValues) {
             for (let i = 0; i < initialValues.length; i++) {
@@ -205,7 +208,7 @@ export class LazySegmentTree<S, F> {
             }
             // 前半を構築 (initialValuesが与えられなかった場合はeのままなので飛ばされる)
             for (let i = this.#size - 1; i > 0; i--) {
-                this.#data[i] = this.#op(this.#data[i * 2], this.#data[i * 2 + 1]);
+                this.#data[i] = this.#op(this.#data[i << 1], this.#data[(i << 1) | 1]);
             }
         }
     }
@@ -229,8 +232,8 @@ export class LazySegmentTree<S, F> {
      * @param index - ノードのインデックス (0-indexed)
      */
     #push(index: number): void {
-        const l = index * 2;
-        const r = index * 2 + 1;
+        const l = index << 1;
+        const r = (index << 1) | 1;
         // lに伝播
         this.#all_apply(l, this.#lazy[index]);
         // rに伝播
@@ -245,7 +248,7 @@ export class LazySegmentTree<S, F> {
      * @param index - ノードのインデックス
      */
     #update(index: number): void {
-        this.#data[index] = this.#op(this.#data[index * 2], this.#data[index * 2 + 1]);
+        this.#data[index] = this.#op(this.#data[index << 1], this.#data[(index << 1) | 1]);
     }
 
     /**
@@ -320,16 +323,16 @@ export class LazySegmentTree<S, F> {
         this.#pushToLeaves(l, r);
         // 2. 区間[l, r)に作用fを作用させる
         while (left < right) {
-            if (left % 2 === 1) {
+            if (left & 1) {
                 this.#all_apply(left, f);
                 left++;
             }
-            if (right % 2 === 1) {
+            if (right & 1) {
                 right--;
                 this.#all_apply(right, f);
             }
-            left = Math.floor(left / 2);
-            right = Math.floor(right / 2);
+            left >>= 1;
+            right >>= 1;
         }
         // 3. 後処理: 変更があった部分の親ノードを再計算する
         this.#updateFromLeaves(l, r);
@@ -362,16 +365,16 @@ export class LazySegmentTree<S, F> {
         let res_left = this.#e;
         let res_right = this.#e;
         while (left < right) {
-            if (left % 2 === 1) {
+            if (left & 1) {
                 res_left = this.#op(res_left, this.#data[left]);
                 left++;
             }
-            if (right % 2 === 1) {
+            if (right & 1) {
                 right--;
                 res_right = this.#op(this.#data[right], res_right);
             }
-            left = Math.floor(left / 2);
-            right = Math.floor(right / 2);
+            left >>= 1;
+            right >>= 1;
         }
         // 3. 結果を返す
         return this.#op(res_left, res_right);
@@ -420,7 +423,7 @@ export class LazySegmentTree<S, F> {
         let pos = left;
         do {
             // posが右の子ノードである場合、親ノードに移動
-            while (pos % 2 === 0) pos = Math.floor(pos / 2);
+            while ((pos & 1) === 0) pos >>= 1;
             // 今のブロック(tree[pos])を足すと条件を満たさなくなるかチェックする
             if (!fn(this.#op(product, this.#data[pos]))) {
                 // 満たさない -> 境界はこのブロックの範囲 -> 葉まで降りていく
@@ -428,7 +431,7 @@ export class LazySegmentTree<S, F> {
                     // 遅延タグを伝播させる
                     this.#push(pos);
                     // 左の子に降りる
-                    pos = pos * 2;
+                    pos = pos << 1;
                     // 今のブロックを足しても条件を満たすなら、足して右の子へ
                     if (fn(this.#op(product, this.#data[pos]))) {
                         product = this.#op(product, this.#data[pos]);
@@ -491,8 +494,8 @@ export class LazySegmentTree<S, F> {
             // 半開区間なので、とりあえず一個左に移動
             pos--;
             // 登れるだけ親に登る
-            while (pos > 1 && pos % 2 === 1) {
-                pos = Math.floor(pos / 2);
+            while (pos > 1 && pos & 1) {
+                pos >>= 1;
             }
             // 今のブロック(tree[pos])を足すと条件を満たさなくなるかチェックする
             if (!fn(this.#op(this.#data[pos], product))) {
@@ -501,7 +504,7 @@ export class LazySegmentTree<S, F> {
                     // 遅延タグを伝播させる
                     this.#push(pos);
                     // 右の子に降りる
-                    pos = pos * 2 + 1;
+                    pos = (pos << 1) | 1;
                     // 右の子なら結合しても大丈夫か？をチェック
                     if (fn(this.#op(this.#data[pos], product))) {
                         // 大丈夫なら結合して、左の子へ (さらに左を探る)
@@ -577,7 +580,11 @@ export class LazySegmentTree<S, F> {
      * @returns index番目の要素
      */
     get(index: number): S {
-        return this.query(index, index + 1);
+        const pos = index + this.#size;
+        for (let i = this.#log; i > 0; i--) {
+            this.#push(pos >> i);
+        }
+        return this.#data[pos];
     }
 
     /**
@@ -597,14 +604,14 @@ export class LazySegmentTree<S, F> {
      * @param value - 新しい値
      */
     set(index: number, value: S): void {
-        // indexに対応する葉ノードの位置を求める
-        const leaf = index + this.#size;
-        // 前処理: 上にある遅延を邪魔にならないように全部落とす
-        this.#pushToLeaves(index, index + 1);
-        // 値を上書き (遅延タグlazyはここには溜まっていないはずなのでdataだけでOK)
-        this.#data[leaf] = value;
-        // 後処理: 親を再計算
-        this.#updateFromLeaves(index, index + 1);
+        const pos = index + this.#size;
+        for (let i = this.#log; i > 0; i--) {
+            this.#push(pos >> i);
+        }
+        this.#data[pos] = value;
+        for (let i = 1; i <= this.#log; i++) {
+            this.#update(pos >> i);
+        }
     }
 
     /**

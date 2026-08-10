@@ -24,6 +24,7 @@ export class SegmentTree<T> {
     /**
      * 新しいSegmentTreeインスタンスを生成します。
      * 初期値として配列を与えることができます。初期値の長さが`size`に満たない場合、残りの要素は単位元`e`で埋められます。
+     * (`e`がオブジェクトで初期化時に各要素が同じオブジェクトへの参照となってほしくない場合は、自力で初期化する必要があります。)
      *
      * 時間計算量: O(N) (Nは`size`の値)
      *
@@ -46,7 +47,8 @@ export class SegmentTree<T> {
         // sizeは与えられたsize以上の最小の2冪に設定
         this.#size = 2 ** Math.ceil(Math.log2(size));
         // data配列を初期化
-        this.#tree = Array.from({ length: this.#size * 2 }, () => e);
+        // oxlint-disable-next-line unicorn/no-new-array
+        this.#tree = new Array(this.#size * 2).fill(e);
         // initialValuesが与えられた場合、data配列の後半にセット
         if (initialValues) {
             for (let i = 0; i < initialValues.length; i++) {
@@ -54,7 +56,7 @@ export class SegmentTree<T> {
             }
             // 前半を構築 (initialValuesが与えられなかった場合はeのままなので飛ばされる)
             for (let i = this.#size - 1; i > 0; i--) {
-                this.#tree[i] = this.#op(this.#tree[i * 2], this.#tree[i * 2 + 1]);
+                this.#tree[i] = this.#op(this.#tree[i << 1], this.#tree[(i << 1) | 1]);
             }
         }
     }
@@ -80,8 +82,8 @@ export class SegmentTree<T> {
         this.#tree[pos] = value;
         // 親ノードに駆け上がりながら値の更新を繰り返す
         while (pos > 1) {
-            pos = Math.floor(pos / 2);
-            this.#tree[pos] = this.#op(this.#tree[pos * 2], this.#tree[pos * 2 + 1]);
+            pos >>= 1;
+            this.#tree[pos] = this.#op(this.#tree[pos << 1], this.#tree[(pos << 1) | 1]);
         }
     }
     /**
@@ -130,16 +132,16 @@ export class SegmentTree<T> {
         let l = left + this.#size;
         let r = right + this.#size;
         while (l < r) {
-            if (l % 2 === 1) {
+            if (l & 1) {
                 sum_left = this.#op(sum_left, this.#tree[l]);
                 l++;
             }
-            if (r % 2 === 1) {
+            if (r & 1) {
                 r--;
                 sum_right = this.#op(this.#tree[r], sum_right);
             }
-            l = Math.floor(l / 2);
-            r = Math.floor(r / 2);
+            l >>= 1;
+            r >>= 1;
         }
         return this.#op(sum_left, sum_right);
     }
@@ -215,13 +217,13 @@ export class SegmentTree<T> {
         let pos = l + this.#size;
         let product = this.#e;
         do {
-            while (pos % 2 === 0) pos >>= 1;
+            while ((pos & 1) === 0) pos >>= 1;
             // 今のブロック (tree[pos]) を足すと条件を満たさなくなるかチェックする
             if (!fn(this.#op(product, this.#tree[pos]))) {
                 // 満たさない -> 境界はこのブロックの範囲にある -> 葉に降りていく
                 while (pos < this.#size) {
                     // 左の子に降りる
-                    pos = pos * 2;
+                    pos <<= 1;
                     // 左の子を足しても大丈夫なら、左の子を採用して右の子に進む
                     if (fn(this.#op(product, this.#tree[pos]))) {
                         product = this.#op(product, this.#tree[pos]);
@@ -278,14 +280,14 @@ export class SegmentTree<T> {
         do {
             pos--; // 半開区間なので左にずらす
             // 登れるだけ親に登る
-            while (pos > 1 && pos % 2 === 1) {
+            while (pos > 1 && pos & 1) {
                 pos >>= 1;
             }
             // 今のブロック (tree[pos]) を足すと条件を満たさなくなるかチェックする
             if (!fn(this.#op(this.#tree[pos], product))) {
                 // 満たさない -> 境界はこのブロックの範囲にある -> 葉に降りていく
                 while (pos < this.#size) {
-                    pos = pos * 2 + 1; // 右の子に降りる
+                    pos = (pos << 1) | 1; // 右の子に降りる
                     // 右の子なら結合しても大丈夫か？をチェック
                     if (fn(this.#op(this.#tree[pos], product))) {
                         // 大丈夫なら結合して、左の子へ (さらに左を探る)
