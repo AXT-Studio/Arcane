@@ -6,6 +6,7 @@ export { Deque } from "./src/Deque.ts";
 export { DisjointSet } from "./src/DisjointSet.ts";
 export { ExtendedMath } from "./src/ExtendedMath.ts";
 export { GraphAdjacencyList } from "./src/GraphAdjacencyList.ts";
+export { UndirectedGraph, DirectedGraph, WeightedDirectedGraph, WeightedUndirectedGraph } from "./src/Graphs.ts";
 export { GridIndex2D } from "./src/GridIndex2D.ts";
 export { Iteration } from "./src/Iteration.ts";
 export { LazySegmentTree } from "./src/LazySegmentTree.ts";
