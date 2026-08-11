@@ -618,6 +618,7 @@ describe("DirectedGraph.getSCC の追加ケース", () => {
             edges.push([u, v]);
         }
         const sccs = DirectedGraph.getSCC(g);
+        // oxlint-disable-next-line unicorn/no-new-array
         const groupIndex = new Array<number>(n);
         sccs.forEach((comp, idx) => {
             for (const v of comp) groupIndex[v] = idx;
