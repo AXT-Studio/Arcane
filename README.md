@@ -71,3 +71,4 @@ Released under the [MIT License](LICENSE).
 - Format: `pnpm run fmt` (`pnpm run fmt:check`)
 - Lint: `pnpm run lint:fix` (`pnpm run lint`)
 - Test: `pnpm run test`
+    - Check slow-types: `pnpm run test:jsr`
