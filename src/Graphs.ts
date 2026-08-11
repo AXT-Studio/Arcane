@@ -610,45 +610,45 @@ export class DirectedGraph {
      */
     static getSCC(g: DirectedGraph): number[][] {
         // 適当な頂点から深さ優先探索して、帰りがけ順を記録
-        // ランタイムの都合で再帰DFSを回避したいので、~vを番兵とする
+        // ランタイムの都合で再帰関数を回避したいので、~vを番兵とする
         // oxlint-disable-next-line unicorn/no-new-array
-        const dfs1_visited = new Array<boolean>(g.vertexCount).fill(false);
-        const dfs1_postOrder: number[] = [];
+        const visited_1 = new Array<boolean>(g.vertexCount).fill(false);
+        const postorder: number[] = [];
         for (let start = 0; start < g.vertexCount; start++) {
-            if (dfs1_visited[start]) continue;
+            if (visited_1[start]) continue;
             const stack = [start];
             while (stack.length > 0) {
                 const v = stack.pop()!;
                 if (v < 0) {
                     // vが負の場合は番兵なので、復元して帰りがけ順に記録する
-                    dfs1_postOrder.push(~v);
+                    postorder.push(~v);
                     continue;
                 }
-                if (dfs1_visited[v]) continue;
-                dfs1_visited[v] = true;
+                if (visited_1[v]) continue;
+                visited_1[v] = true;
                 stack.push(~v); // 帰りがけ用の番兵を先に入れておく
                 for (const next of g.outEdges(v)) {
-                    if (!dfs1_visited[next]) stack.push(next);
+                    if (!visited_1[next]) stack.push(next);
                 }
             }
         }
         // 有向辺の向きをすべて逆にしたグラフを作る
         const reversed = g.reversed();
-        // それに対して、帰りがけ順をpopする形でDFS
+        // それに対して、帰りがけ順をpopする形で深さ優先探索
         // oxlint-disable-next-line unicorn/no-new-array
-        const dfs2_visited = new Array<boolean>(g.vertexCount).fill(false);
+        const visited_2 = new Array<boolean>(g.vertexCount).fill(false);
         const SCCs: number[][] = [];
-        for (let i = dfs1_postOrder.length - 1; i >= 0; i--) {
-            const start = dfs1_postOrder[i];
-            if (dfs2_visited[start]) continue;
+        for (let i = postorder.length - 1; i >= 0; i--) {
+            const start = postorder[i];
+            if (visited_2[start]) continue;
             const stack = [start];
             const group: number[] = [start];
-            dfs2_visited[start] = true;
+            visited_2[start] = true;
             while (stack.length > 0) {
                 const v = stack.pop()!;
                 for (const next of reversed.outEdges(v)) {
-                    if (!dfs2_visited[next]) {
-                        dfs2_visited[next] = true;
+                    if (!visited_2[next]) {
+                        visited_2[next] = true;
                         stack.push(next);
                         group.push(next);
                     }
