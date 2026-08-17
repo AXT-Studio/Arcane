@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { CubicBezierEasing } from "../src/Easing.ts";
+import { CubicBezierEasing } from "../src/Easings.ts";
 
 /** ドキュメントどおり、戻り値の誤差は高々 1.5 * eps */
 const DEFAULT_EPS = 1e-6;
