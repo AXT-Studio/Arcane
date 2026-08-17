@@ -11,13 +11,18 @@
  *     - この制限により、このクラスでは「跳ね返り効果をもつイージング」を扱うことができません。
  * - 計算結果について、その許容誤差の目安を指定することができます。
  *     - デフォルトでは10^(-6) (1e-6)となっています。
- *     - 最大でepsの1.5倍の誤差が出ます。
+ *     - 最大でepsの1.5倍程度の誤差が出ます。
  *     - あまりepsを小さくしすぎると無限ループするため注意してください。
  */
 export class CubicBezierEasing {
     /**
      * 使用頻度の高いイージングについて、その制御点座標をまとめたオブジェクトです。
      * イージングの名称は概ねpostcss-easingsと同じものがついています。
+     *
+     * @example
+     * ```ts
+     * CubicBezierEasing.apply(0.5, CubicBezierEasing.ctrlPts.easeInLinear); // => 0.5
+     * ```
      */
     static ctrlPts: Record<
         `ease${"In" | "Out" | "InOut" | "OutIn"}${"Linear" | "Sine" | "Cubic" | "Quad" | "Quart" | "Quint" | "Expo" | "Circ"}`,
@@ -90,6 +95,13 @@ export class CubicBezierEasing {
      *
      * 時間計算量: O(log(1/eps))
      *
+     * @example
+     * ```ts
+     * CubicBezierEasing.apply(0.5, [1 / 3, 0, 2 / 3, 0]); // => 0.125
+     * CubicBezierEasing.apply(-1, CubicBezierEasing.ctrlPts.easeInSine); // => 0
+     * CubicBezierEasing.apply(2, CubicBezierEasing.ctrlPts.easeInSine); // => 1
+     * ```
+     *
      * @param x - イージングを適用する前の値
      * @param easing - イージング関数 (制御点の座標で指定)
      * @param eps - 許容誤差の目安 (デフォルト1e-6、小さくしすぎると無限ループするため注意)
@@ -106,6 +118,11 @@ export class CubicBezierEasing {
      * yが0以下である場合は0を、1以上である場合は1を返します。
      *
      * 時間計算量: O(log(1/eps))
+     *
+     * @example
+     * ```ts
+     * CubicBezierEasing.invert(0.125, [1 / 3, 0, 2 / 3, 0]); // => 0.5
+     * ```
      *
      * @param y - イージングを適用したあとの値
      * @param easing - イージング関数 (制御点の座標で指定)
