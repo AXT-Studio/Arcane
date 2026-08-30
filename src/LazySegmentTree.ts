@@ -283,17 +283,19 @@ export class LazySegmentTree<S, F> {
         let res_right = this.#e;
         while (left < right) {
             if (left & 1) {
-                res_left = this.#op(res_left, this.#data[left]);
+                res_left = res_left === this.#e ? this.#data[left] : this.#op(res_left, this.#data[left]);
                 left++;
             }
             if (right & 1) {
                 right--;
-                res_right = this.#op(this.#data[right], res_right);
+                res_right = res_right === this.#e ? this.#data[right] : this.#op(this.#data[right], res_right);
             }
             left >>= 1;
             right >>= 1;
         }
         // 3. 結果を返す
+        if (res_left === this.#e) return res_right;
+        if (res_right === this.#e) return res_left;
         return this.#op(res_left, res_right);
     }
 
