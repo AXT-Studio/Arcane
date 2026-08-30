@@ -70,9 +70,23 @@ describe("LazySegmentTree の @example", () => {
         const lazySegTree = maxChmaxTree();
         expect(lazySegTree.size).toBe(100);
     });
+
+    it("constructor は size が 1 のとき生成できる", () => {
+        const tree = maxChmaxTree(1);
+        expect(tree.size).toBe(1);
+        expect(tree.queryAll()).toBe(-Infinity);
+    });
 });
 
 describe("LazySegmentTree のエラー", () => {
+    it("constructor は size が 1 未満・非整数・2^30 超のとき RangeError", () => {
+        expect(() => maxChmaxTree(0)).toThrow(RangeError);
+        expect(() => maxChmaxTree(-1)).toThrow(RangeError);
+        expect(() => maxChmaxTree(1.5)).toThrow(RangeError);
+        expect(() => maxChmaxTree(Number.NaN)).toThrow(RangeError);
+        expect(() => maxChmaxTree(2 ** 30 + 1)).toThrow(RangeError);
+    });
+
     it("maxRight は l が範囲外のとき Error", () => {
         const lazySegTree = maxChmaxTree();
         expect(() => lazySegTree.maxRight(-1, () => true)).toThrow(Error);
@@ -152,19 +166,18 @@ describe("競プロ典型90問 029 - Long Bricks サンプル通過確認", () =
     });
 });
 
-type AffineS = { val: bigint; size: bigint };
 type AffineF = { b: bigint; c: bigint };
 const AFFINE_MOD = 998244353n;
 
 function rangeAffineTree(n: number, a: bigint[]) {
-    return new LazySegmentTree<AffineS, AffineF>(
-        { val: 0n, size: 0n },
-        (x, y) => ({ val: (x.val + y.val) % AFFINE_MOD, size: x.size + y.size }),
-        (s, f) => ({ val: (s.val * f.b + s.size * f.c) % AFFINE_MOD, size: s.size }),
+    return new LazySegmentTree<bigint, AffineF>(
+        0n,
+        (x, y) => (x + y) % AFFINE_MOD,
+        (s, f, len) => (s * f.b + f.c * BigInt(len)) % AFFINE_MOD,
         { b: 1n, c: 0n },
         (newF, oldF) => ({ b: (oldF.b * newF.b) % AFFINE_MOD, c: (newF.b * oldF.c + newF.c) % AFFINE_MOD }),
         n,
-        a.map((v) => ({ val: v, size: 1n })),
+        a,
     );
 }
 
@@ -181,7 +194,7 @@ function solveRangeAffineRangeSum(
             const { b, c } = query;
             lazySegTree.apply(l, r, { b, c });
         } else {
-            answers.push(lazySegTree.query(l, r).val);
+            answers.push(lazySegTree.query(l, r));
         }
     }
     return answers;
@@ -210,68 +223,68 @@ describe("Range Affine Range Sum での残 API", () => {
     it("size と queryAll", () => {
         const tree = rangeAffineTree(5, [1n, 2n, 3n, 4n, 5n]);
         expect(tree.size).toBe(5);
-        expect(tree.queryAll()).toEqual({ val: 15n, size: 5n });
+        expect(tree.queryAll()).toBe(15n);
     });
 
     it("区間作用後の get は遅延を下ろして葉の値を返す", () => {
         const tree = rangeAffineTree(5, [1n, 2n, 3n, 4n, 5n]);
         tree.apply(2, 4, { b: 100n, c: 101n });
-        expect(tree.get(0)).toEqual({ val: 1n, size: 1n });
-        expect(tree.get(2)).toEqual({ val: 401n, size: 1n });
-        expect(tree.get(3)).toEqual({ val: 501n, size: 1n });
-        expect(tree.get(4)).toEqual({ val: 5n, size: 1n });
-        expect(tree.query(0, 3)).toEqual({ val: 404n, size: 3n });
+        expect(tree.get(0)).toBe(1n);
+        expect(tree.get(2)).toBe(401n);
+        expect(tree.get(3)).toBe(501n);
+        expect(tree.get(4)).toBe(5n);
+        expect(tree.query(0, 3)).toBe(404n);
     });
 
     it("applyAt は 1 点だけアフィン変換する", () => {
         const tree = rangeAffineTree(5, [1n, 2n, 3n, 4n, 5n]);
         tree.applyAt(1, { b: 0n, c: 9n });
-        expect(tree.get(1)).toEqual({ val: 9n, size: 1n });
-        expect(tree.query(0, 5)).toEqual({ val: 22n, size: 5n });
+        expect(tree.get(1)).toBe(9n);
+        expect(tree.query(0, 5)).toBe(22n);
     });
 
     it("set は遅延タグを潰して値を上書きする", () => {
         const tree = rangeAffineTree(5, [1n, 2n, 3n, 4n, 5n]);
         tree.apply(0, 5, { b: 2n, c: 0n });
-        tree.set(2, { val: 100n, size: 1n });
-        expect(tree.get(2)).toEqual({ val: 100n, size: 1n });
-        expect(tree.get(0)).toEqual({ val: 2n, size: 1n });
-        expect(tree.queryAll()).toEqual({ val: 124n, size: 5n });
+        tree.set(2, 100n);
+        expect(tree.get(2)).toBe(100n);
+        expect(tree.get(0)).toBe(2n);
+        expect(tree.queryAll()).toBe(124n);
     });
 
     it("maxRight は区間和が閾値未満である最大の r を返す", () => {
         const tree = rangeAffineTree(5, [1n, 2n, 3n, 4n, 5n]);
-        expect(tree.maxRight(0, (s) => s.val < 6n)).toBe(2);
-        expect(tree.maxRight(2, (s) => s.val < 7n)).toBe(3);
-        expect(tree.maxRight(0, (s) => s.val < 16n)).toBe(5);
-        expect(tree.maxRight(5, (s) => s.val < 1n)).toBe(5);
+        expect(tree.maxRight(0, (s) => s < 6n)).toBe(2);
+        expect(tree.maxRight(2, (s) => s < 7n)).toBe(3);
+        expect(tree.maxRight(0, (s) => s < 16n)).toBe(5);
+        expect(tree.maxRight(5, (s) => s < 1n)).toBe(5);
     });
 
     it("maxRight は未 push の遅延があっても正しい", () => {
         const tree = rangeAffineTree(5, [1n, 2n, 3n, 4n, 5n]);
         tree.apply(0, 5, { b: 2n, c: 0n });
-        expect(tree.maxRight(0, (s) => s.val < 7n)).toBe(2);
+        expect(tree.maxRight(0, (s) => s < 7n)).toBe(2);
     });
 
     it("minLeft は区間和が閾値未満である最小の l を返す", () => {
         const tree = rangeAffineTree(5, [1n, 2n, 3n, 4n, 5n]);
-        expect(tree.minLeft(5, (s) => s.val < 10n)).toBe(3);
-        expect(tree.minLeft(5, (s) => s.val < 16n)).toBe(0);
-        expect(tree.minLeft(5, (s) => s.val < 1n)).toBe(5);
-        expect(tree.minLeft(0, (s) => s.val < 1n)).toBe(0);
+        expect(tree.minLeft(5, (s) => s < 10n)).toBe(3);
+        expect(tree.minLeft(5, (s) => s < 16n)).toBe(0);
+        expect(tree.minLeft(5, (s) => s < 1n)).toBe(5);
+        expect(tree.minLeft(0, (s) => s < 1n)).toBe(0);
     });
 
     it("minLeft は未 push の遅延があっても正しい", () => {
         const tree = rangeAffineTree(5, [1n, 2n, 3n, 4n, 5n]);
         tree.apply(0, 5, { b: 2n, c: 0n });
-        expect(tree.minLeft(5, (s) => s.val < 11n)).toBe(4);
+        expect(tree.minLeft(5, (s) => s < 11n)).toBe(4);
     });
 
     it("空区間の query は単位元、apply は何もしない", () => {
         const tree = rangeAffineTree(5, [1n, 2n, 3n, 4n, 5n]);
-        expect(tree.query(2, 2)).toEqual({ val: 0n, size: 0n });
+        expect(tree.query(2, 2)).toBe(0n);
         tree.apply(2, 2, { b: 100n, c: 101n });
-        expect(tree.query(0, 5)).toEqual({ val: 15n, size: 5n });
-        expect(tree.get(2)).toEqual({ val: 3n, size: 1n });
+        expect(tree.query(0, 5)).toBe(15n);
+        expect(tree.get(2)).toBe(3n);
     });
 });

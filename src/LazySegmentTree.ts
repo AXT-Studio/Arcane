@@ -136,9 +136,9 @@ export class LazySegmentTree<S, F> {
      * `#data`の`index`番目の要素に、操作`f`を作用させます。
      * @param index - 要素のインデックス (0-indexed)
      * @param f - 作用
+     * @param len - 当該ノードの担当区間の長さ
      */
-    #all_apply(index: number, f: F): void {
-        const len = this.#size >> (31 - Math.clz32(index));
+    #all_apply(index: number, f: F, len: number): void {
         this.#data[index] = this.#mapping(this.#data[index], f, len);
         if (index < this.#size) {
             if (this.#lazy[index] === this.#id) {
@@ -153,15 +153,17 @@ export class LazySegmentTree<S, F> {
      * @private
      * lazyの`index`番目に格納されている遅延タグを子ノードに伝播させ、lazy[index]を初期化します。
      * @param index - ノードのインデックス (0-indexed)
+     * @param len - 当該ノードの担当区間の長さ
      */
-    #push(index: number): void {
+    #push(index: number, len: number): void {
         if (this.#lazy[index] === this.#id) return;
+        const childLen = len >> 1;
         const l = index << 1;
         const r = (index << 1) | 1;
         // lに伝播
-        this.#all_apply(l, this.#lazy[index]);
+        this.#all_apply(l, this.#lazy[index], childLen);
         // rに伝播
-        this.#all_apply(r, this.#lazy[index]);
+        this.#all_apply(r, this.#lazy[index], childLen);
         // lazy[index]を初期化
         this.#lazy[index] = this.#id;
     }
@@ -187,15 +189,16 @@ export class LazySegmentTree<S, F> {
         const right = r + this.#size;
         // 木の高さから1までループを回せばよい
         for (let i = this.#log; i > 0; i--) {
+            const nodeLen = 1 << i;
             // left側のノードを伝播
             if ((left >> i) << i !== left) {
                 const leftNode = left >> i;
-                this.#push(leftNode);
+                this.#push(leftNode, nodeLen);
             }
             // right側のノードを伝播
             if ((right >> i) << i !== right) {
                 const rightNode = (right - 1) >> i;
-                this.#push(rightNode);
+                this.#push(rightNode, nodeLen);
             }
         }
     }
@@ -247,17 +250,20 @@ export class LazySegmentTree<S, F> {
         // 1. 前処理: 範囲に関係する部分の遅延をすべて出し切る
         this.#pushToLeaves(l, r);
         // 2. 区間[l, r)に作用fを作用させる
+        // left/rightは葉から始まり、1段上がるごとに担当区間は2倍
+        let nodeLen = 1;
         while (left < right) {
             if (left & 1) {
-                this.#all_apply(left, f);
+                this.#all_apply(left, f, nodeLen);
                 left++;
             }
             if (right & 1) {
                 right--;
-                this.#all_apply(right, f);
+                this.#all_apply(right, f, nodeLen);
             }
             left >>= 1;
             right >>= 1;
+            nodeLen <<= 1;
         }
         // 3. 後処理: 変更があった部分の親ノードを再計算する
         this.#updateFromLeaves(l, r);
@@ -347,17 +353,22 @@ export class LazySegmentTree<S, F> {
         let product = this.#e;
         // maxRightの探索
         let pos = left;
+        let nodeLen = 1;
         do {
             // posが右の子ノードである場合、親ノードに移動
-            while ((pos & 1) === 0) pos >>= 1;
+            while ((pos & 1) === 0) {
+                pos >>= 1;
+                nodeLen <<= 1;
+            }
             // 今のブロック(#data[pos])を足すと条件を満たさなくなるかチェックする
             if (!fn(this.#op(product, this.#data[pos]))) {
                 // 満たさない -> 境界はこのブロックの範囲 -> 葉まで降りていく
                 while (pos < this.#size) {
                     // 遅延タグを伝播させる
-                    this.#push(pos);
+                    this.#push(pos, nodeLen);
                     // 左の子に降りる
                     pos = pos << 1;
+                    nodeLen >>= 1;
                     // 今のブロックを足しても条件を満たすなら、足して右の子へ
                     if (fn(this.#op(product, this.#data[pos]))) {
                         product = this.#op(product, this.#data[pos]);
@@ -416,21 +427,24 @@ export class LazySegmentTree<S, F> {
         let product = this.#e;
         // minLeftの探索
         let pos = right;
+        let nodeLen = 1;
         do {
             // 半開区間なので、とりあえず一個左に移動
             pos--;
             // 登れるだけ親に登る
             while (pos > 1 && pos & 1) {
                 pos >>= 1;
+                nodeLen <<= 1;
             }
             // 今のブロック(#data[pos])を足すと条件を満たさなくなるかチェックする
             if (!fn(this.#op(this.#data[pos], product))) {
                 // 満たさない -> 境界はこのブロックの範囲 -> 葉まで降りていく
                 while (pos < this.#size) {
                     // 遅延タグを伝播させる
-                    this.#push(pos);
+                    this.#push(pos, nodeLen);
                     // 右の子に降りる
                     pos = (pos << 1) | 1;
+                    nodeLen >>= 1;
                     // 右の子なら結合しても大丈夫か？をチェック
                     if (fn(this.#op(this.#data[pos], product))) {
                         // 大丈夫なら結合して、左の子へ (さらに左を探る)
@@ -508,7 +522,7 @@ export class LazySegmentTree<S, F> {
     get(index: number): S {
         const pos = index + this.#size;
         for (let i = this.#log; i > 0; i--) {
-            this.#push(pos >> i);
+            this.#push(pos >> i, 1 << i);
         }
         return this.#data[pos];
     }
@@ -532,7 +546,7 @@ export class LazySegmentTree<S, F> {
     set(index: number, value: S): void {
         const pos = index + this.#size;
         for (let i = this.#log; i > 0; i--) {
-            this.#push(pos >> i);
+            this.#push(pos >> i, 1 << i);
         }
         this.#data[pos] = value;
         for (let i = 1; i <= this.#log; i++) {
