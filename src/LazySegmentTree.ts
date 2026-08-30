@@ -4,128 +4,38 @@
 
 /**
  * 遅延評価セグメント木 (Lazy Segment Tree) です。
- * 長さNの配列に対して、区間全要素への作用と区間の総モノイド積の計算をそれぞれO(log N)で行えます。
- * ただし、以下を定義できることが求められます。
- * - `S`: 配列の要素の型
- * - 区間総積について、以下が定義できること
- *     - `op`: 2つのSのモノイド積を求める関数
- *         - `op`は結合律、すなわち`op(a, op(b, c)) === op(op(a, b), c)`を満たす必要があります。
- *     - `e`: opの単位元 (`S`型の値)
- *         - `e`は単位元の性質、すなわち任意の`s: S`に対して`op(s, e) === op(e, s) === s`を満たす必要があります。
- * - 区間作用について、以下が定義できること
- *     - `F`: 作用を行う関数がパラメーターとして求める情報の型
- *     - `mapping`: 要素(`S`)と作用のパラメーター(`F`)を受け取り、作用適用後の要素(`S`)を返す関数
- *     - `id`: F型 mappingに渡すと要素を変更しないような作用のパラメーター
- *         - 任意の`s: S`に対して`mapping(s, id) === s`を満たす必要があります。
- *     - `composition`: 2つの作用のパラメーター(F)を1つのFに合成する関数
- *         - `(newF: F, oldF: F) => F`を指定します。引数の順序(あとに適用する作用が先に記述される)に注意してください。
- *         - `composition`は結合律、すなわち任意の`s: S`, `f1: F`, `f2: F`に対して`mapping(mapping(s, f1), f2) === mapping(s, composition(f2, f1))`を満たす必要があります。
+ * 長さNの配列に対して、「区間全要素への作用」と「区間の総モノイド積の計算」をいずれもO(log N)で行うことができます。
+ *
+ * ただし、以下を定義できる必要があります。
+ * - 定義するもの
+ *     - `S`: 配列の要素の型
+ *     - `op`: 集合`S`上の二項演算(op: S × S → S)
+ *     - `e`: `op`の単位元となる`S`型の値
+ *     - `F`: 作用を行う関数`mapping`がパラメーターとして求める情報の型
+ *     - `mapping`: 要素(`S`型)と作用のパラメーター(`F`型)を受け取り、作用適用後の要素(`S`型)を返す関数
+ *     - `id`: `mapping`において、"要素を変更しない"ことを表す作用のパラメーター
+ *     - `composition`: 2つの作用のパラメーター(`F`型)を1つの作用のパラメーターに合成したものを返す関数
+ *         - `(newF: F, oldF: F) => F`を指定します。引数の順序(あとに適用する作用が先に記述される)に注意してください
+ * - 満たす必要がある条件
+ *     - (`S`, `op`, `e`)はモノイドである。すなわち、以下を満たす
+ *         - 任意の(`a: S`, `b: S`, `c: S`)について、`op(a, op(b, c)) === op(op(a, b), c)`を満たす
+ *         - 任意の`s: S`について、`op(s, e) === op(e, s) === s`を満たす(ような`e`が存在し、それが指定されている)
+ *     - `mapping`は準同型である。すなわち、以下を満たす
+ *         - 任意の(`a: S`, `b: S`, `f: F`)について、`mapping(op(a, b), f) === op(mapping(a, f), mapping(b, f))`を満たす
+ *     - `mapping`・`composition`には単位元`id`が存在する。すなわち、以下をどちらも満たす(ような`id`が存在し、それが指定されている)
+ *         - 任意の`s: S`について、`mapping(s, id) === s`を満たす
+ *         - 任意の`f: F`について、`composition(id, f) === composition(f, id) === f`を満たす
+ *     - `composition`は結合律を満たす。すなわち、以下を満たす
+ *         - 任意の(`f: F`, `g: F`, `h: F`)について、`composition(f, composition(g, h)) === composition(composition(f, g), h)`を満たす
+ *     - `composition`は正しくパラメーターを合成する。すなわち、以下を満たす
+ *         - 任意の(`s: S`, `f1: F`, `f2: F`)について、`mapping(mapping(s, f1), f2) === mapping(s, composition(f2, f1))`を満たす
+ *     - LazySegmentTreeが保持する値(とくにオブジェクト)は、その外側のプログラムや演算、作用などによって破壊されない。例えば……
+ *         - `op`, `mapping`, `composition`は純粋関数である。すなわち、引数に副作用を与えない
+ *         - 初期値として与えたオブジェクト、get()などで取得した内部の値、`apply()`の第3引数`f`などをあとから書き換えてはいけない
  *
  * 以下の点に注意してください。
  * - 配列は0-indexedで管理されます。つまり、最初の要素のindexは`0`、最後の要素のindexは`size - 1`になります。
  * - `S`や`F`がPrimitiveでない場合に発生するオーバーヘッドが、競技プログラミングにおいて実行時間制限を超える原因になることがあります。使用時には十分注意してください。
- *
- * @example 作用: 作用の値が現在の値を超えるなら更新 / 区間総積: 区間の最大値
- * ```ts
- * const lazySegTree = new LazySegmentTree(
- *     -Infinity, // e: 区間の最大値の単位元は負の無限大
- *     (a, b) => Math.max(a, b), // op: 区間の最大値を求める関数
- *     (s, f) => Math.max(s, f), // mapping: 作用は「sをfで更新する(ただしfがsより大きい場合のみ)」
- *     -Infinity, // id: 作用の単位元は負の無限大 (これをmappingに渡してもsは更新されない)
- *     (newF, oldF) => Math.max(newF, oldF), // composition: 作用の合成は「新しい作用と古い作用のうち大きい方」
- *     100, // size: セグメント木のサイズ
- * );
- * ```
- *
- * @example 作用: 区間の要素に値を加算 / 区間総積: 区間の最小値
- * ```ts
- * const lazySegTree = new LazySegmentTree<number, number>(
- *  Infinity,
- *     (a, b) => Math.min(a, b),
- *     (s, f) => s + f,
- *     0,
- *     (newF, oldF) => newF + oldF,
- *     100,
- * );
- * ```
- *
- * @example 作用: 区間の要素に値を加算 / 区間総積: 区間の最大値
- * ```ts
- * const lazySegTree = new LazySegmentTree<number, number>(
- *     -Infinity,
- *     (a, b) => Math.max(a, b),
- *     (s, f) => s + f,
- *     0,
- *     (newF, oldF) => newF + oldF,
- *     100,
- * );
- * ```
- *
- * @example 作用: 区間の要素を値で更新(上書き) / 区間総積: 区間の最小値
- * ```ts
- * const lazySegTree = new LazySegmentTree<number, number | null>(
- *     Infinity,
- *     (a, b) => Math.min(a, b),
- *     (s, f) => f === null ? s : f,
- *     null,
- *     (newF, oldF) => newF === null ? oldF : newF,
- *     100,
- * );
- * ```
- *
- * @example 作用: 区間の要素を値で更新(上書き) / 区間総積: 区間の最大値
- * ```ts
- * const lazySegTree = new LazySegmentTree<number, number | null>(
- *     -Infinity,
- *     (a, b) => Math.max(a, b),
- *     (s, f) => f === null ? s : f,
- *     null,
- *     (newF, oldF) => newF === null ? oldF : newF,
- *     100,
- * );
- * ```
- *
- * @example 作用: 区間の要素に値を加算 / 区間総積: 区間の合計値
- * ```ts
- * const lazySegTree = new LazySegmentTree<{ value: number; size: number }, number>(
- *     { value: 0, size: 0 },
- *     (a, b) => ({ value: a.value + b.value, size: a.size + b.size }),
- *     (s, f) => ({ value: s.value + f * s.size, size: s.size }),
- *     0,
- *     (newF, oldF) => newF + oldF,
- *     100,
- *     // 初期値を指定する場合は、{ value: 初期値, size: 1 } の配列にする必要があります
- * );
- * ```
- *
- * @example 作用: 区間の要素を値で更新(上書き) / 区間総積: 区間の合計値
- * ```ts
- * const lazySegTree = new LazySegmentTree<{ value: number; size: number }, number | null>(
- *     { value: 0, size: 0 },
- *     (a, b) => ({ value: a.value + b.value, size: a.size + b.size }),
- *     (s, f) => f === null ? s : { value: f * s.size, size: s.size },
- *     null,
- *     (newF, oldF) => newF === null ? oldF : newF,
- *     100,
- *     // 初期値を指定する場合は、{ value: 初期値, size: 1 } の配列にする必要があります
- * );
- * ```
- *
- * @example 作用: 区間アフィン変換(区間各要素にa掛けてb足す) / 区間総積: 区間の合計値
- * ```ts
- * const lazySegTree = new LazySegmentTree<{ value: number; size: number }, { a: number; b: number }>(
- *     { value: 0, size: 0 },
- *     (x, y) => ({ value: x.value + y.value, size: x.size + y.size }),
- *     (s, f) => ({ value: f.a * s.value + f.b * s.size, size: s.size }),
- *     { a: 1, b: 0 },
- *     (newF, oldF) => ({ a: newF.a * oldF.a, b: newF.a * oldF.b + newF.b }),
- *     100,
- *     // 初期値を指定する場合は、{ value: 初期値, size: 1 } の配列にする必要があります
- * );
- * ```
- *
- * @template S - 配列の要素の型
- * @template F - 作用のパラメーターの型
  */
 export class LazySegmentTree<S, F> {
     /** 単位元 */
@@ -169,10 +79,10 @@ export class LazySegmentTree<S, F> {
      * ```
      *
      * @param e - [区間総積] モノイド演算の単位元
-     * @param op - [区間総積] モノイド演算を表す関数
-     * @param mapping - [区間作用] 作用を行う関数
+     * @param op - [区間総積] モノイド演算を表す純粋関数
+     * @param mapping - [区間作用] 作用を行う純粋関数
      * @param id - [区間作用] 作用において「何もしない」ことを表す単位元
-     * @param composition - [区間作用] 2つの作用を1つにまとめる関数
+     * @param composition - [区間作用] 2つの作用を1つにまとめる純粋関数
      * @param size - セグメント木のサイズ
      * @param [initialValues] - 初期値の配列(未指定時およびsizeに満たない分はeで埋められます)
      */
@@ -197,7 +107,7 @@ export class LazySegmentTree<S, F> {
         this.#size = 2 ** this.#log;
         // lazyを初期化
         // oxlint-disable-next-line unicorn/no-new-array
-        this.#lazy = new Array(this.#size * 2).fill(id);
+        this.#lazy = new Array(this.#size).fill(id);
         // data配列を初期化
         // oxlint-disable-next-line unicorn/no-new-array
         this.#data = new Array(this.#size * 2).fill(e);
@@ -215,14 +125,18 @@ export class LazySegmentTree<S, F> {
 
     /**
      * @private
-     * `tree`の`index`番目の要素に、操作`f`を作用させます。
+     * `#data`の`index`番目の要素に、操作`f`を作用させます。
      * @param index - 要素のインデックス (0-indexed)
      * @param f - 作用
      */
     #all_apply(index: number, f: F): void {
         this.#data[index] = this.#mapping(this.#data[index], f);
         if (index < this.#size) {
-            this.#lazy[index] = this.#composition(f, this.#lazy[index]);
+            if (this.#lazy[index] === this.#id) {
+                this.#lazy[index] = f;
+            } else {
+                this.#lazy[index] = this.#composition(f, this.#lazy[index]);
+            }
         }
     }
 
@@ -232,6 +146,7 @@ export class LazySegmentTree<S, F> {
      * @param index - ノードのインデックス (0-indexed)
      */
     #push(index: number): void {
+        if (this.#lazy[index] === this.#id) return;
         const l = index << 1;
         const r = (index << 1) | 1;
         // lに伝播
@@ -244,7 +159,7 @@ export class LazySegmentTree<S, F> {
 
     /**
      * @private
-     * treeの`index`番目のノードを、treeの2つの子ノードから計算し更新します。
+     * `#data`の`index`番目のノードを、2つの子ノードから計算し更新します。
      * @param index - ノードのインデックス
      */
     #update(index: number): void {
@@ -279,7 +194,7 @@ export class LazySegmentTree<S, F> {
     /**
      * @private
      * 範囲[l, r)と共通部分を持つが[l, r)に収まっていないノードについて、
-     * 変更されたtreeの子ノードの情報をもとに親ノードの値を(根まで)再計算します。
+     * 変更された子ノードの情報をもとに親ノードの値を(根まで)再計算します。
      * @param l - 区間の左端のindex (0-indexed, 含む)
      * @param r - 区間の右端のindex (0-indexed, 含まない)
      */
@@ -316,6 +231,7 @@ export class LazySegmentTree<S, F> {
      * @param f - 作用
      */
     apply(l: number, r: number, f: F): void {
+        if (l === r) return;
         // lとrに対応する葉ノードの位置を求める
         let left = l + this.#size;
         let right = r + this.#size;
@@ -356,6 +272,7 @@ export class LazySegmentTree<S, F> {
      * @returns 指定された区間の総モノイド積
      */
     query(l: number, r: number): S {
+        if (l === r) return this.#e;
         // lとrに対応する葉ノードの位置を求める
         let left = l + this.#size;
         let right = r + this.#size;
@@ -424,7 +341,7 @@ export class LazySegmentTree<S, F> {
         do {
             // posが右の子ノードである場合、親ノードに移動
             while ((pos & 1) === 0) pos >>= 1;
-            // 今のブロック(tree[pos])を足すと条件を満たさなくなるかチェックする
+            // 今のブロック(#data[pos])を足すと条件を満たさなくなるかチェックする
             if (!fn(this.#op(product, this.#data[pos]))) {
                 // 満たさない -> 境界はこのブロックの範囲 -> 葉まで降りていく
                 while (pos < this.#size) {
@@ -497,7 +414,7 @@ export class LazySegmentTree<S, F> {
             while (pos > 1 && pos & 1) {
                 pos >>= 1;
             }
-            // 今のブロック(tree[pos])を足すと条件を満たさなくなるかチェックする
+            // 今のブロック(#data[pos])を足すと条件を満たさなくなるかチェックする
             if (!fn(this.#op(this.#data[pos], product))) {
                 // 満たさない -> 境界はこのブロックの範囲 -> 葉まで降りていく
                 while (pos < this.#size) {
