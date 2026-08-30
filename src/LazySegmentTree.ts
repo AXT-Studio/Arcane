@@ -13,6 +13,7 @@
  *     - `e`: `op`の単位元となる`S`型の値
  *     - `F`: 作用を行う関数`mapping`がパラメーターとして求める情報の型
  *     - `mapping`: 要素(`S`型)と作用のパラメーター(`F`型)を受け取り、作用適用後の要素(`S`型)を返す関数
+ *         - 第3引数として当該要素の担当区間の長さ`len`を受け取ることができます(不要なら受け取らなくてもOK)
  *     - `id`: `mapping`において、"要素を変更しない"ことを表す作用のパラメーター
  *     - `composition`: 2つの作用のパラメーター(`F`型)を1つの作用のパラメーターに合成したものを返す関数
  *         - `(newF: F, oldF: F) => F`を指定します。引数の順序(あとに適用する作用が先に記述される)に注意してください
@@ -22,13 +23,15 @@
  *         - 任意の`s: S`について、`op(s, e) === op(e, s) === s`を満たす(ような`e`が存在し、それが指定されている)
  *     - `mapping`は準同型である。すなわち、以下を満たす
  *         - 任意の(`a: S`, `b: S`, `f: F`)について、`mapping(op(a, b), f) === op(mapping(a, f), mapping(b, f))`を満たす
+ *             - 第3引数`len`を使う場合、`a`, `b`の担当範囲の長さを`la: number`, `lb: number`として`mapping(op(a, b), f, la + lb) === op(mapping(a, f, la), mapping(b, f, lb))`を満たす
  *     - `mapping`・`composition`には単位元`id`が存在する。すなわち、以下をどちらも満たす(ような`id`が存在し、それが指定されている)
- *         - 任意の`s: S`について、`mapping(s, id) === s`を満たす
+ *         - 任意の`s: S`, `len: number`について、`mapping(s, id, len) === s`を満たす
  *         - 任意の`f: F`について、`composition(id, f) === composition(f, id) === f`を満たす
  *     - `composition`は結合律を満たす。すなわち、以下を満たす
  *         - 任意の(`f: F`, `g: F`, `h: F`)について、`composition(f, composition(g, h)) === composition(composition(f, g), h)`を満たす
  *     - `composition`は正しくパラメーターを合成する。すなわち、以下を満たす
  *         - 任意の(`s: S`, `f1: F`, `f2: F`)について、`mapping(mapping(s, f1), f2) === mapping(s, composition(f2, f1))`を満たす
+ *             - `mapping`で`len`を使う場合、`mapping(mapping(s, f1, len), f2, len) === mapping(s, composition(f2, f1), len)`を満たす
  *     - LazySegmentTreeが保持する値(とくにオブジェクト)は、その外側のプログラムや演算、作用などによって破壊されない。例えば……
  *         - `op`, `mapping`, `composition`は純粋関数である。すなわち、引数に副作用を与えない
  *         - 初期値として与えたオブジェクト、get()などで取得した内部の値、`apply()`の第3引数`f`などをあとから書き換えてはいけない
@@ -43,7 +46,7 @@ export class LazySegmentTree<S, F> {
     /** モノイド演算を表す関数 */
     #op: (a: S, b: S) => S;
     /** 作用を表す関数 */
-    #mapping: (s: S, f: F) => S;
+    #mapping: (s: S, f: F, len: number) => S;
     /** 作用の単位元 */
     #id: F;
     /** 作用の合成を表す関数 */
@@ -83,18 +86,23 @@ export class LazySegmentTree<S, F> {
      * @param mapping - [区間作用] 作用を行う純粋関数
      * @param id - [区間作用] 作用において「何もしない」ことを表す単位元
      * @param composition - [区間作用] 2つの作用を1つにまとめる純粋関数
-     * @param size - セグメント木のサイズ
+     * @param size - セグメント木のサイズ(1以上2^30以下)
      * @param [initialValues] - 初期値の配列(未指定時およびsizeに満たない分はeで埋められます)
+     * @throws {RangeError} - sizeが「1以上2^30以下の整数」でない場合
      */
     constructor(
         e: S,
         op: (a: S, b: S) => S,
-        mapping: (s: S, f: F) => S,
+        mapping: (s: S, f: F, len: number) => S,
         id: F,
         composition: (newF: F, oldF: F) => F,
         size: number,
         initialValues?: S[],
     ) {
+        // sizeは1以上2^30以下である必要がある
+        if (!Number.isInteger(size) || size < 1 || size > 2 ** 30) {
+            throw new RangeError("size must be an integer in [1, 2**30]");
+        }
         // e, op, mapping, id, compositionはそのまま保存
         this.#e = e;
         this.#op = op;
@@ -103,8 +111,8 @@ export class LazySegmentTree<S, F> {
         this.#composition = composition;
         this.#originalSize = size;
         // sizeは与えられたsize以上の最小の2冪に設定
-        this.#log = Math.ceil(Math.log2(size));
-        this.#size = 2 ** this.#log;
+        this.#log = 32 - Math.clz32(size - 1);
+        this.#size = 1 << this.#log;
         // lazyを初期化
         // oxlint-disable-next-line unicorn/no-new-array
         this.#lazy = new Array(this.#size).fill(id);
@@ -130,7 +138,8 @@ export class LazySegmentTree<S, F> {
      * @param f - 作用
      */
     #all_apply(index: number, f: F): void {
-        this.#data[index] = this.#mapping(this.#data[index], f);
+        const len = this.#size >> (31 - Math.clz32(index));
+        this.#data[index] = this.#mapping(this.#data[index], f, len);
         if (index < this.#size) {
             if (this.#lazy[index] === this.#id) {
                 this.#lazy[index] = f;
