@@ -294,8 +294,6 @@ export class LazySegmentTree<S, F> {
             right >>= 1;
         }
         // 3. 結果を返す
-        if (res_left === this.#e) return res_right;
-        if (res_right === this.#e) return res_left;
         return this.#op(res_left, res_right);
     }
 
