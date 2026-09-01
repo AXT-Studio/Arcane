@@ -30,7 +30,7 @@ export class RollingHash {
      * Rolling Hashの計算を行うためのインスタンスを作成します。
      * `65535 < m < h <= 94906266`を満たす、整数`m`と素数`h`の組を指定する必要があります。
      * ただし、constructor内でそれらのチェックは行われず、条件を満たさない値を指定した場合エラーなくハッシュが意味を成さなくなる点に留意してください。
-     * (`h`の上限が`94906266`なのは、実装が`(h - 1) ** 2 + 65535 <= Number.MAX_SAFE_INTEGER`を前提としているためです)
+     * (`h`の上限が`94906266`なのは、実装が`(h - 1) ** 2 + (h - 1) <= Number.MAX_SAFE_INTEGER`を前提としているためです)
      * 指定しなかった場合、デフォルトでは`m = 1000003, h = 94906249`が使用されます。
      * 2系統目が必要で選定を行いたくない場合は`m = 999983, h = 94906247`を使用することをおすすめします。
      *
@@ -63,6 +63,7 @@ export class RollingHash {
 
     /**
      * 文字列のハッシュ値を計算します。
+     * なお、空文字列のハッシュ値は(m, h)にかかわらず`0`です。
      *
      * 時間計算量: 最悪 O(|s|) (※|s|はsの長さ)
      *
@@ -168,5 +169,28 @@ export class RollingHash {
      */
     popFromHead(char: string, hash: number, currentLength: number): number {
         return (((hash - this.#power(currentLength - 1) * char.charCodeAt(0)) % this.#h) + this.#h) % this.#h;
+    }
+
+    /**
+     * ハッシュがわかっている2つの文字列を連結した文字列のハッシュを計算します。
+     *
+     * 時間計算量: 償却 O(1)、最悪 O(currentLength)
+     *
+     * @example
+     * ```ts
+     * const rh = new RollingHash();
+     * const abc = rh.hashOf("abc");
+     * const def = rh.hashOf("def");
+     * const abcdef = rh.concat(abc, def, 3);
+     * console.log(abcdef === rh.hashOf("abcdef")); // => true
+     * ```
+     *
+     * @param hashA - 連結する2つの文字列のうち先頭側の方のハッシュ
+     * @param hashB - 連結する2つの文字列のうち末尾側の方のハッシュ
+     * @param lenB - 連結する2つの文字列のうち末尾側の方の文字数 (サロゲートペアは2文字カウント。str.lengthを与えればよいです。)
+     * @returns - 2つの文字列を連結した文字列のハッシュ
+     */
+    concat(hashA: number, hashB: number, lenB: number): number {
+        return (hashA * this.#power(lenB) + hashB) % this.#h;
     }
 }

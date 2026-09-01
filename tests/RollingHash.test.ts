@@ -15,6 +15,14 @@ function mulberry32(seed: number): () => number {
 /** ASCII 英小文字・ひらがな・全角文字。すべて BMP 内 */
 const CHAR_POOL = Array.from("abcdefghijklmnopqrstuvwxyzあいうえおＡ一");
 
+function randomString(rand: () => number, length: number): string {
+    let s = "";
+    for (let i = 0; i < length; i++) {
+        s += CHAR_POOL[Math.floor(rand() * CHAR_POOL.length)];
+    }
+    return s;
+}
+
 function assertRandomWalk(rh: RollingHash, seed: number): void {
     const rand = mulberry32(seed);
     for (let trial = 0; trial < 100; trial++) {
@@ -42,6 +50,17 @@ function assertRandomWalk(rh: RollingHash, seed: number): void {
             }
             expect(hash).toBe(rh.hashOf(chars.join("")));
         }
+    }
+}
+
+function assertRandomConcat(rh: RollingHash, seed: number): void {
+    const rand = mulberry32(seed);
+    for (let trial = 0; trial < 100; trial++) {
+        const a = randomString(rand, Math.floor(rand() * 40));
+        const b = randomString(rand, Math.floor(rand() * 40));
+        const hashA = rh.hashOf(a);
+        const hashB = rh.hashOf(b);
+        expect(rh.concat(hashA, hashB, b.length)).toBe(rh.hashOf(a + b));
     }
 }
 
@@ -90,6 +109,13 @@ describe("RollingHash の @example", () => {
         const rh = new RollingHash();
         expect(rh.hashOf("")).toBe(0);
     });
+
+    it("concat", () => {
+        const rh = new RollingHash();
+        const abc = rh.hashOf("abc");
+        const def = rh.hashOf("def");
+        expect(rh.concat(abc, def, 3)).toBe(rh.hashOf("abcdef"));
+    });
 });
 
 describe("RollingHash のランダム一致", () => {
@@ -99,5 +125,23 @@ describe("RollingHash のランダム一致", () => {
 
     it("第2系統 (999983, 94906247)", () => {
         assertRandomWalk(new RollingHash(999983, 94906247), 20260903);
+    });
+
+    it("concat デフォルトパラメータ", () => {
+        assertRandomConcat(new RollingHash(), 20260904);
+    });
+
+    it("concat 第2系統 (999983, 94906247)", () => {
+        assertRandomConcat(new RollingHash(999983, 94906247), 20260905);
+    });
+});
+
+describe("RollingHash の境界・特例", () => {
+    it("concat は lenB が 0 のとき hashA と一致する", () => {
+        const rh = new RollingHash();
+        const hashA = rh.hashOf("abc");
+        const hashB = rh.hashOf("");
+        expect(rh.concat(hashA, hashB, 0)).toBe(hashA);
+        expect(rh.concat(hashA, hashB, 0)).toBe(rh.hashOf("abc"));
     });
 });
