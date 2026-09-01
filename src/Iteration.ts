@@ -74,6 +74,7 @@ export class Iteration {
             }
         }
     }
+
     /**
      * 呼び出されるたびに、各位置`i`について`0`以上`max[i]`未満の整数からなる組の次の要素を返すジェネレーター関数です。
      * bit全探索(`[2, 2, ..., 2]`)などに使うことができます。
@@ -119,6 +120,32 @@ export class Iteration {
                 }
             }
             if (a[0] === max[0]) return;
+        }
+    }
+
+    /**
+     * 配列の隣り合う2要素のペアに対して処理を行います。
+     * (配列の長さが2未満の場合は何もしません)
+     *
+     * 時間計算量: O(|array|) (|array|は配列長。実際はcallbackFnの計算量が掛かる)
+     *
+     * @example
+     * ```ts
+     * const arr = [1, 4, 10, 15];
+     * Iteration.forEachPair(arr, (a, b, idx) => {
+     *     console.log(`Pair #${idx}: ${Math.abs(a - b)}`);
+     *     // Pair #0: 3
+     *     // Pair #1: 6
+     *     // Pair #2: 5
+     * });
+     * ```
+     *
+     * @param array - 対象とする配列
+     * @param callbackFn - arrayの隣り合う各ペア(a, b)ごとに行いたい処理 (第3引数はaのidx)
+     */
+    static forEachPair<T>(array: ArrayLike<T>, callbackFn: (a: T, b: T, idx: number) => void): void {
+        for (let i = 0; i < array.length - 1; i++) {
+            callbackFn(array[i], array[i + 1], i);
         }
     }
 }

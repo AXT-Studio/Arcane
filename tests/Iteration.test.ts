@@ -57,6 +57,15 @@ describe("Iteration の @example", () => {
         const products = Array.from(Iteration.next_product([]));
         expect(products).toEqual([[]]);
     });
+
+    it("forEachPair で隣り合う差を表示", () => {
+        const arr = [1, 4, 10, 15];
+        const lines: string[] = [];
+        Iteration.forEachPair(arr, (a, b, idx) => {
+            lines.push(`Pair #${idx}: ${Math.abs(a - b)}`);
+        });
+        expect(lines).toEqual(["Pair #0: 3", "Pair #1: 6", "Pair #2: 5"]);
+    });
 });
 
 describe("Iteration の境界・特例", () => {
@@ -77,5 +86,31 @@ describe("Iteration の境界・特例", () => {
             [1, 2, 1],
             [2, 1, 1],
         ]);
+    });
+
+    it("forEachPair は長さ 0 / 1 で何もしない", () => {
+        let called = 0;
+        const cb = () => {
+            called++;
+        };
+        Iteration.forEachPair([], cb);
+        expect(called).toBe(0);
+        Iteration.forEachPair([42], cb);
+        expect(called).toBe(0);
+    });
+
+    it("forEachPair はランダム長 2e5 の隣接ペアと index を渡す", () => {
+        const n = 200_000;
+        const arr = Array.from({ length: n }, () => Math.random());
+        let count = 0;
+        let mismatch = -1;
+        Iteration.forEachPair(arr, (a, b, idx) => {
+            if (mismatch < 0 && (idx !== count || a !== arr[count] || b !== arr[count + 1])) {
+                mismatch = idx;
+            }
+            count++;
+        });
+        expect(mismatch).toBe(-1);
+        expect(count).toBe(n - 1);
     });
 });
