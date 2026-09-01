@@ -174,7 +174,7 @@ export class RollingHash {
     /**
      * ハッシュがわかっている2つの文字列を連結した文字列のハッシュを計算します。
      *
-     * 時間計算量: 償却 O(1)、最悪 O(currentLength)
+     * 時間計算量: 償却 O(1)、最悪 O(lenB)
      *
      * @example
      * ```ts
