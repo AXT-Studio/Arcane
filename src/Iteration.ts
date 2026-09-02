@@ -147,6 +147,7 @@ export class Iteration {
         for (let i = 0; i < array.length - 1; i++) {
             callbackFn(array[i], array[i + 1], i);
         }
+    }
 
     /**
      * 数値配列の累積和を計算します。
