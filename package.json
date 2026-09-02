@@ -6,7 +6,8 @@
         "lint:fix": "oxlint --fix",
         "test": "vitest run",
         "test:watch": "vitest",
-        "test:jsr": "jsr publish --dry-run"
+        "test:jsr": "jsr publish --dry-run",
+        "test:doc": "deno doc --html --name=\"@ayaexptech/arcane\" --output=./.docs-preview/ ./mod.ts && deno run -A jsr:@std/http/file-server .docs-preview"
     },
     "devDependencies": {
         "jsr": "^0.14.3",

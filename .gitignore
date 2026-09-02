@@ -34,3 +34,6 @@ pnpm-debug.log*
 
 # Generated files
 *.tgz
+
+# Deno Doc Preview
+.docs-preview
