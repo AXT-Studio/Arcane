@@ -122,7 +122,24 @@ export class Iteration {
         }
     }
 
+    /**
+     * 数値配列の累積和を計算します。
+     * - 関数を指定することで、和以外の累積を行うこともできます。
+     * - 単位元を指定することで、戻り値の配列を半開区間[0, i)の累積にできます。
+     *     - 指定がない場合は閉区間[0, i]とします。
+     *
+     * 時間計算量: 最悪O(|array|) (※|array|はarrayの長さ、実際はoperatorの計算量が掛かる)
+     */
     static accumulate(array: ArrayLike<number>, op?: (a: number, b: number) => number, e?: number): number[];
+
+    /**
+     * 数値配列の累積和を計算します。
+     * - 関数を指定することで、和以外の累積を行うこともできます。
+     * - 単位元を指定することで、戻り値の配列を半開区間[0, i)の累積にできます。
+     *     - 指定がない場合は閉区間[0, i]とします。
+     *
+     * 時間計算量: 最悪O(|array|) (※|array|はarrayの長さ、実際はoperatorの計算量が掛かる)
+     */
     static accumulate(array: ArrayLike<bigint>, op?: (a: bigint, b: bigint) => bigint, e?: bigint): bigint[];
     /**
      * 数値配列の累積和を計算します。
