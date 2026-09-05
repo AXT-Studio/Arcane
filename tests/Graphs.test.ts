@@ -1,16 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { DirectedGraph, UndirectedGraph, WeightedDirectedGraph, WeightedUndirectedGraph } from "../src/Graphs.ts";
-
-/** seed 固定の疑似乱数生成器 (mulberry32) */
-function mulberry32(seed: number): () => number {
-    let t = seed >>> 0;
-    return () => {
-        t = (t + 0x6d2b79f5) >>> 0;
-        let r = Math.imul(t ^ (t >>> 15), 1 | t);
-        r ^= r + Math.imul(r ^ (r >>> 7), 61 | r);
-        return ((r ^ (r >>> 14)) >>> 0) / 4294967296;
-    };
-}
+import { mulberry32 } from "./utils.ts";
 
 /** SCC の成分内・成分間の順序を正規化して比較用にする */
 function normalizeSCCs(sccs: number[][]): number[][] {
