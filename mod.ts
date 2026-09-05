@@ -17,5 +17,6 @@ export { ModOps } from "./src/ModOps.ts";
 export { SegmentTree } from "./src/SegmentTree.ts";
 export { StringOperations } from "./src/StringOperations.ts";
 export { Treap } from "./src/Treap.ts";
+export { TwoSAT } from "./src/TwoSAT.ts";
 export { UniqueID } from "./src/UniqueID.ts";
 export { Vector2DFloat, Vector2DInt } from "./src/Vector2D.ts";
