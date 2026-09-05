@@ -46,20 +46,16 @@ export class Deque<T> {
      * #frontから#backに要素を移動します。 (バランス処理, プライベートメソッド)
      */
     #balance_FrontToBack(): void {
-        // #frontにある要素を逆順にして#backに追加する
-        while (this.#front.length > 0) {
-            this.#back.push(this.#front.pop() as T);
-        }
+        // #frontの底側(deque末尾寄り)の半分を逆順にして#backへ
+        this.#back = this.#front.splice(0, Math.ceil(this.#front.length / 2)).reverse();
     }
     /**
      * @private
      * #backから#frontに要素を移動します。 (バランス処理, プライベートメソッド)
      */
     #balance_BackToFront(): void {
-        // #backにある要素を逆順にして#frontに追加する
-        while (this.#back.length > 0) {
-            this.#front.push(this.#back.pop() as T);
-        }
+        // #backの底側(deque先頭寄り)の半分を逆順にして#frontへ
+        this.#front = this.#back.splice(0, Math.ceil(this.#back.length / 2)).reverse();
     }
     /**
      * Dequeの先頭に値を挿入します。
