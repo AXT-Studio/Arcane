@@ -4,14 +4,10 @@
 
 /**
  * 数学的な関数のうち、JavaScript標準の`Math`にないものを提供するユーティリティクラスです。
- * - 最大公約数(gcd)、最小公倍数(lcm) (number, bigint)
- * - 拡張ユークリッドの互除法 (bigint)
- * - 約数の列挙 (number)
- * - 整数平方根 (bigint)
- * - 冪乗の余剰計算 (bigint)
- * - ミラー・ラビン素数判定法 (bigint)
- * - popcount (number)
- * - min, max, abs, sign (bigint)
+ * - number: 最大公約数・最小公倍数・約数列挙・popcount(下位32bit)
+ * - bigint: 最大公約数・最小公倍数・拡張ユークリッドの互除法・min, max, abs, sign・整数平方根
+ * - bigint: 冪乗mod・逆元・中国剰余定理(CRT)
+ * - ミラー-ラビン素数判定法
  */
 export class ExtendedMath {
     /**
