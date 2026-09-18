@@ -14,6 +14,7 @@ export { LazySegmentTree } from "./src/LazySegmentTree.ts";
 export { LinearSieve } from "./src/LinearSieve.ts";
 export { MaxFlow } from "./src/MaxFlow.ts";
 export { ModOps } from "./src/ModOps.ts";
+export { RollingHash } from "./src/RollingHash.ts";
 export { SegmentTree } from "./src/SegmentTree.ts";
 export { StringOperations } from "./src/StringOperations.ts";
 export { Treap } from "./src/Treap.ts";
