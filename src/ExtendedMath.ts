@@ -243,6 +243,41 @@ export class ExtendedMath {
     }
 
     /**
+     * 法をmとする合同算術におけるaのモジュラ逆数(乗法の逆元)を返します。
+     * すなわち、av ≡ 1 (mod m)となる0以上m未満の唯一の整数vを返します。
+     * (ただし、gcd(a, m) ≠ 1のとき逆元は存在せず、このときは例外を発生させます。)
+     *
+     * 時間計算量: O(log m)
+     *
+     * @example
+     * ```ts
+     * console.log(ExtendedMath.modInv(3n, 7n)); // => 5n (3×5 = 15 ≡ 1 (mod 7))
+     * console.log(ExtendedMath.modInv(0n, 1n)); // => 0n
+     * console.log(ExtendedMath.modInv(-2n, 7n)); // => 3n
+     * console.log(ExtendedMath.modInv(2n, 4n)); // => throw Error (gcd(2,4)=2(≠1))
+     * ```
+     *
+     * @param a - 逆元を求めたい整数
+     * @param m - 法 (1以上)
+     * @returns 法をmとする合同算術におけるaのモジュラ逆数(乗法の逆元)。0以上m未満の整数
+     * @throws {Error} - aとmが互いに素でない(つまり、逆元が存在しない)か、mが1未満である場合
+     */
+    static modInv(a: bigint, m: bigint): bigint {
+        if (m < 1n) {
+            throw new Error("The modulus `m` must be greater than or equal to 1.");
+        }
+        const a_mod_m = a % m;
+        const a0 = a_mod_m + (a_mod_m < 0n ? m : 0n);
+        const [g, x] = ExtendedMath.extendedGCD(a0, m);
+        if (g !== 1n) {
+            throw new Error(`Inverse does not exist for ${a} (mod ${m}) because gcd(${a0}, ${m}) = ${g} (is not 1).`);
+        }
+        const x_mod_m = x % m;
+        const x0 = x_mod_m + (x_mod_m < 0n ? m : 0n);
+        return x0;
+    }
+
+    /**
      * `n`が素数であるかを、ミラー・ラビン素数判定法により判定します。
      *
      * > [!IMPORTANT]
@@ -447,5 +482,52 @@ export class ExtendedMath {
             const b = sequence[sequence.length / 2];
             return (a + b) / 2;
         }
+    }
+
+    /**
+     * 中国剰余定理を用いて、連立合同式を合体します。
+     * k元連立合同式x≡a_i(mod n_i) (0≦i<k)を満たすxは0以上lcm(n_0, n_1, ...)未満の範囲にただ一つ存在します。
+     * (ただし、"法が同じでa_iが異なる"のような自明な例外を除きます。)
+     * それを踏まえて、k元連立合同式のaとmをすべて受け取り、xとlcm(n_0, n_1, ...)を返します。
+     *
+     * 時間計算量: O(|n| log lcm(n))
+     *
+     * @example
+     * ```ts
+     * console.log(ExtendedMath.crt([10n], [7n])); // => [3n, 7n]
+     * console.log(ExtendedMath.crt([-1n, 3n], [4n, 6n])); // => [3n, 12n]
+     * console.log(ExtendedMath.crt([1n, 3n], [4n, 6n])); // => [9n, 12n]
+     * console.log(ExtendedMath.crt([0n, 1n], [2n, 2n])); // => [0n, 0n]
+     * console.log(ExtendedMath.crt([0n], [1n])); // => [0n, 1n]
+     * ```
+     *
+     * @param a - a[i]は、条件として与えるk元連立合同式x≡a_i(mod n_i)のa_i
+     * @param n - n[i]は、条件として与えるk元連立合同式x≡a_i(mod n_i)のn_i
+     * @returns [x, l]で、x+lt(tは整数)がすべての合同式を満たすとを示す。解なしの場合は[0n, 0n]。
+     * @throws {Error} - aとnの長さが一致しないか、nに1未満の値が含まれている場合
+     */
+    static crt(a: readonly bigint[], n: readonly bigint[]): [x: bigint, l: bigint] {
+        if (a.length !== n.length) {
+            throw Error("The lengths of arrays `a` and `n` must match.");
+        }
+        if (n.some((ni) => ni < 1n)) {
+            throw Error("Array `n` must not contain any values less than 1.");
+        }
+        let a1 = 0n;
+        let n1 = 1n;
+        for (let i = 0; i < a.length; i++) {
+            const a2 = a[i];
+            const n2 = n[i];
+            const g = ExtendedMath.gcd(n1, n2);
+            if ((a2 - a1) % g !== 0n) return [0n, 0n];
+            const n2g = n2 / g;
+            const u = ExtendedMath.modInv(n1 / g, n2g);
+            const t = (u * (a2 - a1)) / g;
+            const t_mod_n2g = t % n2g;
+            const t0 = t_mod_n2g + (t_mod_n2g < 0n ? n2g : 0n);
+            a1 = a1 + n1 * t0;
+            n1 = n1 * n2g;
+        }
+        return [a1, n1];
     }
 }
