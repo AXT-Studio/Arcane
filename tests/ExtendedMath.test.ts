@@ -83,6 +83,16 @@ describe("ExtendedMath の @example", () => {
         expect(ExtendedMath.signBigint(-7n)).toBe(-1n);
     });
 
+    it("divBigint", () => {
+        expect(ExtendedMath.divBigint(1n, 2n)).toBe(0n);
+        expect(ExtendedMath.divBigint(5n, 3n)).toBe(1n);
+        expect(ExtendedMath.divBigint(-1n, 3n)).toBe(-1n);
+    });
+
+    it("floorSum", () => {
+        expect(ExtendedMath.floorSum(4n, 10n, 6n, 3n)).toBe(3n);
+    });
+
     it("medianOfSorted", () => {
         expect(ExtendedMath.medianOfSorted([1, 2, 3])).toBe(2);
         expect(ExtendedMath.medianOfSorted([1, 2, 3, 4])).toBe(2.5);
@@ -126,6 +136,11 @@ describe("ExtendedMath のエラー", () => {
     it("crt は n に 1 未満の値が含まれるとき Error", () => {
         expect(() => ExtendedMath.crt([1n], [0n])).toThrow(Error);
         expect(() => ExtendedMath.crt([1n, 2n], [3n, -1n])).toThrow(Error);
+    });
+
+    it("divBigint は m <= 0 のとき RangeError", () => {
+        expect(() => ExtendedMath.divBigint(1n, -3n)).toThrow(RangeError);
+        expect(() => ExtendedMath.divBigint(2n, 0n)).toThrow(RangeError);
     });
 });
 
@@ -178,5 +193,27 @@ describe("ExtendedMath の境界・特例", () => {
         expect(ExtendedMath.medianOfSorted({ length: 1.5, 0: 1, 1: 2 })).toBeNaN();
         expect(ExtendedMath.medianOfSorted({ length: Number.POSITIVE_INFINITY, 0: 1 })).toBeNaN();
         expect(ExtendedMath.medianOfSorted({ length: Number.NaN })).toBeNaN();
+    });
+
+    it("divBigint は小さいランダムケースで floor 除算と一致する", () => {
+        const refDivBigint = (a: bigint, m: bigint) => BigInt(Math.floor(Number(a) / Number(m)));
+        for (let t = 0; t < 10_000; t++) {
+            const a = BigInt(Math.floor(Math.random() * 20_001) - 10_000);
+            const m = BigInt(Math.floor(Math.random() * 10_000) + 1);
+            expect(ExtendedMath.divBigint(a, m)).toBe(refDivBigint(a, m));
+        }
+    });
+
+    it("floorSum の追加ケース", () => {
+        const cases: [bigint, bigint, bigint, bigint, bigint][] = [
+            [6n, 5n, 4n, 3n, 13n],
+            [1n, 1n, 0n, 0n, 0n],
+            [31415n, 92653n, 58979n, 32384n, 314095480n],
+            [1000000000n, 1000000000n, 999999999n, 999999999n, 499999999500000000n],
+            [10n, 3n, -7n, -11n, -145n],
+        ];
+        for (const [n, m, a, b, ans] of cases) {
+            expect(ExtendedMath.floorSum(n, m, a, b)).toBe(ans);
+        }
     });
 });

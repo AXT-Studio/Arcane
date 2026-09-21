@@ -5,8 +5,8 @@
 /**
  * 数学的な関数のうち、JavaScript標準の`Math`にないものを提供するユーティリティクラスです。
  * - number: 最大公約数・最小公倍数・約数列挙・popcount(下位32bit)
- * - bigint: 最大公約数・最小公倍数・拡張ユークリッドの互除法・min, max, abs, sign・整数平方根
- * - bigint: 冪乗mod・逆元・中国剰余定理(CRT)
+ * - bigint: 最大公約数・最小公倍数・拡張ユークリッドの互除法・min, max, abs, sign, div・整数平方根
+ * - bigint: 冪乗mod・逆元・中国剰余定理(CRT)・床関数和(floorSum)
  * - ミラー-ラビン素数判定法
  */
 export class ExtendedMath {
@@ -451,6 +451,37 @@ export class ExtendedMath {
     }
 
     /**
+     * 整数aと正整数mについて、a = qm + r (0 ≦ r < m)を満たす整数q(商)を求めます。この値は除法の原理により一意に定まります。
+     *
+     * - ECMAScript標準のDivision演算子`/`でbigint同士の計算を行った場合と異なり、常に非負の数(0以上m未満)を返します
+     * - 言い換えると「a÷m (1未満の端数は負の無限大方向に丸め)」です。numberでは単にそのように書けば同じ事ができることに留意してください
+     * - 剰余`r`が必要な場合は、このメソッドの戻り値を`q`として`a - qm`で得ることができます
+     *
+     * 時間計算量: O(1) (※各種演算をO(1)と仮定した場合。内部では除算・剰余・条件(三項)・加算を1回ずつ行う。)
+     *
+     * @example
+     * ```ts
+     * console.log(ExtendedMath.divBigint(1n, 2n)); // => 0n
+     * console.log(ExtendedMath.divBigint(5n, 3n)); // => 1n
+     * console.log(ExtendedMath.divBigint(-1n, 3n)); // => -1n (※`-1n / 3n`では0nとなる)
+     * console.log(ExtendedMath.divBigint(1n, -3n)); // RangeError: `m` must be a positive integer
+     * console.log(ExtendedMath.divBigint(2n, 0n)); // RangeError: `m` must be a positive integer
+     * ```
+     *
+     * @param a - 割られる数 (a/m, 整数)
+     * @param m - 割る数 (a/m, 正整数)
+     * @returns a/mの商
+     * @throws {RangeError} - m <= 0n の場合
+     */
+    static divBigint(a: bigint, m: bigint): bigint {
+        // エラーハンドリング
+        if (m <= 0n) {
+            throw new RangeError("`m` must be a positive integer");
+        }
+        return a / m + (a % m < 0n ? -1n : 0n);
+    }
+
+    /**
      * ソート済みの数列に対して、中央値を返します。
      * 空配列に対してはNaNを返します。
      *
@@ -478,6 +509,41 @@ export class ExtendedMath {
             const b = sequence[sequence.length / 2];
             return (a + b) / 2;
         }
+    }
+
+    /**
+     * 非負整数`n`・正整数`m`・整数`a`・整数`b`に対して、「∑[i = 0..n-1]floor((ai + b) / m)」を計算します。なお、floor()は「負の無限大方向への整数丸め」です。
+     * 幾何学的には「直線 y=(ax+b)/m の下にある格子点の数え上げ」に相当します。
+     * O(log m)回程度の再帰呼び出しを行うため、`m`に非常に大きな値を指定する場合はランタイム等のコールスタックサイズ制限に注意してください。
+     *
+     * 時間計算量: O(log m)
+     *
+     * @example
+     * ```ts
+     * console.log(ExtendedMath.floorSum(4n, 10n, 6n, 3n)); // => 3n
+     * ```
+     *
+     * @param n - 範囲の右端 (∑[i = 0..n-1]floor((ai + b) / m))
+     * @param m - 直線の分母 (∑[i = 0..n-1]floor((ai + b) / m))
+     * @param a - 直線の傾き (∑[i = 0..n-1]floor((ai + b) / m))
+     * @param b - 直線の切片 (∑[i = 0..n-1]floor((ai + b) / m))
+     * @returns ∑[i = 0..n-1]floor((ai + b) / m)。幾何学的には「直線 y=(ax+b)/m の下にある格子点の数え上げ」に相当。
+     * @throws {Error} 環境と`m`の大きさによってはコールスタックサイズ制限に触れる可能性あり(Uncaught RangeError: Maximum call stack size exceeded)
+     */
+    static floorSum(n: bigint, m: bigint, a: bigint, b: bigint): bigint {
+        const q = ExtendedMath.divBigint(a, m);
+        const r = a - q * m;
+        const s = ExtendedMath.divBigint(b, m);
+        const t = b - s * m;
+        const c1 = (n * (n - 1n) * q) / 2n + n * s;
+        if (r === 0n) return c1;
+        const jMax = ExtendedMath.divBigint(r * n + t, m);
+        if (jMax === 0n) return c1;
+        const iMax = jMax * m - t;
+        const v = ExtendedMath.divBigint(-iMax, r);
+        const w = -iMax - v * r;
+        const c2 = jMax * (n + v);
+        return c1 + c2 + ExtendedMath.floorSum(jMax, r, m, w);
     }
 
     /**
