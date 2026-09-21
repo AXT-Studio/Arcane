@@ -43,6 +43,13 @@ describe("ExtendedMath の @example", () => {
         expect(ExtendedMath.modPow(3n, 200n, 50n)).toBe(1n);
     });
 
+    it("modInv", () => {
+        expect(ExtendedMath.modInv(3n, 7n)).toBe(5n);
+        expect(ExtendedMath.modInv(0n, 1n)).toBe(0n);
+        expect(ExtendedMath.modInv(-2n, 7n)).toBe(3n);
+        expect(() => ExtendedMath.modInv(2n, 4n)).toThrow(Error);
+    });
+
     it("isProbablyPrime", () => {
         expect(ExtendedMath.isProbablyPrime(17n)).toBe(true);
         expect(ExtendedMath.isProbablyPrime(18n)).toBe(false);
@@ -92,6 +99,14 @@ describe("ExtendedMath の @example", () => {
         expect(ExtendedMath.medianOfSorted([1, 3, 3, 6])).toBe(3);
         expect(ExtendedMath.medianOfSorted([])).toBeNaN();
     });
+
+    it("crt", () => {
+        expect(ExtendedMath.crt([10n], [7n])).toEqual([3n, 7n]);
+        expect(ExtendedMath.crt([-1n, 3n], [4n, 6n])).toEqual([3n, 12n]);
+        expect(ExtendedMath.crt([1n, 3n], [4n, 6n])).toEqual([9n, 12n]);
+        expect(ExtendedMath.crt([0n, 1n], [2n, 2n])).toEqual([0n, 0n]);
+        expect(ExtendedMath.crt([0n], [1n])).toEqual([0n, 1n]);
+    });
 });
 
 describe("ExtendedMath のエラー", () => {
@@ -106,6 +121,21 @@ describe("ExtendedMath のエラー", () => {
     it("modPow は法が正でないとき RangeError", () => {
         expect(() => ExtendedMath.modPow(3n, 2n, 0n)).toThrow(RangeError);
         expect(() => ExtendedMath.modPow(3n, 2n, -5n)).toThrow(RangeError);
+    });
+
+    it("modInv は法が 1 未満のとき Error", () => {
+        expect(() => ExtendedMath.modInv(3n, 0n)).toThrow(Error);
+        expect(() => ExtendedMath.modInv(3n, -1n)).toThrow(Error);
+    });
+
+    it("crt は a と n の長さが一致しないとき Error", () => {
+        expect(() => ExtendedMath.crt([1n], [2n, 3n])).toThrow(Error);
+        expect(() => ExtendedMath.crt([1n, 2n], [3n])).toThrow(Error);
+    });
+
+    it("crt は n に 1 未満の値が含まれるとき Error", () => {
+        expect(() => ExtendedMath.crt([1n], [0n])).toThrow(Error);
+        expect(() => ExtendedMath.crt([1n, 2n], [3n, -1n])).toThrow(Error);
     });
 
     it("divBigint は m <= 0 のとき RangeError", () => {

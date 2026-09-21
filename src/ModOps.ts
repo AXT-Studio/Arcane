@@ -218,14 +218,7 @@ export class ModOps {
      * @throws Error - aとこのModOpsの法が互いに素でない場合 (つまり、逆元が存在しない場合)
      */
     inv(a: bigint): bigint {
-        const value = this.normalize(a);
-        const [g, x] = ExtendedMath.extendedGCD(value, this.#mod);
-        if (g !== 1n) {
-            throw new Error(
-                `Inverse does not exist for ${a} modulo ${this.#mod} because gcd(${a}, ${this.#mod}) = ${g} is not 1.`,
-            );
-        }
-        return this.normalize(x);
+        return ExtendedMath.modInv(a, this.#mod);
     }
 
     /**
