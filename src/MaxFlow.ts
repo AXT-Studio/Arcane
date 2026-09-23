@@ -10,7 +10,6 @@ import { Deque } from "./Deque";
 
 /**
  * Dinic's algorithm を用いて最大流問題を解くためのクラスです。
- *
  */
 export class MaxFlow {
     /** v_size := グラフの頂点数 */
