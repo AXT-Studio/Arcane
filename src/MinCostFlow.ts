@@ -139,9 +139,9 @@ export class MinCostFlow {
      * minCostFlow.addEdge(1, 2, 2, 6);
      * minCostFlow.flow(0, 2);
      * console.log(minCostFlow.getEdges()); // [{ from: 0, to: 1, cap: 3, cost: 2, flow: 2 }, { from: 1, to: 2, cap: 2, cost: 6, flow: 2 }]
+     * ```
      *
      * @returns -追加された辺の情報。戻り値の`i`番目の要素は、`i`番目に追加された辺が、頂点`from`から`to`を結ぶ容量`cap`・流量1単位あたりコスト`cost`の辺で、現在の流量が`flow`であることを表す。
-     * ```
      */
     getEdges(): { from: number; to: number; cap: number; cost: number; flow: number }[] {
         const edges: { from: number; to: number; cap: number; cost: number; flow: number }[] = [];
@@ -170,7 +170,7 @@ export class MinCostFlow {
      * minCostFlow.addEdge(B, T, 1, 1);
      * const slopeResult = minCostFlow.slope(S, T);
      * console.log(slopeResult.flow); // => [0, 1, 2]
-     * console.log(slopeResult.cost); // => [0, 2, 8]
+     * console.log(slopeResult.cost); // => [0, 2, 6]
      * ```
      *
      * @remarks
@@ -305,7 +305,7 @@ export class MinCostFlow {
      * minCostFlow.addEdge(A, T, 1, 3);
      * minCostFlow.addEdge(B, T, 1, 1);
      * const flowResult = minCostFlow.flow(S, T);
-     * console.log(flowResult); // {flow: 2, cost: 8};
+     * console.log(flowResult); // {flow: 2, cost: 6};
      * ```
      *
      * @example 流量を制限する場合
