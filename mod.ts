@@ -13,6 +13,7 @@ export { Iteration } from "./src/Iteration.ts";
 export { LazySegmentTree } from "./src/LazySegmentTree.ts";
 export { LinearSieve } from "./src/LinearSieve.ts";
 export { MaxFlow } from "./src/MaxFlow.ts";
+export { MinCostFlow } from "./src/MinCostFlow.ts";
 export { ModOps } from "./src/ModOps.ts";
 export { RollingHash } from "./src/RollingHash.ts";
 export { SegmentTree } from "./src/SegmentTree.ts";
