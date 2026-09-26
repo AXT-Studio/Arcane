@@ -9,7 +9,8 @@ import { Deque } from "./Deque";
 // ================================================================
 
 /**
- * Dinic's algorithm を用いて最大流問題を解くためのクラスです。
+ * 最大流問題(Max-Cost Flow Problem)を解くためのクラスです。
+ * Dinic法を用います。
  */
 export class MaxFlow {
     /** v_size := グラフの頂点数 */
@@ -36,7 +37,7 @@ export class MaxFlow {
      * const maxFlow = new MaxFlow(4);
      * ```
      *
-     * @param n - グラフの頂点数
+     * @param n - フローネットワークの頂点数
      */
     constructor(n: number) {
         this.#v_size = n;
@@ -62,7 +63,7 @@ export class MaxFlow {
      *
      * @param from - 辺の始点番号 (0 <= from < n)
      * @param to - 辺の終点番号 (0 <= to < n, from == toも可)
-     * @param cap - 辺の容量 (0 <= cap)
+     * @param cap - 辺の容量 (0 <= cap, cap ∈ ℤ)
      * @returns 何番目に追加された辺か (0-indexed, getEdgeやchangeEdgeの引数として使用される)
      */
     addEdge(from: number, to: number, cap: number): number {
@@ -101,12 +102,16 @@ export class MaxFlow {
      * console.log(flow); // => 2 (0->1->3で1、0->2->3で1の流量を流せるので、合計2)
      * ```
      *
-     * @param s - 流量の始点
-     * @param t - 流量の終点
+     * @param s - フローの始点
+     * @param t - フローの終点
      * @param max - 流量の上限 (デフォルトはInfinity)
      * @returns 点sから点tへ(追加で)流せた流量 (その流量を流すようなフローの詳細はflow()実行後にminCut()やgetEdge()などで取得可能)
+     * @throws {Error} - 頂点`s`と頂点`t`に同一頂点を指定した場合
      */
     flow(s: number, t: number, max: number = Infinity): number {
+        if (s === t) {
+            throw Error("source(`s`) and sink(`t`) must be distinct vertices.");
+        }
         /** 現在のs→tの流量 */
         let currentFlow_s_t = 0;
         levelLoop: while (true) {
