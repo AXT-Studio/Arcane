@@ -31,56 +31,80 @@ export class Convolution {
     /**
      * @private calcの内部で使うNTTパートの実装です
      *
-     * @param c - c[i]は多項式Aのi次の係数。長さL (Lは2の冪で、cは空でない)
+     * @param c - c[i]は多項式Aのi次の係数。長さL (Lは2の冪で、cは空でない。各要素は0以上p未満に正規化済みであること。)
      * @param omega - 法pにおける原始L乗根 (0 <= omega < p, L=1の場合omega=1n)
      * @param p - 法p (奇素数)
-     * @returns - result[i]はA(omega**i) mod p。長さL
+     * @returns - result[i]はA(omega**i) mod p。長さLで、cをin-placeに書き換えて返すこともある
      */
-    static #ntt(c: readonly bigint[], omega: bigint, p: bigint): bigint[] {
+    static #ntt(c: bigint[], omega: bigint, p: bigint): bigint[] {
         const L = c.length;
         // L === 1の場合、c[0]は定数項なのでそのまま返せばOK
         if (L === 1) return [((c[0] % p) + p) % p];
-        // 偶奇で振り分け
-        const evens: bigint[] = [];
-        const odds: bigint[] = [];
-        for (let i = 0; i < L; i += 2) {
-            evens.push(c[i]);
-            odds.push(c[i + 1]);
+        const modP = new ModOps(p);
+
+        // cをビット反転順へ並べ替えておく
+        Convolution.#bitReverseInPlace(c);
+        // cをそのまま途中計算→最終結果に使う
+        // 2個のブロック→4個のブロック→8個のブロック……というように範囲を倍々にしながら組み合わせていく
+        for (let size = 2; size <= L; size *= 2) {
+            const half = size / 2;
+            const stageOmega = modP.pow(omega, BigInt(L / size));
+            // size 要素のブロックを先頭から順に処理する
+            for (let start = 0; start < L; start += size) {
+                // このあとのループでstageOmegaの(非負整数)乗を順に使うので、それを保持する変数を用意しておく。初期値はstageOmega**0 = 1
+                let x = 1n;
+                for (let k = 0; k < half; k++) {
+                    const evenIndex = start + k;
+                    const oddIndex = start + half + k;
+                    // eとxoは先に計算しないと上書きにより元の値が失われるので注意
+                    const e = c[evenIndex];
+                    const xo = (x * c[oddIndex]) % p;
+                    c[evenIndex] = (e + xo) % p;
+                    c[oddIndex] = (e - xo + p) % p;
+                    x = (x * stageOmega) % p;
+                }
+            }
         }
-        // A(x) = E(x^2) + x･O(x^2)に分割したあとのomegaは単にomega**2 mod p
-        const child_omega = (omega * omega) % p;
-        // 分割したものをそれぞれ再帰で求める
-        const evenValues = Convolution.#ntt(evens, child_omega, p);
-        const oddValues = Convolution.#ntt(odds, child_omega, p);
-        // このあとのループでomegaの(非負整数)乗を順に使うので、それを保持する変数を用意しておく。初期値はomega**0 = 1
-        let x = 1n;
-        // 答えを埋める。このとき、前半と後半は先の議論により同時に埋めることができる
-        const result = Array.from({ length: L }, () => 0n);
-        for (let k = 0; k < L / 2; k++) {
-            const e = evenValues[k];
-            const xo = (x * oddValues[k]) % p;
-            result[k] = (e + xo) % p;
-            result[k + L / 2] = (e - xo + p) % p;
-            x = (x * omega) % p;
+        return c;
+    }
+
+    /**
+     * @private #nttの内部で使います。配列を添字をbit反転したときの昇順に従って(in-placeで)並び替えます
+     */
+    static #bitReverseInPlace(c: bigint[]): void {
+        const L = c.length;
+        // 2進数カウントを左から自力でやるイメージ
+        let j = 0;
+        for (let i = 1; i < L; i++) {
+            let bit = L >>> 1;
+            while ((j & bit) !== 0) {
+                j ^= bit;
+                bit >>>= 1;
+            }
+            j ^= bit;
+            if (i < j) {
+                const temp = c[i];
+                c[i] = c[j];
+                c[j] = temp;
+            }
         }
-        return result;
     }
 
     /**
      * 長さNの数列a(a_0, a_1, ..., a_{N-1})と長さMの数列b(b_0, b_1, ..., b_{M-1})から、以下を満たす長さN+M-1の数列cの各要素の値を、指定された法のもとで求めます。
-     * c_i = ∑[j = 0..i](a_j × b_{i-j})
+     * c_i = ∑[j = 0..i](a_j × b_{i-j}) (ただし、配列の範囲外の要素は0とみなします。)
      *
      * - a, bの少なくとも一方が空配列のときは、空配列を返します
      * - 法`p`に指定できる値は制限されています (NTT-Friendlyな素数である必要があるため)
      * - 指定した法`p`によって、N+M-1の上限が変わります
      *
-     * 時間計算量: O(n log n + log p) (n=N+M)
+     * 時間計算量: O(n log n + log p) (n=N+M, 各種BigInt演算はO(1)と仮定)
      *
      * @remarks
      * 以下に、法`p`として指定可能な値と、それらの値におけるN+M-1の上限を列挙します
-     * - `p = 998244353n` ... 制約: `2n ** 23n >= N + M - 1n` (998244353 = 119 * 2 ** 23 + 1)
-     * - `p = 167772161n` ... 制約: `2n ** 25n >= N + M - 1n` (167772161 = 5 * 2 ** 25 + 1)
-     * - `p = 3221225473n` ... 制約: `2n ** 30n >= N + M - 1n` (3221225473 = 3 * 2 ** 30 + 1)
+     * - p = 998244353n  ... N + M - 1 <= 2 ** 23
+     * - p = 167772161n  ... N + M - 1 <= 2 ** 25
+     * - p = 3221225473n ... N + M - 1 <= 2 ** 30
      *
      * @example
      * ```ts
@@ -93,7 +117,7 @@ export class Convolution {
      * @returns - result[i] = c_i = ∑[j = 0..i](a_j × b_{i-j}) mod p
      * @throws {RangeError} - 法`p`として指定した値の特徴に対して、aの長さ+bの長さ-1が大きすぎる場合
      */
-    static calc(a: readonly bigint[], b: readonly bigint[], p: ConvolutionMod) {
+    static calc(a: readonly bigint[], b: readonly bigint[], p: ConvolutionMod): bigint[] {
         const modP = new ModOps(p);
         const N = a.length;
         const M = b.length;
