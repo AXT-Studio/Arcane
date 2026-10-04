@@ -40,8 +40,8 @@ describe("Treap の @example", () => {
         treap.set(1, "one");
         treap.set(3, "three");
         treap.set(5, "five");
-        expect(treap.lowerBound(0)).toEqual({ key: 1, value: "one" });
-        expect(treap.lowerBound(3)).toEqual({ key: 3, value: "three" });
+        expect(treap.lowerBound(0)).toEqual({ key: 1, value: "one", index: 0 });
+        expect(treap.lowerBound(3)).toEqual({ key: 3, value: "three", index: 1 });
         expect(treap.lowerBound(6)).toBeUndefined();
     });
 
@@ -50,8 +50,8 @@ describe("Treap の @example", () => {
         treap.set(1, "one");
         treap.set(3, "three");
         treap.set(5, "five");
-        expect(treap.upperBound(0)).toEqual({ key: 1, value: "one" });
-        expect(treap.upperBound(3)).toEqual({ key: 5, value: "five" });
+        expect(treap.upperBound(0)).toEqual({ key: 1, value: "one", index: 0 });
+        expect(treap.upperBound(3)).toEqual({ key: 5, value: "five", index: 2 });
         expect(treap.upperBound(5)).toBeUndefined();
     });
 
