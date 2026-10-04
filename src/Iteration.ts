@@ -156,6 +156,19 @@ export class Iteration {
      *     - 指定がない場合は閉区間[0, i]とします。
      *
      * 時間計算量: 最悪O(|array|) (※|array|はarrayの長さ、実際はoperatorの計算量が掛かる)
+     *
+     * @example
+     * ```ts
+     * const nums = [2, 3, 5, 7];
+     * console.log(Iteration.accumulate(nums)); // [2, 5, 10, 17]
+     * console.log(Iteration.accumulate(nums, (a, b) => a * b)); // [2, 6, 30, 210]
+     * console.log(Iteration.accumulate(nums, (a, b) => a + b, 0)); // [0, 2, 5, 10, 17]
+     * ```
+     *
+     * @param array 対象とする数値配列
+     * @param operator 累積する演算 (指定がない場合加算)
+     * @param e operatorの単位元 (returnValue[i]を半開区間[0, i)の累積とする場合に指定)
+     * @returns 先頭からの累積結果の配列。eを指定した場合半開区間、指定がない場合閉区間
      */
     static accumulate(array: ArrayLike<number>, op?: (a: number, b: number) => number, e?: number): number[];
 
@@ -166,6 +179,19 @@ export class Iteration {
      *     - 指定がない場合は閉区間[0, i]とします。
      *
      * 時間計算量: 最悪O(|array|) (※|array|はarrayの長さ、実際はoperatorの計算量が掛かる)
+     *
+     * @example
+     * ```ts
+     * const ints = [2n, 3n, 5n, 7n];
+     * console.log(Iteration.accumulate(ints)); // [2n, 5n, 10n, 17n]
+     * console.log(Iteration.accumulate(ints, (a, b) => a * b)); // [2n, 6n, 30n, 210n]
+     * console.log(Iteration.accumulate(ints, (a, b) => a + b, 0n)); // [0n, 2n, 5n, 10n, 17n]
+     * ```
+     *
+     * @param array 対象とする数値配列
+     * @param operator 累積する演算 (指定がない場合加算)
+     * @param e operatorの単位元 (returnValue[i]を半開区間[0, i)の累積とする場合に指定)
+     * @returns 先頭からの累積結果の配列。eを指定した場合半開区間、指定がない場合閉区間
      */
     static accumulate(array: ArrayLike<bigint>, op?: (a: bigint, b: bigint) => bigint, e?: bigint): bigint[];
     /**
