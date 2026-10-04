@@ -154,7 +154,7 @@ export class Treap<K, V> {
      * キーと値のペアをTreapに挿入します。
      * すでに同じキーが存在する場合は、その値を上書きします。
      *
-     * 時間計算量: O(log N) (NはTreap内の要素数)
+     * 時間計算量: 期待 O(log (N+1)) (NはTreap内の要素数)
      *
      * @example
      * ```ts
@@ -187,7 +187,7 @@ export class Treap<K, V> {
      * キーに対応する値をTreapから削除します。
      * そのキーが存在しない場合は何もしません。
      *
-     * 時間計算量: O(log N) (NはTreap内の要素数)
+     * 時間計算量: 期待 O(log (N+1)) (NはTreap内の要素数)
      *
      * @example
      * ```ts
@@ -216,7 +216,7 @@ export class Treap<K, V> {
      * キーに対応する値をTreapから取得します。
      * そのキーが存在しない場合は`undefined`を返します。
      *
-     * 時間計算量: O(log N) (NはTreap内の要素数)
+     * 時間計算量: 期待 O(log (N+1)) (NはTreap内の要素数)
      *
      * @example
      * ```ts
@@ -245,7 +245,7 @@ export class Treap<K, V> {
      * キー"以上"と判定される最小のキー・その値・その順位(0-indexed)を取得します。
      * そのようなキーが存在しない場合は`undefined`を返します。
      *
-     * 時間計算量: O(log N) (NはTreap内の要素数)
+     * 時間計算量: 期待 O(log (N+1)) (NはTreap内の要素数)
      *
      * @example
      * ```ts
@@ -299,7 +299,7 @@ export class Treap<K, V> {
      * キー"より大きい"と判定される最小のキー・その値・その順位(0-indexed)を取得します。
      * そのようなキーが存在しない場合は`undefined`を返します。
      *
-     * 時間計算量: O(log N) (NはTreap内の要素数)
+     * 時間計算量: 期待 O(log (N+1)) (NはTreap内の要素数)
      *
      * @example
      * ```ts
@@ -347,7 +347,7 @@ export class Treap<K, V> {
      * kは0始まりのインデックスです。
      * そのような要素が存在しない場合は`undefined`を返します。
      *
-     * 時間計算量: O(log N) (NはTreap内の要素数)
+     * 時間計算量: 期待 O(log (N+1)) (NはTreap内の要素数)
      *
      * 以下の点に注意してください。
      * - kは0以上である必要があり、これを満たさない場合は例外がスローされます。
@@ -395,7 +395,7 @@ export class Treap<K, V> {
     /**
      * このTreap内にある、キーがkey(未満|以下|以上|超過)の要素の数を取得します。
      *
-     * 時間計算量: O(log N) (NはTreap内の要素数)
+     * 時間計算量: 期待 O(log (N+1)) (NはTreap内の要素数)
      *
      * @example
      * ```ts
