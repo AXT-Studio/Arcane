@@ -74,4 +74,16 @@ describe("Convolution の境界・特例", () => {
         expect(Convolution.calc([-3n, 5n], [4n, -1n], 998244353n)).toEqual([998244341n, 23n, 998244348n]);
         expect(Convolution.calc([998244353n + 2n], [1n], 998244353n)).toEqual([2n]);
     });
+
+    it("出力長1000でも正常に計算できる", () => {
+        const a = Array<bigint>(500).fill(1n);
+        const b = Array<bigint>(501).fill(1n);
+
+        // 全部1なので、自明に「1, 2, …, 499, 500, 500, 499, …, 2, 1」となるはず
+        const expected = Array.from({ length: 1000 }, (_, i) => BigInt(Math.min(i + 1, 500, 1000 - i)));
+
+        for (const p of MODS) {
+            expect(Convolution.calc(a, b, p)).toEqual(expected);
+        }
+    });
 });
