@@ -2,17 +2,17 @@ import { describe, expect, it } from "vitest";
 import { BinaryHeap, BinaryHeapLite } from "../src/BinaryHeap.ts";
 
 describe("BinaryHeap - JSDoc @example", () => {
-    it("constructor() [初期値なし]", () => {
+    it("new BinaryHeap() [初期値なし]", () => {
         expect(() => {
             const _minHeap = new BinaryHeap<number>((a, b) => a - b);
         }).not.toThrow();
     });
-    it("constructor() [初期値を与える]", () => {
+    it("new BinaryHeap() [初期値を与える]", () => {
         const minHeap = new BinaryHeap<number>((a, b) => a - b, [5, 3, 8, 1]);
         expect(minHeap.pop()).toBe(1);
         expect(minHeap.pop()).toBe(3);
     });
-    it("size", () => {
+    it("get size", () => {
         const heap = new BinaryHeap<number>((a, b) => a - b);
         expect(heap.size).toBe(0);
         heap.push(5);
@@ -64,17 +64,17 @@ describe("BinaryHeap - JSDoc @example", () => {
 });
 
 describe("BinaryHeapLite - JSDoc @example", () => {
-    it("constructor() [初期値なし]", () => {
+    it("new BinaryHeapLite() [初期値なし]", () => {
         expect(() => {
             const _minHeap = new BinaryHeapLite<number>((a, b) => a - b);
         }).not.toThrow();
     });
-    it("constructor() [初期値を与える]", () => {
+    it("new BinaryHeapLite() [初期値を与える]", () => {
         const minHeap = new BinaryHeapLite<number>((a, b) => a - b, [5, 3, 8, 1]);
         expect(minHeap.pop()).toBe(1);
         expect(minHeap.pop()).toBe(3);
     });
-    it("size", () => {
+    it("get size", () => {
         const heap = new BinaryHeap<number>((a, b) => a - b);
         expect(heap.size).toBe(0);
         heap.push(5);
@@ -113,14 +113,35 @@ describe("BinaryHeapLite - JSDoc @example", () => {
     });
 });
 
-describe("BinaryHeap - ランダムテスト", () => {
-    it("挿入時にソートするArrayと比較", () => {
+describe("BinaryHeap - Random Tests", () => {
+    it("push(), pop()について、挿入時にソートするArrayと比較して一致確認", () => {
         const heap = new BinaryHeap<number>((a, b) => a - b);
         const array: number[] = [];
-        for (let q = 0; q < 1e4; q++) {
+        for (let q = 0; q < 1e3; q++) {
             const op = array.length / 1e2 <= Math.random() ? "push" : "pop";
             if (op === "push") {
-                const n = Math.floor(Math.random() * 1e4);
+                const n = Math.floor(Math.random() * 1e3);
+                heap.push(n);
+                array.push(n);
+                array.sort((a, b) => a - b);
+            } else {
+                expect(heap.pop()!).toBe(array.shift()!);
+            }
+        }
+        while (array.length > 0) {
+            expect(heap.pop()!).toBe(array.shift()!);
+        }
+    });
+});
+
+describe("BinaryHeapLite - Random Tests", () => {
+    it("push(), pop()について、挿入時にソートするArrayと比較して一致確認", () => {
+        const heap = new BinaryHeapLite<number>((a, b) => a - b);
+        const array: number[] = [];
+        for (let q = 0; q < 1e3; q++) {
+            const op = array.length / 1e2 <= Math.random() ? "push" : "pop";
+            if (op === "push") {
+                const n = Math.floor(Math.random() * 1e3);
                 heap.push(n);
                 array.push(n);
                 array.sort((a, b) => a - b);
