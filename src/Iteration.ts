@@ -169,6 +169,7 @@ export class Iteration {
      * @param operator 累積する演算 (指定がない場合加算)
      * @param e operatorの単位元 (returnValue[i]を半開区間[0, i)の累積とする場合に指定)
      * @returns 先頭からの累積結果の配列。eを指定した場合半開区間、指定がない場合閉区間
+     * @ignore - (このJSDocはJSR docs(deno doc)では非表示にします)
      */
     static accumulate(array: ArrayLike<number>, op?: (a: number, b: number) => number, e?: number): number[];
 
@@ -192,6 +193,7 @@ export class Iteration {
      * @param operator 累積する演算 (指定がない場合加算)
      * @param e operatorの単位元 (returnValue[i]を半開区間[0, i)の累積とする場合に指定)
      * @returns 先頭からの累積結果の配列。eを指定した場合半開区間、指定がない場合閉区間
+     * @ignore - (このJSDocはJSR docs(deno doc)では非表示にします)
      */
     static accumulate(array: ArrayLike<bigint>, op?: (a: bigint, b: bigint) => bigint, e?: bigint): bigint[];
     /**
