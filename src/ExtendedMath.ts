@@ -198,6 +198,55 @@ export class ExtendedMath {
     }
 
     /**
+     * 整数`n`の整数立方根を求めます。すなわち、`x ** 3 <= n < (x + 1) ** 3`を満たす唯一の整数`x`を返します。
+     *
+     * 時間計算量: nが2^40未満の場合はO(1)、それ以上の場合はO(M(log_2(n)))
+     * ここで M(k) はkビット整数の乗算の時間計算量で、これは実行エンジンに依存します。一般に M(k) は O(k^(log_2(3))) もしくは O(k log k log log k) となります。
+     *
+     * @remarks
+     * `0n <= n < 2n**40n`では`Math.cbrt()`に計算を委譲します。`Math.cbrt()`の精度が十分でない実行環境では不正確な値が返される可能性がある点に注意してください。
+     * (DenoとBunで問題ないことはこちらで全列挙して確認してあります。)
+     *
+     * @example
+     * ```ts
+     * ExtendedMath.icbrt(8n) // => 2n
+     * ExtendedMath.icbrt(26n) // => 2n
+     * ExtendedMath.icbrt(27n) // => 3n
+     * ```
+     *
+     * @param n - 対象の整数 (n >= 0)
+     * @returns nの整数立方根
+     * @throws {RangeError} nが負の数の場合
+     */
+    static icbrt(n: bigint): bigint {
+        // nが負の数の場合はエラー
+        if (n < 0n) {
+            throw new RangeError("n must be non-negative");
+        }
+        // f64 で扱える範囲ならば、Math.cbrt + 1段階の補正を利用する
+        // n <= 2^40 では floor(cbrt) が高々 +1 しかずれない (全列挙して確認済み、ECMAScriptとしての仕様保証はないがさすがに大丈夫だろう)
+        if (n < 1099511627776n /* 2n ** 40n */) {
+            let s = BigInt(Math.floor(Math.cbrt(Number(n))));
+            if (s ** 3n > n) s--;
+            return s;
+        }
+        // 漸化式の初期値
+        // 効率的なビット長の近似計算: 16進数文字列長 * 4
+        const bitLength = BigInt(n.toString(16).length * 4);
+        let x0 = 1n << ((bitLength + 2n) / 3n);
+        let x1 = (2n * x0 + n / (x0 * x0)) / 3n; // 漸化式で次のステップの値を計算
+
+        // x1 が x0 より小さい間 = まだ収束していない間
+        while (x1 < x0) {
+            x0 = x1; // 値を更新
+            x1 = (2n * x0 + n / (x0 * x0)) / 3n; // 再度、次のステップの値を計算
+        }
+
+        // ループを抜けた時点の x0 が求める答え
+        return x0;
+    }
+
+    /**
      * 整数`a`, 非負整数`n`, 正整数`m`について、`a`の`n`乗を`m`で割った余り(`(a ** n) % m`)を求めます。
      *
      * 時間計算量: O(log n)

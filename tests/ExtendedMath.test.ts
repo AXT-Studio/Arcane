@@ -39,6 +39,12 @@ describe("ExtendedMath の @example", () => {
         expect(ExtendedMath.isqrt(16n)).toBe(4n);
     });
 
+    it("icbrt", () => {
+        expect(ExtendedMath.icbrt(8n)).toBe(2n);
+        expect(ExtendedMath.icbrt(26n)).toBe(2n);
+        expect(ExtendedMath.icbrt(27n)).toBe(3n);
+    });
+
     it("modPow", () => {
         expect(ExtendedMath.modPow(3n, 200n, 50n)).toBe(1n);
     });
@@ -112,6 +118,10 @@ describe("ExtendedMath の @example", () => {
 describe("ExtendedMath のエラー", () => {
     it("isqrt は n が負のとき RangeError", () => {
         expect(() => ExtendedMath.isqrt(-1n)).toThrow(RangeError);
+    });
+
+    it("icbrt は n が負のとき RangeError", () => {
+        expect(() => ExtendedMath.icbrt(-1n)).toThrow(RangeError);
     });
 
     it("modPow は指数が負のとき RangeError", () => {
@@ -193,6 +203,26 @@ describe("ExtendedMath の境界・特例", () => {
         expect(ExtendedMath.medianOfSorted({ length: 1.5, 0: 1, 1: 2 })).toBeNaN();
         expect(ExtendedMath.medianOfSorted({ length: Number.POSITIVE_INFINITY, 0: 1 })).toBeNaN();
         expect(ExtendedMath.medianOfSorted({ length: Number.NaN })).toBeNaN();
+    });
+
+    it("icbrt(0n)", () => {
+        expect(ExtendedMath.icbrt(0n)).toBe(0n);
+    });
+
+    it("icbrt は 1 以上 2^10 以下で floor(cbrt) と一致する", () => {
+        const ref = (n: bigint) => BigInt(Math.floor(Math.cbrt(Number(n))));
+        for (let n = 1n; n <= 1n << 10n; n++) {
+            expect(ExtendedMath.icbrt(n)).toBe(ref(n));
+        }
+    });
+
+    it("icbrt は 1 以上 2^52 以下のランダムな整数で floor(cbrt) と一致する", () => {
+        const ref = (n: bigint) => BigInt(Math.floor(Math.cbrt(Number(n))));
+        const limit = 1n << 52n;
+        for (let t = 0; t < 1000; t++) {
+            const n = BigInt(Math.floor(Math.random() * Number(limit))) + 1n;
+            expect(ExtendedMath.icbrt(n)).toBe(ref(n));
+        }
     });
 
     it("divBigint は小さいランダムケースで floor 除算と一致する", () => {
