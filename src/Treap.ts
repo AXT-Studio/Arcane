@@ -40,6 +40,8 @@ class TreapNode<K, V> {
  *
  * @template K - キーの型
  * @template V - 値の型
+ *
+ * @since 1.0.0
  */
 export class Treap<K, V> {
     /** 根となるノード */

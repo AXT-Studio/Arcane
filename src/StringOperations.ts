@@ -167,6 +167,8 @@ const sa_is = (s: number[]): number[] => {
  * - Z Array (Z Algorithm)
  * - Suffix Array
  * - LCP Array
+ *
+ * @since 1.0.0
  */
 export class StringOperations {
     /**

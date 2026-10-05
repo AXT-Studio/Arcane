@@ -4,6 +4,8 @@
 
 /**
  * 反復処理に関するメソッド群を提供するユーティリティクラスです。
+ *
+ * @since 1.0.0
  */
 export class Iteration {
     /**
@@ -142,6 +144,8 @@ export class Iteration {
      *
      * @param array - 対象とする配列
      * @param callbackFn - arrayの隣り合う各ペア(a, b)ごとに行いたい処理 (第3引数はaのidx)
+     *
+     * @since 1.4.0
      */
     static forEachPair<T>(array: ArrayLike<T>, callbackFn: (a: T, b: T, idx: number) => void): void {
         for (let i = 0; i < array.length - 1; i++) {
@@ -170,6 +174,8 @@ export class Iteration {
      * @param e operatorの単位元 (returnValue[i]を半開区間[0, i)の累積とする場合に指定)
      * @returns 先頭からの累積結果の配列。eを指定した場合半開区間、指定がない場合閉区間
      * @ignore - (このJSDocはJSR docs(deno doc)では非表示にします)
+     *
+     * @since 1.4.0
      */
     static accumulate(array: ArrayLike<number>, op?: (a: number, b: number) => number, e?: number): number[];
 
@@ -194,6 +200,8 @@ export class Iteration {
      * @param e operatorの単位元 (returnValue[i]を半開区間[0, i)の累積とする場合に指定)
      * @returns 先頭からの累積結果の配列。eを指定した場合半開区間、指定がない場合閉区間
      * @ignore - (このJSDocはJSR docs(deno doc)では非表示にします)
+     *
+     * @since 1.4.0
      */
     static accumulate(array: ArrayLike<bigint>, op?: (a: bigint, b: bigint) => bigint, e?: bigint): bigint[];
     /**
@@ -220,6 +228,8 @@ export class Iteration {
      * @param operator 累積する演算 (指定がない場合加算)
      * @param e operatorの単位元 (returnValue[i]を半開区間[0, i)の累積とする場合に指定)
      * @returns 先頭からの累積結果の配列。eを指定した場合半開区間、指定がない場合閉区間
+     *
+     * @since 1.4.0
      */
     static accumulate<T extends number | bigint>(array: ArrayLike<T>, operator?: (a: T, b: T) => T, e?: T): T[] {
         const res: T[] = [];

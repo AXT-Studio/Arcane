@@ -11,6 +11,8 @@ import { Deque } from "./Deque";
 /**
  * 最大流問題(Max-Cost Flow Problem)を解くためのクラスです。
  * Dinic法を用います。
+ *
+ * @since 1.0.0
  */
 export class MaxFlow {
     /** v_size := グラフの頂点数 */

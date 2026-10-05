@@ -8,6 +8,8 @@
  * Priority Queueの実装などに利用できます。
  *
  * @template T - ヒープに格納する要素の型
+ *
+ * @since 1.0.0
  */
 export class BinaryHeap<T> {
     /** ヒープの要素を格納する配列 0番目は現在の要素数 */
@@ -429,6 +431,8 @@ export class BinaryHeap<T> {
  * 定数倍高速化のために、push, pop, peek, size, clear のみをサポートします。
  *
  * @template T - ヒープに格納する要素の型
+ *
+ * @since 1.0.0
  */
 export class BinaryHeapLite<T> {
     /** ヒープの要素を格納する配列 0番目は現在の要素数 */

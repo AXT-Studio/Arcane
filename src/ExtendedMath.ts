@@ -8,6 +8,8 @@
  * - bigint: 最大公約数・最小公倍数・拡張ユークリッドの互除法・min, max, abs, sign, div・整数平方根
  * - bigint: 冪乗mod・逆元・中国剰余定理(CRT)・床関数和(floorSum)
  * - ミラー-ラビン素数判定法
+ *
+ * @since 1.0.0
  */
 export class ExtendedMath {
     /**
@@ -217,6 +219,8 @@ export class ExtendedMath {
      * @param n - 対象の整数 (n >= 0)
      * @returns nの整数立方根
      * @throws {RangeError} nが負の数の場合
+     *
+     * @since 1.9.0
      */
     static icbrt(n: bigint): bigint {
         // nが負の数の場合はエラー
@@ -306,6 +310,8 @@ export class ExtendedMath {
      * @param m - 法 (1以上)
      * @returns 法をmとする合同算術におけるaのモジュラ逆数(乗法の逆元)。0以上m未満の整数
      * @throws {Error} - aとmが互いに素でない(つまり、逆元が存在しない)か、mが1未満である場合
+     *
+     * @since 1.6.0
      */
     static modInv(a: bigint, m: bigint): bigint {
         if (m < 1n) {
@@ -521,6 +527,8 @@ export class ExtendedMath {
      * @param m - 割る数 (a/m, 正整数)
      * @returns a/mの商
      * @throws {RangeError} - m <= 0n の場合
+     *
+     * @since 1.6.0
      */
     static divBigint(a: bigint, m: bigint): bigint {
         // エラーハンドリング
@@ -578,6 +586,8 @@ export class ExtendedMath {
      * @param b - 直線の切片 (∑[i = 0..n-1]floor((ai + b) / m))
      * @returns ∑[i = 0..n-1]floor((ai + b) / m)。幾何学的には「直線 y=(ax+b)/m の下にある格子点の数え上げ」に相当。
      * @throws {Error} 環境と`m`の大きさによってはコールスタックサイズ制限に触れる可能性あり(Uncaught RangeError: Maximum call stack size exceeded)
+     *
+     * @since 1.6.0
      */
     static floorSum(n: bigint, m: bigint, a: bigint, b: bigint): bigint {
         const q = ExtendedMath.divBigint(a, m);
@@ -616,6 +626,8 @@ export class ExtendedMath {
      * @param n - n[i]は、条件として与えるk元連立合同式x≡a_i(mod n_i)のn_i
      * @returns [x, l]で、x+lt(tは整数)がすべての合同式を満たすとを示す。解なしの場合は[0n, 0n]。
      * @throws {Error} - aとnの長さが一致しないか、nに1未満の値が含まれている場合
+     *
+     * @since 1.6.0
      */
     static crt(a: readonly bigint[], n: readonly bigint[]): [x: bigint, l: bigint] {
         if (a.length !== n.length) {
