@@ -203,6 +203,10 @@ export class ExtendedMath {
      * 時間計算量: nが2^40未満の場合はO(1)、それ以上の場合はO(M(log_2(n)))
      * ここで M(k) はkビット整数の乗算の時間計算量で、これは実行エンジンに依存します。一般に M(k) は O(k^(log_2(3))) もしくは O(k log k log log k) となります。
      *
+     * @remarks
+     * `0n <= n < 2n**40n`では`Math.cbrt()`に計算を委譲します。`Math.cbrt()`の精度が十分でない実行環境では不正確な値が返される可能性がある点に注意してください。
+     * (DenoとBunで問題ないことはこちらで全列挙して確認してあります。)
+     *
      * @example
      * ```ts
      * ExtendedMath.icbrt(8n) // => 2n
