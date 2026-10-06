@@ -26,6 +26,8 @@ const nttConfigs = new Map<ConvolutionMod, { a: bigint; b: bigint; g: bigint }>(
 
 /**
  * 畳み込みを計算するためのユーティリティクラスです。
+ *
+ * @since 2.0.0
  */
 export class Convolution {
     /**
