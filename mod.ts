@@ -18,6 +18,7 @@ export { MinCostFlow } from "./src/MinCostFlow.ts";
 export { ModOps } from "./src/ModOps.ts";
 export { RollingHash } from "./src/RollingHash.ts";
 export { SegmentTree } from "./src/SegmentTree.ts";
+export { SparseTable } from "./src/SparseTable.ts";
 export { StringOperations } from "./src/StringOperations.ts";
 export { Treap } from "./src/Treap.ts";
 export { TwoSAT } from "./src/TwoSAT.ts";
