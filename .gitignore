@@ -37,3 +37,6 @@ pnpm-debug.log*
 
 # Deno Doc Preview
 .docs-preview
+
+# Temporary
+temp

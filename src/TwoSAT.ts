@@ -14,6 +14,8 @@ import { DirectedGraph } from "./Graphs";
  * - 「`x[a] === f`と`x[b] === g`の少なくとも一方は真(両方真でも良い)」という条件をM個与えます
  *     - つまり、各条件は`[a: number, f: boolean, b: number, g: boolean]`で表されます
  * - このとき、M個の条件すべてを満たすような`x`が作れるかを判定し、また可能な場合はそのような`x`を一つ与えます
+ *
+ * @since 1.6.0
  */
 export class TwoSAT {
     /** 変数の数 (xの長さ, x[0]〜x[n-1]のn変数について考えることとする) */

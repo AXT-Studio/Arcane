@@ -1,16 +1,15 @@
 import { describe, expect, it } from "vitest";
 import { Deque } from "../src/Deque.ts";
 
-describe("Deque の @example", () => {
-    it("constructor と unshift / push", () => {
+describe("Deque - JSDoc @example", () => {
+    it("new Deque()", () => {
         const deque = new Deque<number>([1, 2, 3]);
         expect(deque.toArray()).toEqual([1, 2, 3]);
         deque.unshift(0);
         deque.push(4);
         expect(deque.toArray()).toEqual([0, 1, 2, 3, 4]);
     });
-
-    it("unshift のあと push", () => {
+    it("unshift()", () => {
         const deque = new Deque<number>();
         deque.unshift(3);
         deque.unshift(2);
@@ -20,8 +19,17 @@ describe("Deque の @example", () => {
         deque.push(5);
         expect(deque.toArray()).toEqual([1, 2, 3, 4, 5]);
     });
-
-    it("shift と pop", () => {
+    it("push()", () => {
+        const deque = new Deque<number>();
+        deque.unshift(3);
+        deque.unshift(2);
+        deque.unshift(1);
+        expect(deque.toArray()).toEqual([1, 2, 3]);
+        deque.push(4);
+        deque.push(5);
+        expect(deque.toArray()).toEqual([1, 2, 3, 4, 5]);
+    });
+    it("shift()", () => {
         const deque = new Deque<number>([1, 2, 3, 4, 5]);
         expect(deque.toArray()).toEqual([1, 2, 3, 4, 5]);
         expect(deque.shift()).toBe(1);
@@ -29,15 +37,27 @@ describe("Deque の @example", () => {
         expect(deque.pop()).toBe(5);
         expect(deque.toArray()).toEqual([2, 3, 4]);
     });
-
-    it("first と last", () => {
+    it("pop()", () => {
+        const deque = new Deque<number>([1, 2, 3, 4, 5]);
+        expect(deque.toArray()).toEqual([1, 2, 3, 4, 5]);
+        expect(deque.shift()).toBe(1);
+        expect(deque.toArray()).toEqual([2, 3, 4, 5]);
+        expect(deque.pop()).toBe(5);
+        expect(deque.toArray()).toEqual([2, 3, 4]);
+    });
+    it("first()", () => {
         const deque = new Deque<number>([1, 2, 3]);
         expect(deque.first()).toBe(1);
         expect(deque.last()).toBe(3);
         expect(deque.toArray()).toEqual([1, 2, 3]);
     });
-
-    it("get", () => {
+    it("last()", () => {
+        const deque = new Deque<number>([1, 2, 3]);
+        expect(deque.first()).toBe(1);
+        expect(deque.last()).toBe(3);
+        expect(deque.toArray()).toEqual([1, 2, 3]);
+    });
+    it("get()", () => {
         const deque = new Deque<number>([1, 2, 3]);
         expect(deque.get(0)).toBe(1);
         expect(deque.get(1)).toBe(2);
@@ -45,8 +65,7 @@ describe("Deque の @example", () => {
         expect(deque.get(3)).toBeUndefined();
         expect(deque.get(-1)).toBeUndefined();
     });
-
-    it("set", () => {
+    it("set()", () => {
         const deque = new Deque<number>([1, 2, 3]);
         deque.set(0, 4);
         expect(deque.toArray()).toEqual([4, 2, 3]);
@@ -56,8 +75,7 @@ describe("Deque の @example", () => {
         expect(deque.toArray()).toEqual([4, 5, 6]);
         expect(() => deque.set(3, 7)).toThrow(RangeError);
     });
-
-    it("isEmpty", () => {
+    it("isEmpty()", () => {
         const deque = new Deque<number>();
         expect(deque.isEmpty()).toBe(true);
         deque.push(1);
@@ -65,8 +83,14 @@ describe("Deque の @example", () => {
         deque.pop();
         expect(deque.isEmpty()).toBe(true);
     });
-
-    it("size", () => {
+    it("toArray()", () => {
+        const deque = new Deque<number>([1, 2, 3]);
+        expect(deque.toArray()).toEqual([1, 2, 3]);
+        deque.unshift(0);
+        deque.push(4);
+        expect(deque.toArray()).toEqual([0, 1, 2, 3, 4]);
+    });
+    it("get size", () => {
         const deque = new Deque<number>([1, 2, 3]);
         expect(deque.size).toBe(3);
         deque.unshift(0);
@@ -75,20 +99,54 @@ describe("Deque の @example", () => {
     });
 });
 
-describe("Deque のエラー", () => {
-    it("set はインデックスが範囲外のとき RangeError", () => {
+describe("Deque - Edge Cases", () => {
+    it("shift()は空のときundefined", () => {
+        const deque = new Deque<number>();
+        expect(deque.shift()).toBeUndefined();
+    });
+    it("pop()は空のときundefined", () => {
+        const deque = new Deque<number>();
+        expect(deque.pop()).toBeUndefined();
+    });
+    it("first()は空のときundefined", () => {
+        const deque = new Deque<number>();
+        expect(deque.first()).toBeUndefined();
+    });
+    it("last()は空のときundefined", () => {
+        const deque = new Deque<number>();
+        expect(deque.last()).toBeUndefined();
+    });
+    it("set()はインデックスが負のときRangeError", () => {
         const deque = new Deque<number>([1, 2, 3]);
         expect(() => deque.set(-1, 0)).toThrow(RangeError);
+    });
+    it("set()はインデックスが長さ以上のときRangeError", () => {
+        const deque = new Deque<number>([1, 2, 3]);
         expect(() => deque.set(3, 0)).toThrow(RangeError);
     });
 });
 
-describe("Deque の境界・特例", () => {
-    it("空のとき shift / pop / first / last は undefined", () => {
+describe("Deque - Random Tests", () => {
+    it("push(), pop(), shift(), unshift()について、number[]と比較して一致確認", () => {
         const deque = new Deque<number>();
-        expect(deque.shift()).toBeUndefined();
-        expect(deque.pop()).toBeUndefined();
-        expect(deque.first()).toBeUndefined();
-        expect(deque.last()).toBeUndefined();
+        const array: number[] = [];
+        const ops = ["push", "pop", "shift", "unshift"] as const;
+        for (let q = 0; q < 300; q++) {
+            const op = ops[Math.floor(Math.random() * ops.length)];
+            if (op === "push") {
+                const n = Math.floor(Math.random() * 100);
+                deque.push(n);
+                array.push(n);
+            } else if (op === "unshift") {
+                const n = Math.floor(Math.random() * 100);
+                deque.unshift(n);
+                array.unshift(n);
+            } else if (op === "pop") {
+                expect(deque.pop()).toBe(array.pop());
+            } else {
+                expect(deque.shift()).toBe(array.shift());
+            }
+            expect(deque.toArray()).toEqual(array);
+        }
     });
 });

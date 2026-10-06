@@ -4,6 +4,8 @@
 
 /**
  * ECMAScriptのArray#sort()や本ライブラリのBinarySearchで要求される比較関数をまとめたユーティリティクラスです。
+ *
+ * @since 1.0.0
  */
 export class CompareFn {
     /**

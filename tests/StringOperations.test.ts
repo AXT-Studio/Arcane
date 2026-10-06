@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { StringOperations } from "../src/StringOperations.ts";
 
-describe("StringOperations の @example", () => {
-    it("runLengthEncoding", () => {
+describe("StringOperations - JSDoc @example", () => {
+    it("StringOperations.runLengthEncoding()", () => {
         expect(StringOperations.runLengthEncoding("aaabb")).toEqual([
             { value: "a", count: 3 },
             { value: "b", count: 2 },
@@ -13,19 +13,16 @@ describe("StringOperations の @example", () => {
         ]);
         expect(StringOperations.runLengthEncoding([])).toEqual([]);
     });
-
-    it("zArray", () => {
+    it("StringOperations.zArray()", () => {
         expect(StringOperations.zArray("ababc")).toEqual([5, 0, 2, 0, 0]);
         expect(StringOperations.zArray("aaaaa")).toEqual([5, 4, 3, 2, 1]);
         expect(StringOperations.zArray("abcde")).toEqual([5, 0, 0, 0, 0]);
     });
-
-    it("getSuffixArray", () => {
+    it("StringOperations.getSuffixArray()", () => {
         expect(StringOperations.getSuffixArray("abcaba")).toEqual([5, 3, 0, 4, 1, 2]);
         expect(StringOperations.getSuffixArray([-1000, 0, 1000, -1000, 0, -1000])).toEqual([5, 3, 0, 4, 1, 2]);
     });
-
-    it("getLCPArray", () => {
+    it("StringOperations.getLCPArray()", () => {
         const s = "abcaba";
         const sa = StringOperations.getSuffixArray(s);
         expect(sa).toEqual([5, 3, 0, 4, 1, 2]);
@@ -33,19 +30,26 @@ describe("StringOperations の @example", () => {
     });
 });
 
-describe("StringOperations のエラー", () => {
-    it("getLCPArray は s と sa の長さが異なるとき Error", () => {
+describe("StringOperations - Edge Cases", () => {
+    it("getLCPArray()はsとsaの長さが異なるときError", () => {
         expect(() => StringOperations.getLCPArray("abc", [0, 1])).toThrow(Error);
     });
-});
-
-describe("StringOperations の境界・特例", () => {
-    it("空入力は空配列を返す", () => {
+    it("zArray()は空文字列のとき[]", () => {
         expect(StringOperations.zArray("")).toEqual([]);
+    });
+    it("zArray()は空配列のとき[]", () => {
         expect(StringOperations.zArray([])).toEqual([]);
+    });
+    it("getSuffixArray()は空文字列のとき[]", () => {
         expect(StringOperations.getSuffixArray("")).toEqual([]);
+    });
+    it("getSuffixArray()は空配列のとき[]", () => {
         expect(StringOperations.getSuffixArray([])).toEqual([]);
+    });
+    it("getLCPArray()はsが空文字列でsaが空のとき[]", () => {
         expect(StringOperations.getLCPArray("", [])).toEqual([]);
+    });
+    it("getLCPArray()はsが空配列でsaが空のとき[]", () => {
         expect(StringOperations.getLCPArray([], [])).toEqual([]);
     });
 });

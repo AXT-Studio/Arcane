@@ -40,6 +40,8 @@ class TreapNode<K, V> {
  *
  * @template K - キーの型
  * @template V - 値の型
+ *
+ * @since 1.0.0
  */
 export class Treap<K, V> {
     /** 根となるノード */
@@ -154,7 +156,7 @@ export class Treap<K, V> {
      * キーと値のペアをTreapに挿入します。
      * すでに同じキーが存在する場合は、その値を上書きします。
      *
-     * 時間計算量: O(log N) (NはTreap内の要素数)
+     * 時間計算量: 期待 O(log (N+1)) (NはTreap内の要素数)
      *
      * @example
      * ```ts
@@ -187,7 +189,7 @@ export class Treap<K, V> {
      * キーに対応する値をTreapから削除します。
      * そのキーが存在しない場合は何もしません。
      *
-     * 時間計算量: O(log N) (NはTreap内の要素数)
+     * 時間計算量: 期待 O(log (N+1)) (NはTreap内の要素数)
      *
      * @example
      * ```ts
@@ -216,7 +218,7 @@ export class Treap<K, V> {
      * キーに対応する値をTreapから取得します。
      * そのキーが存在しない場合は`undefined`を返します。
      *
-     * 時間計算量: O(log N) (NはTreap内の要素数)
+     * 時間計算量: 期待 O(log (N+1)) (NはTreap内の要素数)
      *
      * @example
      * ```ts
@@ -242,10 +244,10 @@ export class Treap<K, V> {
     }
 
     /**
-     * キー"以上"と判定される最小のキーとその値を取得します。
+     * キー"以上"と判定される最小のキー・その値・その順位(0-indexed)を取得します。
      * そのようなキーが存在しない場合は`undefined`を返します。
      *
-     * 時間計算量: O(log N) (NはTreap内の要素数)
+     * 時間計算量: 期待 O(log (N+1)) (NはTreap内の要素数)
      *
      * @example
      * ```ts
@@ -253,44 +255,53 @@ export class Treap<K, V> {
      * treap.set(1, 'one');
      * treap.set(3, 'three');
      * treap.set(5, 'five');
-     * console.log(treap.lowerBound(0)); // => { key: 1, value: 'one' } (1が0以上の最小のキー)
-     * console.log(treap.lowerBound(3)); // => { key: 3, value: 'three' } (3が3以上の最小のキー)
+     * console.log(treap.lowerBound(0)); // => { key: 1, value: 'one', index: 0 } (1が0以上の最小のキーは0番目の{1 -> 'one'})
+     * console.log(treap.lowerBound(3)); // => { key: 3, value: 'three', index: 1 } (3が3以上の最小のキーは1番目の{3 -> 'three'})
      * console.log(treap.lowerBound(6)); // => undefined (6以上のキーは存在しない)
      * ```
      *
      * @param key - 基準となるキー
-     * @returns キーがkey以上の最小のキーとその値、存在しない場合は`undefined`
+     * @returns キーがkey以上の最小のキー・その値・その順位(0-indexed)。存在しない場合は`undefined`
      */
-    lowerBound(key: K): { key: K; value: V } | undefined {
+    lowerBound(key: K): { key: K; value: V; index: number } | undefined {
         let currentTargetNode = this.root;
         /** @type {TreapNode<K,V> | undefined} */
         let candidateNode: TreapNode<K, V> | undefined;
+        // indexを得るためにメモを用意
+        let indexBase = 0;
+        let candidateIndex = 0;
+        // 木を下りながら……
         while (currentTargetNode) {
+            const leftSize = Treap.#getSize(currentTargetNode.left);
             const cmp = this.#keyCompareFn(key, currentTargetNode.key);
             if (cmp === 0) {
+                candidateIndex = indexBase + leftSize;
                 return {
                     key: currentTargetNode.key,
                     value: currentTargetNode.value,
+                    index: candidateIndex,
                 };
             } else if (cmp < 0) {
+                candidateIndex = indexBase + leftSize;
                 candidateNode = currentTargetNode;
                 currentTargetNode = currentTargetNode.left;
             } else {
+                indexBase += leftSize + 1;
                 currentTargetNode = currentTargetNode.right;
             }
         }
         if (candidateNode) {
-            return { key: candidateNode.key, value: candidateNode.value };
+            return { key: candidateNode.key, value: candidateNode.value, index: candidateIndex };
         } else {
             return undefined;
         }
     }
 
     /**
-     * キー"より大きい"と判定される最小のキーとその値を取得します。
+     * キー"より大きい"と判定される最小のキー・その値・その順位(0-indexed)を取得します。
      * そのようなキーが存在しない場合は`undefined`を返します。
      *
-     * 時間計算量: O(log N) (NはTreap内の要素数)
+     * 時間計算量: 期待 O(log (N+1)) (NはTreap内の要素数)
      *
      * @example
      * ```ts
@@ -298,29 +309,36 @@ export class Treap<K, V> {
      * treap.set(1, 'one');
      * treap.set(3, 'three');
      * treap.set(5, 'five');
-     * console.log(treap.upperBound(0)); // => { key: 1, value: 'one' } (1が0より大きい最小のキー)
-     * console.log(treap.upperBound(3)); // => { key: 5, value: 'five' } (5が3より大きい最小のキー)
+     * console.log(treap.upperBound(0)); // => { key: 1, value: 'one', index: 0 } (1が0より大きい最小のキーは0番目の{1 -> 'one'})
+     * console.log(treap.upperBound(3)); // => { key: 5, value: 'five', index: 2 } (5が3より大きい最小のキーは2番目の{5 -> 'five'})
      * console.log(treap.upperBound(5)); // => undefined (5より大きいキーは存在しない)
      * ```
      *
      * @param key - 基準となるキー
-     * @returns キーがkeyより大きい最小のキーとその値、存在しない場合は`undefined`
+     * @returns キーがkeyより大きい最小のキー・その値・その順位(0-indexed)。存在しない場合は`undefined`
      */
-    upperBound(key: K): { key: K; value: V } | undefined {
+    upperBound(key: K): { key: K; value: V; index: number } | undefined {
         let currentTargetNode = this.root;
         /** @type {TreapNode<K,V> | undefined} */
         let candidateNode: TreapNode<K, V> | undefined;
+        // indexを得るためにメモを用意
+        let indexBase = 0;
+        let candidateIndex = 0;
+        // 木を下りながら……
         while (currentTargetNode) {
+            const leftSize = Treap.#getSize(currentTargetNode.left);
             const cmp = this.#keyCompareFn(key, currentTargetNode.key);
             if (cmp < 0) {
+                candidateIndex = indexBase + leftSize;
                 candidateNode = currentTargetNode;
                 currentTargetNode = currentTargetNode.left;
             } else {
+                indexBase += leftSize + 1;
                 currentTargetNode = currentTargetNode.right;
             }
         }
         if (candidateNode) {
-            return { key: candidateNode.key, value: candidateNode.value };
+            return { key: candidateNode.key, value: candidateNode.value, index: candidateIndex };
         } else {
             return undefined;
         }
@@ -331,7 +349,7 @@ export class Treap<K, V> {
      * kは0始まりのインデックスです。
      * そのような要素が存在しない場合は`undefined`を返します。
      *
-     * 時間計算量: O(log N) (NはTreap内の要素数)
+     * 時間計算量: 期待 O(log (N+1)) (NはTreap内の要素数)
      *
      * 以下の点に注意してください。
      * - kは0以上である必要があり、これを満たさない場合は例外がスローされます。
@@ -379,7 +397,7 @@ export class Treap<K, V> {
     /**
      * このTreap内にある、キーがkey(未満|以下|以上|超過)の要素の数を取得します。
      *
-     * 時間計算量: O(log N) (NはTreap内の要素数)
+     * 時間計算量: 期待 O(log (N+1)) (NはTreap内の要素数)
      *
      * @example
      * ```ts

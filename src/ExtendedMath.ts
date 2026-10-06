@@ -8,6 +8,8 @@
  * - bigint: 最大公約数・最小公倍数・拡張ユークリッドの互除法・min, max, abs, sign, div・整数平方根
  * - bigint: 冪乗mod・逆元・中国剰余定理(CRT)・床関数和(floorSum)
  * - ミラー-ラビン素数判定法
+ *
+ * @since 1.0.0
  */
 export class ExtendedMath {
     /**
@@ -198,6 +200,57 @@ export class ExtendedMath {
     }
 
     /**
+     * 整数`n`の整数立方根を求めます。すなわち、`x ** 3 <= n < (x + 1) ** 3`を満たす唯一の整数`x`を返します。
+     *
+     * 時間計算量: nが2^40未満の場合はO(1)、それ以上の場合はO(M(log_2(n)))
+     * ここで M(k) はkビット整数の乗算の時間計算量で、これは実行エンジンに依存します。一般に M(k) は O(k^(log_2(3))) もしくは O(k log k log log k) となります。
+     *
+     * @remarks
+     * `0n <= n < 2n**40n`では`Math.cbrt()`に計算を委譲します。`Math.cbrt()`の精度が十分でない実行環境では不正確な値が返される可能性がある点に注意してください。
+     * (DenoとBunで問題ないことはこちらで全列挙して確認してあります。)
+     *
+     * @example
+     * ```ts
+     * ExtendedMath.icbrt(8n) // => 2n
+     * ExtendedMath.icbrt(26n) // => 2n
+     * ExtendedMath.icbrt(27n) // => 3n
+     * ```
+     *
+     * @param n - 対象の整数 (n >= 0)
+     * @returns nの整数立方根
+     * @throws {RangeError} nが負の数の場合
+     *
+     * @since 1.9.0
+     */
+    static icbrt(n: bigint): bigint {
+        // nが負の数の場合はエラー
+        if (n < 0n) {
+            throw new RangeError("n must be non-negative");
+        }
+        // f64 で扱える範囲ならば、Math.cbrt + 1段階の補正を利用する
+        // n <= 2^40 では floor(cbrt) が高々 +1 しかずれない (全列挙して確認済み、ECMAScriptとしての仕様保証はないがさすがに大丈夫だろう)
+        if (n < 1099511627776n /* 2n ** 40n */) {
+            let s = BigInt(Math.floor(Math.cbrt(Number(n))));
+            if (s ** 3n > n) s--;
+            return s;
+        }
+        // 漸化式の初期値
+        // 効率的なビット長の近似計算: 16進数文字列長 * 4
+        const bitLength = BigInt(n.toString(16).length * 4);
+        let x0 = 1n << ((bitLength + 2n) / 3n);
+        let x1 = (2n * x0 + n / (x0 * x0)) / 3n; // 漸化式で次のステップの値を計算
+
+        // x1 が x0 より小さい間 = まだ収束していない間
+        while (x1 < x0) {
+            x0 = x1; // 値を更新
+            x1 = (2n * x0 + n / (x0 * x0)) / 3n; // 再度、次のステップの値を計算
+        }
+
+        // ループを抜けた時点の x0 が求める答え
+        return x0;
+    }
+
+    /**
      * 整数`a`, 非負整数`n`, 正整数`m`について、`a`の`n`乗を`m`で割った余り(`(a ** n) % m`)を求めます。
      *
      * 時間計算量: O(log n)
@@ -257,6 +310,8 @@ export class ExtendedMath {
      * @param m - 法 (1以上)
      * @returns 法をmとする合同算術におけるaのモジュラ逆数(乗法の逆元)。0以上m未満の整数
      * @throws {Error} - aとmが互いに素でない(つまり、逆元が存在しない)か、mが1未満である場合
+     *
+     * @since 1.6.0
      */
     static modInv(a: bigint, m: bigint): bigint {
         if (m < 1n) {
@@ -472,6 +527,8 @@ export class ExtendedMath {
      * @param m - 割る数 (a/m, 正整数)
      * @returns a/mの商
      * @throws {RangeError} - m <= 0n の場合
+     *
+     * @since 1.6.0
      */
     static divBigint(a: bigint, m: bigint): bigint {
         // エラーハンドリング
@@ -529,6 +586,8 @@ export class ExtendedMath {
      * @param b - 直線の切片 (∑[i = 0..n-1]floor((ai + b) / m))
      * @returns ∑[i = 0..n-1]floor((ai + b) / m)。幾何学的には「直線 y=(ax+b)/m の下にある格子点の数え上げ」に相当。
      * @throws {Error} 環境と`m`の大きさによってはコールスタックサイズ制限に触れる可能性あり(Uncaught RangeError: Maximum call stack size exceeded)
+     *
+     * @since 1.6.0
      */
     static floorSum(n: bigint, m: bigint, a: bigint, b: bigint): bigint {
         const q = ExtendedMath.divBigint(a, m);
@@ -567,6 +626,8 @@ export class ExtendedMath {
      * @param n - n[i]は、条件として与えるk元連立合同式x≡a_i(mod n_i)のn_i
      * @returns [x, l]で、x+lt(tは整数)がすべての合同式を満たすとを示す。解なしの場合は[0n, 0n]。
      * @throws {Error} - aとnの長さが一致しないか、nに1未満の値が含まれている場合
+     *
+     * @since 1.6.0
      */
     static crt(a: readonly bigint[], n: readonly bigint[]): [x: bigint, l: bigint] {
         if (a.length !== n.length) {

@@ -1,147 +1,158 @@
 import { describe, expect, it } from "vitest";
 import { RollingHash } from "../src/RollingHash.ts";
 
-/** seed 固定の疑似乱数生成器 (mulberry32) */
-function mulberry32(seed: number): () => number {
-    let t = seed >>> 0;
-    return () => {
-        t = (t + 0x6d2b79f5) >>> 0;
-        let r = Math.imul(t ^ (t >>> 15), 1 | t);
-        r ^= r + Math.imul(r ^ (r >>> 7), 61 | r);
-        return ((r ^ (r >>> 14)) >>> 0) / 4294967296;
-    };
-}
-
-/** ASCII 英小文字・ひらがな・全角文字。すべて BMP 内 */
-const CHAR_POOL = Array.from("abcdefghijklmnopqrstuvwxyzあいうえおＡ一");
-
-function randomString(rand: () => number, length: number): string {
-    let s = "";
-    for (let i = 0; i < length; i++) {
-        s += CHAR_POOL[Math.floor(rand() * CHAR_POOL.length)];
-    }
-    return s;
-}
-
-function assertRandomWalk(rh: RollingHash, seed: number): void {
-    const rand = mulberry32(seed);
-    for (let trial = 0; trial < 100; trial++) {
-        const chars: string[] = [];
-        let hash = 0;
-        for (let step = 0; step < 300; step++) {
-            const opCount = chars.length === 0 ? 2 : 4;
-            const op = Math.floor(rand() * opCount);
-            if (op === 0) {
-                const c = CHAR_POOL[Math.floor(rand() * CHAR_POOL.length)];
-                hash = rh.pushToTail(hash, c);
-                chars.push(c);
-            } else if (op === 1) {
-                const c = CHAR_POOL[Math.floor(rand() * CHAR_POOL.length)];
-                hash = rh.pushToHead(c, hash, chars.length);
-                chars.unshift(c);
-            } else if (op === 2) {
-                const c = chars[chars.length - 1];
-                hash = rh.popFromTail(hash, c);
-                chars.pop();
-            } else {
-                const c = chars[0];
-                hash = rh.popFromHead(c, hash, chars.length);
-                chars.shift();
-            }
-            expect(hash).toBe(rh.hashOf(chars.join("")));
-        }
-    }
-}
-
-function assertRandomConcat(rh: RollingHash, seed: number): void {
-    const rand = mulberry32(seed);
-    for (let trial = 0; trial < 100; trial++) {
-        const a = randomString(rand, Math.floor(rand() * 40));
-        const b = randomString(rand, Math.floor(rand() * 40));
-        const hashA = rh.hashOf(a);
-        const hashB = rh.hashOf(b);
-        expect(rh.concat(hashA, hashB, b.length)).toBe(rh.hashOf(a + b));
-    }
-}
-
-describe("RollingHash の @example", () => {
-    it("constructor", () => {
+describe("RollingHash - JSDoc @example", () => {
+    it("new RollingHash()", () => {
+        const rh1 = new RollingHash();
+        const rh2 = new RollingHash(999983, 94906247);
+        const hash1 = rh1.hashOf("abcde");
+        const hash2 = rh2.hashOf("abcde");
+        expect(Number.isInteger(hash1)).toBe(true);
+        expect(hash1).toBeGreaterThanOrEqual(0);
+        expect(hash1).toBeLessThan(94906249);
+        expect(Number.isInteger(hash2)).toBe(true);
+        expect(hash2).toBeGreaterThanOrEqual(0);
+        expect(hash2).toBeLessThan(94906247);
+    });
+    it("hashOf()", () => {
         const rh = new RollingHash();
         const hash = rh.hashOf("abcde");
         expect(Number.isInteger(hash)).toBe(true);
         expect(hash).toBeGreaterThanOrEqual(0);
         expect(hash).toBeLessThan(94906249);
     });
-
-    it("constructor 第2系統", () => {
-        const rh = new RollingHash(999983, 94906247);
-        const hash = rh.hashOf("abcde");
-        expect(Number.isInteger(hash)).toBe(true);
-        expect(hash).toBeGreaterThanOrEqual(0);
-        expect(hash).toBeLessThan(94906247);
-    });
-
-    it("pushToTail", () => {
+    it("pushToTail()", () => {
         const rh = new RollingHash();
-        const h = rh.hashOf("abc");
-        expect(rh.pushToTail(h, "d")).toBe(rh.hashOf("abcd"));
+        const abc = rh.hashOf("abc");
+        const abcd = rh.pushToTail(abc, "d");
+        expect(abcd === rh.hashOf("abcd")).toBe(true);
     });
-
-    it("pushToHead", () => {
+    it("pushToHead()", () => {
         const rh = new RollingHash();
-        const h = rh.hashOf("bcd");
-        expect(rh.pushToHead("a", h, 3)).toBe(rh.hashOf("abcd"));
+        const bcd = rh.hashOf("bcd");
+        const abcd = rh.pushToHead("a", bcd, 3);
+        expect(abcd === rh.hashOf("abcd")).toBe(true);
     });
-
-    it("popFromTail", () => {
+    it("popFromTail()", () => {
         const rh = new RollingHash();
-        const h = rh.hashOf("abcd");
-        expect(rh.popFromTail(h, "d")).toBe(rh.hashOf("abc"));
+        const abcd = rh.hashOf("abcd");
+        const abc = rh.popFromTail(abcd, "d");
+        expect(abc === rh.hashOf("abc")).toBe(true);
     });
-
-    it("popFromHead", () => {
+    it("popFromHead()", () => {
         const rh = new RollingHash();
-        const h = rh.hashOf("abcd");
-        expect(rh.popFromHead("a", h, 4)).toBe(rh.hashOf("bcd"));
+        const abcd = rh.hashOf("abcd");
+        const bcd = rh.popFromHead("a", abcd, 4);
+        expect(bcd === rh.hashOf("bcd")).toBe(true);
     });
-
-    it("hashOf 空文字列", () => {
-        const rh = new RollingHash();
-        expect(rh.hashOf("")).toBe(0);
-    });
-
-    it("concat", () => {
+    it("concat()", () => {
         const rh = new RollingHash();
         const abc = rh.hashOf("abc");
         const def = rh.hashOf("def");
-        expect(rh.concat(abc, def, 3)).toBe(rh.hashOf("abcdef"));
+        const abcdef = rh.concat(abc, def, 3);
+        expect(abcdef === rh.hashOf("abcdef")).toBe(true);
     });
 });
 
-describe("RollingHash のランダム一致", () => {
-    it("デフォルトパラメータ", () => {
-        assertRandomWalk(new RollingHash(), 20260902);
+describe("RollingHash - Edge Cases", () => {
+    it("hashOf()は空文字列のとき0", () => {
+        const rh = new RollingHash();
+        expect(rh.hashOf("")).toBe(0);
     });
-
-    it("第2系統 (999983, 94906247)", () => {
-        assertRandomWalk(new RollingHash(999983, 94906247), 20260903);
-    });
-
-    it("concat デフォルトパラメータ", () => {
-        assertRandomConcat(new RollingHash(), 20260904);
-    });
-
-    it("concat 第2系統 (999983, 94906247)", () => {
-        assertRandomConcat(new RollingHash(999983, 94906247), 20260905);
-    });
-});
-
-describe("RollingHash の境界・特例", () => {
-    it("concat は lenB が 0 のとき hashA と一致する", () => {
+    it("concat()はlenBが0のときhashAと一致", () => {
         const rh = new RollingHash();
         const hashA = rh.hashOf("abc");
         const hashB = rh.hashOf("");
         expect(rh.concat(hashA, hashB, 0)).toBe(hashA);
         expect(rh.concat(hashA, hashB, 0)).toBe(rh.hashOf("abc"));
+    });
+});
+
+describe("RollingHash - Random Tests", () => {
+    it("pushToTail(), pushToHead(), popFromTail(), popFromHead()について、デフォルトの(m, h)でhashOf()と比較して一致確認", () => {
+        const chars = Array.from("abcdefghijklmnopqrstuvwxyzあいうえおＡ一");
+        const rh = new RollingHash();
+        for (let trial = 0; trial < 50; trial++) {
+            const built: string[] = [];
+            let hash = 0;
+            for (let step = 0; step < 200; step++) {
+                const opCount = built.length === 0 ? 2 : 4;
+                const op = Math.floor(Math.random() * opCount);
+                if (op === 0) {
+                    const c = chars[Math.floor(Math.random() * chars.length)];
+                    hash = rh.pushToTail(hash, c);
+                    built.push(c);
+                } else if (op === 1) {
+                    const c = chars[Math.floor(Math.random() * chars.length)];
+                    hash = rh.pushToHead(c, hash, built.length);
+                    built.unshift(c);
+                } else if (op === 2) {
+                    const c = built[built.length - 1];
+                    hash = rh.popFromTail(hash, c);
+                    built.pop();
+                } else {
+                    const c = built[0];
+                    hash = rh.popFromHead(c, hash, built.length);
+                    built.shift();
+                }
+                expect(hash).toBe(rh.hashOf(built.join("")));
+            }
+        }
+    });
+    it("pushToTail(), pushToHead(), popFromTail(), popFromHead()について、第2系統の(m, h)でhashOf()と比較して一致確認", () => {
+        const chars = Array.from("abcdefghijklmnopqrstuvwxyzあいうえおＡ一");
+        const rh = new RollingHash(999983, 94906247);
+        for (let trial = 0; trial < 50; trial++) {
+            const built: string[] = [];
+            let hash = 0;
+            for (let step = 0; step < 200; step++) {
+                const opCount = built.length === 0 ? 2 : 4;
+                const op = Math.floor(Math.random() * opCount);
+                if (op === 0) {
+                    const c = chars[Math.floor(Math.random() * chars.length)];
+                    hash = rh.pushToTail(hash, c);
+                    built.push(c);
+                } else if (op === 1) {
+                    const c = chars[Math.floor(Math.random() * chars.length)];
+                    hash = rh.pushToHead(c, hash, built.length);
+                    built.unshift(c);
+                } else if (op === 2) {
+                    const c = built[built.length - 1];
+                    hash = rh.popFromTail(hash, c);
+                    built.pop();
+                } else {
+                    const c = built[0];
+                    hash = rh.popFromHead(c, hash, built.length);
+                    built.shift();
+                }
+                expect(hash).toBe(rh.hashOf(built.join("")));
+            }
+        }
+    });
+    it("concat()について、デフォルトの(m, h)でhashOf()と比較して一致確認", () => {
+        const chars = Array.from("abcdefghijklmnopqrstuvwxyzあいうえおＡ一");
+        const rh = new RollingHash();
+        for (let trial = 0; trial < 100; trial++) {
+            const lenA = Math.floor(Math.random() * 40);
+            const lenB = Math.floor(Math.random() * 40);
+            let a = "";
+            let b = "";
+            for (let i = 0; i < lenA; i++) a += chars[Math.floor(Math.random() * chars.length)];
+            for (let i = 0; i < lenB; i++) b += chars[Math.floor(Math.random() * chars.length)];
+            expect(rh.concat(rh.hashOf(a), rh.hashOf(b), b.length)).toBe(rh.hashOf(a + b));
+        }
+    });
+    it("concat()について、第2系統の(m, h)でhashOf()と比較して一致確認", () => {
+        const chars = Array.from("abcdefghijklmnopqrstuvwxyzあいうえおＡ一");
+        const rh = new RollingHash(999983, 94906247);
+        for (let trial = 0; trial < 100; trial++) {
+            const lenA = Math.floor(Math.random() * 40);
+            const lenB = Math.floor(Math.random() * 40);
+            let a = "";
+            let b = "";
+            for (let i = 0; i < lenA; i++) a += chars[Math.floor(Math.random() * chars.length)];
+            for (let i = 0; i < lenB; i++) b += chars[Math.floor(Math.random() * chars.length)];
+            expect(rh.concat(rh.hashOf(a), rh.hashOf(b), b.length)).toBe(rh.hashOf(a + b));
+        }
     });
 });

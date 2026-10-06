@@ -10,6 +10,8 @@ import { ModOps } from "./ModOps";
 
 /**
  * 組み合わせ(二項係数)を計算するためのクラスです。
+ *
+ * @since 1.0.0
  */
 export class Combination {
     #modOps: ModOps;
