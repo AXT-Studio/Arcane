@@ -7,6 +7,9 @@ AyaExpTech Arcane (`/éɪéksték ɑːkéin/`のように発音)は、主に競�
 copyright (c) 2026- Ayasaka-Koto(AyaExpTech)  
 Released under the [MIT License](LICENSE).
 
+- `tests/`内テストファイル群は、AIエージェント(Grok 4.7 on Cursor)により作成されています
+- それ以外の各ファイルは、(一部はAIを使いながら勉強した上で)Ayasaka-Kotoにより作成されています
+
 ## Installation
 
 このライブラリは[JSR](https://jsr.io/@ayaexptech/arcane)パッケージとして公開されています。

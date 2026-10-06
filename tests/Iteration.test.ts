@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { Iteration } from "../src/Iteration.ts";
 
-describe("Iteration の @example", () => {
-    it("next_permutation を Array.from で展開", () => {
+describe("Iteration - JSDoc @example", () => {
+    it("Iteration.next_permutation() [順列を配列に展開する]", () => {
         const arr = [1, 2, 3];
         const permutations = Array.from(Iteration.next_permutation(arr, (a, b) => a - b));
         expect(permutations).toEqual([
@@ -14,8 +14,7 @@ describe("Iteration の @example", () => {
             [3, 2, 1],
         ]);
     });
-
-    it("next_permutation を for-of で走査", () => {
+    it("Iteration.next_permutation() [順列を1つずつ処理する]", () => {
         const arr = [1, 2, 3];
         const permutations: number[][] = [];
         for (const perm of Iteration.next_permutation(arr, (a, b) => a - b)) {
@@ -30,8 +29,7 @@ describe("Iteration の @example", () => {
             [3, 2, 1],
         ]);
     });
-
-    it("next_product による bit 全探索", () => {
+    it("Iteration.next_product() [bit全探索]", () => {
         const products = Array.from(Iteration.next_product([2, 2]));
         expect(products).toEqual([
             [0, 0],
@@ -40,8 +38,7 @@ describe("Iteration の @example", () => {
             [1, 1],
         ]);
     });
-
-    it("上限が異なる next_product", () => {
+    it("Iteration.next_product() [桁ごとに上限を変える場合]", () => {
         const products = Array.from(Iteration.next_product([2, 3]));
         expect(products).toEqual([
             [0, 0],
@@ -52,13 +49,11 @@ describe("Iteration の @example", () => {
             [1, 2],
         ]);
     });
-
-    it("空配列の next_product", () => {
+    it("Iteration.next_product() [空配列の場合]", () => {
         const products = Array.from(Iteration.next_product([]));
         expect(products).toEqual([[]]);
     });
-
-    it("forEachPair で隣り合う差を表示", () => {
+    it("Iteration.forEachPair()", () => {
         const arr = [1, 4, 10, 15];
         const lines: string[] = [];
         Iteration.forEachPair(arr, (a, b, idx) => {
@@ -66,15 +61,11 @@ describe("Iteration の @example", () => {
         });
         expect(lines).toEqual(["Pair #0: 3", "Pair #1: 6", "Pair #2: 5"]);
     });
-
-    it("accumulate の number 例", () => {
+    it("Iteration.accumulate()", () => {
         const nums = [2, 3, 5, 7];
         expect(Iteration.accumulate(nums)).toEqual([2, 5, 10, 17]);
         expect(Iteration.accumulate(nums, (a, b) => a * b)).toEqual([2, 6, 30, 210]);
         expect(Iteration.accumulate(nums, (a, b) => a + b, 0)).toEqual([0, 2, 5, 10, 17]);
-    });
-
-    it("accumulate の bigint 例", () => {
         const ints = [2n, 3n, 5n, 7n];
         expect(Iteration.accumulate(ints)).toEqual([2n, 5n, 10n, 17n]);
         expect(Iteration.accumulate(ints, (a, b) => a * b)).toEqual([2n, 6n, 30n, 210n]);
@@ -82,18 +73,20 @@ describe("Iteration の @example", () => {
     });
 });
 
-describe("Iteration の境界・特例", () => {
-    it("next_product は 0 以下を含むとき何も返さない", () => {
+describe("Iteration - Edge Cases", () => {
+    it("next_product()は0を含むとき[]", () => {
         expect(Array.from(Iteration.next_product([2, 0]))).toEqual([]);
+    });
+    it("next_product()は負数を含むとき[]", () => {
         expect(Array.from(Iteration.next_product([-1]))).toEqual([]);
     });
-
-    it("next_permutation の長さ 0 / 1", () => {
+    it("next_permutation()は長さ0のとき[[]]", () => {
         expect(Array.from(Iteration.next_permutation([], (a, b) => a - b))).toEqual([[]]);
+    });
+    it("next_permutation()は長さ1のとき[[42]]", () => {
         expect(Array.from(Iteration.next_permutation([42], (a, b) => a - b))).toEqual([[42]]);
     });
-
-    it("next_permutation の重複要素", () => {
+    it("next_permutation()は重複要素のとき辞書順の3通り", () => {
         const permutations = Array.from(Iteration.next_permutation([1, 1, 2], (a, b) => a - b));
         expect(permutations).toEqual([
             [1, 1, 2],
@@ -101,19 +94,24 @@ describe("Iteration の境界・特例", () => {
             [2, 1, 1],
         ]);
     });
-
-    it("forEachPair は長さ 0 / 1 で何もしない", () => {
+    it("forEachPair()は長さ0のときcallbackを呼ばない", () => {
         let called = 0;
-        const cb = () => {
+        Iteration.forEachPair([], () => {
             called++;
-        };
-        Iteration.forEachPair([], cb);
-        expect(called).toBe(0);
-        Iteration.forEachPair([42], cb);
+        });
         expect(called).toBe(0);
     });
+    it("forEachPair()は長さ1のときcallbackを呼ばない", () => {
+        let called = 0;
+        Iteration.forEachPair([42], () => {
+            called++;
+        });
+        expect(called).toBe(0);
+    });
+});
 
-    it("forEachPair はランダム長 2e5 の隣接ペアと index を渡す", () => {
+describe("Iteration - Random Tests", () => {
+    it("forEachPair()について、隣接要素と添字を直接参照して一致確認", () => {
         const n = 200_000;
         const arr = Array.from({ length: n }, () => Math.random());
         let count = 0;
@@ -127,21 +125,24 @@ describe("Iteration の境界・特例", () => {
         expect(mismatch).toBe(-1);
         expect(count).toBe(n - 1);
     });
-  
-    it("長さ 1000 の加算・乗算 (mod 998244353)", () => {
+    it("accumulate()について、長さ1000の加算(mod 998244353)を愚直計算して一致確認", () => {
         const MOD = 998244353n;
         const a = Array.from({ length: 1000 }, () => BigInt(Math.floor(Math.random() * 1e6)) % MOD);
         const add = (x: bigint, y: bigint) => (x + y) % MOD;
-        const mul = (x: bigint, y: bigint) => (x * y) % MOD;
-
         const sums: bigint[] = [a[0]];
-        const prods: bigint[] = [a[0]];
         for (let i = 1; i < a.length; i++) {
             sums.push(add(sums[i - 1], a[i]));
+        }
+        expect(Iteration.accumulate(a, add)).toEqual(sums);
+    });
+    it("accumulate()について、長さ1000の乗算(mod 998244353)を愚直計算して一致確認", () => {
+        const MOD = 998244353n;
+        const a = Array.from({ length: 1000 }, () => BigInt(Math.floor(Math.random() * 1e6)) % MOD);
+        const mul = (x: bigint, y: bigint) => (x * y) % MOD;
+        const prods: bigint[] = [a[0]];
+        for (let i = 1; i < a.length; i++) {
             prods.push(mul(prods[i - 1], a[i]));
         }
-
-        expect(Iteration.accumulate(a, add)).toEqual(sums);
         expect(Iteration.accumulate(a, mul)).toEqual(prods);
     });
 });
