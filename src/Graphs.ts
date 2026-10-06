@@ -221,6 +221,8 @@ class AdjacencyCore<E> {
 
 /**
  * (重みを持たない)有向グラフを表すクラスです。
+ *
+ * @since 1.1.0
  */
 export class DirectedGraph {
     /** 内部で使用する隣接リスト表現 */
@@ -662,6 +664,8 @@ export class DirectedGraph {
 
 /**
  * (重みを持たない)無向グラフを表すクラスです。
+ *
+ * @since 1.1.0
  */
 export class UndirectedGraph {
     /** 内部で使用する隣接リスト表現 */
@@ -1007,6 +1011,8 @@ export class UndirectedGraph {
 /**
  * 重み付き有向グラフを表すクラスです。
  * 重みの型`W`はデフォルトではnumberです。number以外を指定することもできます。
+ *
+ * @since 1.1.0
  */
 export class WeightedDirectedGraph<W = number> {
     /** 内部で使用する隣接リスト表現 */
@@ -1384,6 +1390,8 @@ export class WeightedDirectedGraph<W = number> {
 /**
  * 重み付き無向グラフを表すクラスです。
  * 重みの型`W`はデフォルトではnumberです。number以外を指定することもできます。
+ *
+ * @since 1.1.0
  */
 export class WeightedUndirectedGraph<W = number> {
     /** 内部で使用する隣接リスト表現 */

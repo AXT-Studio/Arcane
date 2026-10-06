@@ -11,6 +11,8 @@ import { BinaryHeapLite } from "./BinaryHeap";
 /**
  * 最小費用流問題(Minimun-Cost Flow Problem)を解くためのクラスです。
  * (ポテンシャル付きDijkstra法による)逐次最短路法を用います。
+ *
+ * @since 1.7.0
  */
 export class MinCostFlow {
     /** v_size := グラフの頂点数 */

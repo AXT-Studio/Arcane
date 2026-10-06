@@ -12,6 +12,8 @@ import { ExtendedMath } from "./ExtendedMath";
  * 指定された法の中で整数の演算を行うための演算器クラスです。
  * - 加算、減算、乗算、累乗、逆元、除算などの演算を提供します。
  * - 内部でbigintを使用しているため、大きな整数の演算も正確に行うことができます。
+ *
+ * @since 1.0.0
  */
 export class ModOps {
     /** 演算の法 */
