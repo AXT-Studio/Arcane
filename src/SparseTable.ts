@@ -28,6 +28,12 @@ export class SparseTable<S> {
      *
      * 時間計算量: 最悪O(N log N) (`op`がO(1)である場合)
      *
+     * @example
+     * ```ts
+     * const arr = [1, 5, 3, 8, 2, 7, 4, 6];
+     * const sparseTable = new SparseTable<number>(arr, (a, b) => Math.max(a, b));
+     * ```
+     *
      * @param array - 対象となる配列 (`[...array]`によってコピーされます)
      * @param op - `array`の要素に対する二項演算。冪等性(`op(x, x) = x`)と結合律(`op(op(a, b), c) = op(a, op(b, c))`を満たす必要がある)
      */
@@ -60,8 +66,20 @@ export class SparseTable<S> {
      *
      * 時間計算量: 最悪O(1) (`op`がO(1)である場合)
      *
-     * @param l - 区間の左端(l自身を含む)
-     * @param r - 区間の右端(r自身を含まない)
+     * @example
+     * ```ts
+     * const arr = [1, 5, 3, 8, 2, 7, 4, 6];
+     * const sparseTable = new SparseTable<number>(arr, (a, b) => Math.max(a, b));
+     * console.log(sparseTable.query(0, 2)); // => 5 ([1, 5, 3]のmaxなので)
+     * console.log(sparseTable.query(4, 8)); // => 7 ([2, 7, 4, 6]のmaxなので)
+     * console.log(sparseTable.query(7, 8)); // => 6 (長さ1の場合はそのまま返ってくる)
+     * sparseTable.query(5, 5); // RangeError (半開区間[5, 5)は空の区間なので)
+     * sparseTable.query(6, 2); // RangeError (不正な(負の)区間は指定できない)
+     * sparseTable.query(0, 9); // RangeError (arr[8]がないので範囲外参照)
+     * ```
+     *
+     * @param l - 区間の左端(l自身を含む, 0-indexed)
+     * @param r - 区間の右端(r自身を含まない, 0-indexed)
      * @returns - `op(op(op(array[l], array[l + 1]), ...), array[r - 1])`
      * @throws {RangeError} 空区間・不正な区間・範囲外を含む区間を指定した場合
      */
