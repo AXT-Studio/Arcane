@@ -198,6 +198,11 @@ export class StringOperations {
         return lcp;
     }
 
+    /**
+     * @private
+     * 指定された数列のSuffix Arrayを構築します。
+     * ただし、番兵データはすでに追加されているものとします。
+     */
     static #sa_is(s: number[]): number[] {
         const n = s.length;
         // S型・L型の分類をする
