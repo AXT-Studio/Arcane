@@ -2,161 +2,6 @@
 // Utilities
 // ================================================================
 
-/**
- * @private
- * 指定された数列のSuffix Arrayを構築します。
- * ただし、番兵データはすでに追加されているものとします。
- */
-const sa_is = (s: number[]): number[] => {
-    const n = s.length;
-    // S型・L型の分類をする
-    const isS = Array.from({ length: n }, () => false);
-    isS[n - 1] = true;
-    for (let i = n - 2; i >= 0; i--) {
-        if (s[i] > s[i + 1]) {
-            isS[i] = false; // L型
-        } else if (s[i] < s[i + 1]) {
-            isS[i] = true; // S型
-        } else {
-            isS[i] = isS[i + 1];
-        }
-    }
-    // LMS(直前がLのS型のindex)を列挙する
-    const lmsIndices: number[] = [];
-    for (let i = 1; i < n; i++) {
-        if (isS[i] && !isS[i - 1]) lmsIndices.push(i);
-    }
-    const isLMS = Array.from({ length: n }, () => false);
-    for (let i = 0; i < lmsIndices.length; i++) {
-        isLMS[lmsIndices[i]] = true;
-    }
-    // S内に登場する数値の最大値を確認する
-    const S_max = s.reduce((a, c) => Math.max(a, c));
-    // 0以上S以下の数値が、それぞれ何回出てくるかカウントする
-    const countInS = Array.from({ length: S_max + 1 }, () => 0);
-    for (let i = 0; i < n; i++) countInS[s[i]]++;
-    // カウントの累積和を取る
-    const scan = [countInS[0]];
-    for (let i = 1; i <= S_max; i++) scan[i] = scan[i - 1] + countInS[i];
-    // 各数字に対応するバケツ領域の先頭と末尾のindexを取得
-    const heads_1 = [0, ...scan.slice(0, -1)];
-    const tails_1a = scan.map((n) => n - 1);
-    // Induced Sorting (1回目)
-    const sa = Array.from({ length: n }, () => -1);
-    // 1. LMSを仮置きする (先頭文字のバケツ領域の末尾)
-    for (let i = 0; i < lmsIndices.length; i++) {
-        const lmsIndex = lmsIndices[i];
-        const char = s[lmsIndex];
-        sa[tails_1a[char]] = lmsIndex;
-        tails_1a[char]--;
-    }
-    // 2. L型を埋める (文字のバケツ領域の先頭)
-    for (let i = 0; i < n; i++) {
-        if (sa[i] === -1) continue;
-        const v = sa[i];
-        if (v > 0 && !isS[v - 1]) {
-            sa[heads_1[s[v - 1]]] = v - 1;
-            heads_1[s[v - 1]]++;
-        }
-    }
-    // 3. S型を埋める (文字のバケツ領域の末尾)
-    const tails_1b = scan.map((n) => n - 1);
-    for (let i = n - 1; i >= 0; i--) {
-        if (sa[i] === -1) continue;
-        const v = sa[i];
-        if (v > 0 && isS[v - 1]) {
-            sa[tails_1b[s[v - 1]]] = v - 1;
-            tails_1b[s[v - 1]]--;
-        }
-    }
-    // saからLMSを指す数値だけ抜き出し、もとの文字列のindexに変えて並べる
-    /** 辞書順にソートされたLMSのインデックス */
-    const sortedLMS: number[] = [];
-    for (let i = 0; i < n; i++) {
-        const v = sa[i];
-        if (v > 0 && isS[v] && !isS[v - 1]) sortedLMS.push(v);
-    }
-    // LMS部分文字列に対して名前をつけていく
-    const names = Array.from({ length: n }, () => -1);
-    let nameCounter = 0;
-    names[sortedLMS[0]] = nameCounter;
-    for (let i = 1; i < sortedLMS.length; i++) {
-        const prevLMS = sortedLMS[i - 1];
-        const currLMS = sortedLMS[i];
-        // oxlint-disable-next-line no-constant-condition (reason: 下記のforループはロジック上どこかでbreakすることが保証されている)
-        for (let d = 0; true; d++) {
-            // 文字そのものが違えば不一致
-            if (s[prevLMS + d] !== s[currLMS + d]) {
-                names[currLMS] = ++nameCounter;
-                break;
-            }
-            // どちらかが次のLMSに到達したかどうかの判定
-            if (d > 0) {
-                const prevIsEnd = isLMS[prevLMS + d];
-                const currIsEnd = isLMS[currLMS + d];
-                // 両方trueなら一致
-                if (prevIsEnd && currIsEnd) {
-                    names[currLMS] = nameCounter;
-                    break;
-                }
-                // 片方がtrueなら不一致
-                if (prevIsEnd || currIsEnd) {
-                    names[currLMS] = ++nameCounter;
-                    break;
-                }
-            }
-        }
-    }
-    // LMS部分文字列のランクを元の文字列における出現順に並べた配列を作る
-    const S1: number[] = [];
-    for (let i = 0; i < names.length; i++) {
-        if (names[i] !== -1) S1.push(names[i]);
-    }
-    // S1のSuffix Arrayを取得する
-    const SA1: number[] = [];
-    if (nameCounter + 1 === S1.length) {
-        for (let i = 0; i < S1.length; i++) {
-            SA1[S1[i]] = i;
-        }
-    } else {
-        const recursion = sa_is(S1);
-        recursion.forEach((element) => {
-            SA1.push(element);
-        });
-    }
-    // Induced Sorting (2回目)
-    const heads_2 = [0, ...scan.slice(0, -1)];
-    const tails_2a = scan.map((n) => n - 1);
-    const tails_2b = scan.map((n) => n - 1);
-    const answer = Array.from({ length: n }, () => -1);
-    // 1. LMSを埋める (末尾)
-    for (let i = SA1.length - 1; i >= 0; i--) {
-        const lmsIndex = lmsIndices[SA1[i]];
-        const char = s[lmsIndex];
-        answer[tails_2a[char]] = lmsIndex;
-        tails_2a[char]--;
-    }
-    // 2. L型を埋める (先頭)
-    for (let i = 0; i < n; i++) {
-        if (answer[i] === -1) continue;
-        const v = answer[i];
-        if (v > 0 && !isS[v - 1]) {
-            answer[heads_2[s[v - 1]]] = v - 1;
-            heads_2[s[v - 1]]++;
-        }
-    }
-    // 3. S型を埋める (末尾)
-    for (let i = n - 1; i >= 0; i--) {
-        if (answer[i] === -1) continue;
-        const v = answer[i];
-        if (v > 0 && isS[v - 1]) {
-            answer[tails_2b[s[v - 1]]] = v - 1;
-            tails_2b[s[v - 1]]--;
-        }
-    }
-    return answer;
-};
-
 // ================================================================
 // Exports
 // ================================================================
@@ -286,7 +131,7 @@ export class StringOperations {
             // 最大値と最小値の差が255以下の場合、座圧せずにminValueが1になるように変換し、番兵0を追加してSA-ISにわたす
             const s2 = transformedArray.map((v) => v - minValue + 1);
             s2.push(0); // 番兵
-            result = sa_is(s2);
+            result = StringOperations.#sa_is(s2);
         } else {
             // 差が255以上ある場合、座圧してから番兵を追加してSA-ISにわたす
             const sortedUniqueValues = [...new Set(transformedArray)].sort((a, b) => a - b);
@@ -296,7 +141,7 @@ export class StringOperations {
             });
             const s2 = transformedArray.map((v) => valueToCompressed.get(v) ?? 0);
             s2.push(0); // 番兵
-            result = sa_is(s2);
+            result = StringOperations.#sa_is(s2);
         }
         // 番兵を削除する
         result.shift();
@@ -351,5 +196,155 @@ export class StringOperations {
             if (h > 0) h--;
         }
         return lcp;
+    }
+
+    static #sa_is(s: number[]): number[] {
+        const n = s.length;
+        // S型・L型の分類をする
+        const isS = Array.from({ length: n }, () => false);
+        isS[n - 1] = true;
+        for (let i = n - 2; i >= 0; i--) {
+            if (s[i] > s[i + 1]) {
+                isS[i] = false; // L型
+            } else if (s[i] < s[i + 1]) {
+                isS[i] = true; // S型
+            } else {
+                isS[i] = isS[i + 1];
+            }
+        }
+        // LMS(直前がLのS型のindex)を列挙する
+        const lmsIndices: number[] = [];
+        for (let i = 1; i < n; i++) {
+            if (isS[i] && !isS[i - 1]) lmsIndices.push(i);
+        }
+        const isLMS = Array.from({ length: n }, () => false);
+        for (let i = 0; i < lmsIndices.length; i++) {
+            isLMS[lmsIndices[i]] = true;
+        }
+        // S内に登場する数値の最大値を確認する
+        const S_max = s.reduce((a, c) => Math.max(a, c));
+        // 0以上S以下の数値が、それぞれ何回出てくるかカウントする
+        const countInS = Array.from({ length: S_max + 1 }, () => 0);
+        for (let i = 0; i < n; i++) countInS[s[i]]++;
+        // カウントの累積和を取る
+        const scan = [countInS[0]];
+        for (let i = 1; i <= S_max; i++) scan[i] = scan[i - 1] + countInS[i];
+        // 各数字に対応するバケツ領域の先頭と末尾のindexを取得
+        const heads_1 = [0, ...scan.slice(0, -1)];
+        const tails_1a = scan.map((n) => n - 1);
+        // Induced Sorting (1回目)
+        const sa = Array.from({ length: n }, () => -1);
+        // 1. LMSを仮置きする (先頭文字のバケツ領域の末尾)
+        for (let i = 0; i < lmsIndices.length; i++) {
+            const lmsIndex = lmsIndices[i];
+            const char = s[lmsIndex];
+            sa[tails_1a[char]] = lmsIndex;
+            tails_1a[char]--;
+        }
+        // 2. L型を埋める (文字のバケツ領域の先頭)
+        for (let i = 0; i < n; i++) {
+            if (sa[i] === -1) continue;
+            const v = sa[i];
+            if (v > 0 && !isS[v - 1]) {
+                sa[heads_1[s[v - 1]]] = v - 1;
+                heads_1[s[v - 1]]++;
+            }
+        }
+        // 3. S型を埋める (文字のバケツ領域の末尾)
+        const tails_1b = scan.map((n) => n - 1);
+        for (let i = n - 1; i >= 0; i--) {
+            if (sa[i] === -1) continue;
+            const v = sa[i];
+            if (v > 0 && isS[v - 1]) {
+                sa[tails_1b[s[v - 1]]] = v - 1;
+                tails_1b[s[v - 1]]--;
+            }
+        }
+        // saからLMSを指す数値だけ抜き出し、もとの文字列のindexに変えて並べる
+        /** 辞書順にソートされたLMSのインデックス */
+        const sortedLMS: number[] = [];
+        for (let i = 0; i < n; i++) {
+            const v = sa[i];
+            if (v > 0 && isS[v] && !isS[v - 1]) sortedLMS.push(v);
+        }
+        // LMS部分文字列に対して名前をつけていく
+        const names = Array.from({ length: n }, () => -1);
+        let nameCounter = 0;
+        names[sortedLMS[0]] = nameCounter;
+        for (let i = 1; i < sortedLMS.length; i++) {
+            const prevLMS = sortedLMS[i - 1];
+            const currLMS = sortedLMS[i];
+            // oxlint-disable-next-line no-constant-condition (reason: 下記のforループはロジック上どこかでbreakすることが保証されている)
+            for (let d = 0; true; d++) {
+                // 文字そのものが違えば不一致
+                if (s[prevLMS + d] !== s[currLMS + d]) {
+                    names[currLMS] = ++nameCounter;
+                    break;
+                }
+                // どちらかが次のLMSに到達したかどうかの判定
+                if (d > 0) {
+                    const prevIsEnd = isLMS[prevLMS + d];
+                    const currIsEnd = isLMS[currLMS + d];
+                    // 両方trueなら一致
+                    if (prevIsEnd && currIsEnd) {
+                        names[currLMS] = nameCounter;
+                        break;
+                    }
+                    // 片方がtrueなら不一致
+                    if (prevIsEnd || currIsEnd) {
+                        names[currLMS] = ++nameCounter;
+                        break;
+                    }
+                }
+            }
+        }
+        // LMS部分文字列のランクを元の文字列における出現順に並べた配列を作る
+        const S1: number[] = [];
+        for (let i = 0; i < names.length; i++) {
+            if (names[i] !== -1) S1.push(names[i]);
+        }
+        // S1のSuffix Arrayを取得する
+        const SA1: number[] = [];
+        if (nameCounter + 1 === S1.length) {
+            for (let i = 0; i < S1.length; i++) {
+                SA1[S1[i]] = i;
+            }
+        } else {
+            const recursion = StringOperations.#sa_is(S1);
+            recursion.forEach((element) => {
+                SA1.push(element);
+            });
+        }
+        // Induced Sorting (2回目)
+        const heads_2 = [0, ...scan.slice(0, -1)];
+        const tails_2a = scan.map((n) => n - 1);
+        const tails_2b = scan.map((n) => n - 1);
+        const answer = Array.from({ length: n }, () => -1);
+        // 1. LMSを埋める (末尾)
+        for (let i = SA1.length - 1; i >= 0; i--) {
+            const lmsIndex = lmsIndices[SA1[i]];
+            const char = s[lmsIndex];
+            answer[tails_2a[char]] = lmsIndex;
+            tails_2a[char]--;
+        }
+        // 2. L型を埋める (先頭)
+        for (let i = 0; i < n; i++) {
+            if (answer[i] === -1) continue;
+            const v = answer[i];
+            if (v > 0 && !isS[v - 1]) {
+                answer[heads_2[s[v - 1]]] = v - 1;
+                heads_2[s[v - 1]]++;
+            }
+        }
+        // 3. S型を埋める (末尾)
+        for (let i = n - 1; i >= 0; i--) {
+            if (answer[i] === -1) continue;
+            const v = answer[i];
+            if (v > 0 && isS[v - 1]) {
+                answer[tails_2b[s[v - 1]]] = v - 1;
+                tails_2b[s[v - 1]]--;
+            }
+        }
+        return answer;
     }
 }
