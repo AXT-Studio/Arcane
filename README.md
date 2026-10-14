@@ -7,7 +7,7 @@ AyaExpTech Arcane (`/éɪéksték ɑːkéin/`のように発音)は、主に競�
 copyright (c) 2026- Ayasaka-Koto(AyaExpTech).  
 Released under the [MIT License](LICENSE).
 
-- 公開されているコードを複製すること、またそれを改変することは明示的に許可されます
+- 公開されているコードを複製すること、またそれを改変することを(別途明示的に)許可します
     - ただし、以下のような情報を含むコメントを添えることにより出典を辿れるようにしてある場合に限ります
         - リポジトリURL: `https://github.com/AXT-Studio/Arcane`
         - JSR package URL: `https://jsr.io/@ayaexptech/arcane`
