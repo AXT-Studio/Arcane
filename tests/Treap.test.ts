@@ -51,6 +51,15 @@ describe("Treap - JSDoc @example", () => {
         expect(treap.upperBound(3)).toEqual({ key: 5, value: "five", index: 2 });
         expect(treap.upperBound(5)).toBeUndefined();
     });
+    it("floor()", () => {
+        const treap = new Treap<number, string>((a, b) => a - b);
+        treap.set(1, "one");
+        treap.set(3, "three");
+        treap.set(5, "five");
+        expect(treap.floor(2)).toEqual({ key: 1, value: "one", index: 0 });
+        expect(treap.floor(3)).toEqual({ key: 3, value: "three", index: 1 });
+        expect(treap.floor(0)).toBeUndefined();
+    });
     it("kthElement()", () => {
         const treap = new Treap<number, string>((a, b) => a - b);
         treap.set(10, "ten");
