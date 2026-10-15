@@ -37,9 +37,7 @@ export class IntervalSet {
      * @private key(左端)がx以下である最も右の区間を取得します(なければundefined)
      */
     #floor(x: number): { key: number; value: number } | undefined {
-        const next = this.#intervals.upperBound(x);
-        const index = (next?.index ?? this.#intervals.size) - 1;
-        return index >= 0 ? this.#intervals.kthElement(index) : undefined;
+        return this.#intervals.floor(x);
     }
 
     /**
