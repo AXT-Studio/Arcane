@@ -289,8 +289,8 @@ export class Treap<K, V> {
      * treap.set(1, 'one');
      * treap.set(3, 'three');
      * treap.set(5, 'five');
-     * console.log(treap.lowerBound(0)); // => { key: 1, value: 'one', index: 0 } (1が0以上の最小のキーは0番目の{1 -> 'one'})
-     * console.log(treap.lowerBound(3)); // => { key: 3, value: 'three', index: 1 } (3が3以上の最小のキーは1番目の{3 -> 'three'})
+     * console.log(treap.lowerBound(0)); // => { key: 1, value: 'one', index: 0 } (keyが0以上の最小のキーは0番目の{1 -> 'one'})
+     * console.log(treap.lowerBound(3)); // => { key: 3, value: 'three', index: 1 } (keyが3以上の最小のキーは1番目の{3 -> 'three'})
      * console.log(treap.lowerBound(6)); // => undefined (6以上のキーは存在しない)
      * ```
      *
@@ -343,8 +343,8 @@ export class Treap<K, V> {
      * treap.set(1, 'one');
      * treap.set(3, 'three');
      * treap.set(5, 'five');
-     * console.log(treap.upperBound(0)); // => { key: 1, value: 'one', index: 0 } (1が0より大きい最小のキーは0番目の{1 -> 'one'})
-     * console.log(treap.upperBound(3)); // => { key: 5, value: 'five', index: 2 } (5が3より大きい最小のキーは2番目の{5 -> 'five'})
+     * console.log(treap.upperBound(0)); // => { key: 1, value: 'one', index: 0 } (keyが0より大きい最小のキーは0番目の{1 -> 'one'})
+     * console.log(treap.upperBound(3)); // => { key: 5, value: 'five', index: 2 } (keyが3より大きい最小のキーは2番目の{5 -> 'five'})
      * console.log(treap.upperBound(5)); // => undefined (5より大きいキーは存在しない)
      * ```
      *
@@ -367,6 +367,51 @@ export class Treap<K, V> {
                 candidateNode = currentTargetNode;
                 currentTargetNode = currentTargetNode.left;
             } else {
+                indexBase += leftSize + 1;
+                currentTargetNode = currentTargetNode.right;
+            }
+        }
+        if (candidateNode) {
+            return { key: candidateNode.key, value: candidateNode.value, index: candidateIndex };
+        } else {
+            return undefined;
+        }
+    }
+
+    /**
+     * キー"以下"と判定される最大のキー・その値・その順位(0-indexed)を取得します。
+     * そのようなキーが存在しない場合は`undefined`を返します。
+     *
+     * 時間計算量: 期待 O(log (N+1)) (NはTreap内の要素数)
+     *
+     * @example
+     * ```ts
+     * const treap = new Treap<number, string>((a, b) => a - b);
+     * treap.set(1, 'one');
+     * treap.set(3, 'three');
+     * treap.set(5, 'five');
+     * console.log(treap.floor(2)); // => { key: 1, value: 'one', index: 0 } (keyが2以下で最大のキーは0番目の{1 -> 'one'})
+     * console.log(treap.floor(3)); // => { key: 3, value: 'three', index: 1 } (keyが3以下で最大のキーは1番目の{3 -> 'three'})
+     * console.log(treap.floor(0)); // => undefined (0以下のキーは存在しない)
+     * ```
+     *
+     * @param key - 基準となるキー
+     * @returns キーがkey以下となる最大のキー・その値・その順位(0-indexed)。存在しない場合は`undefined`
+     *
+     * @since 2.0.0
+     */
+    floor(key: K): { key: K; value: V; index: number } | undefined {
+        let currentTargetNode = this.root;
+        let candidateNode: TreapNode<K, V> | undefined;
+        let indexBase = 0;
+        let candidateIndex = 0;
+        while (currentTargetNode) {
+            const leftSize = Treap.#getSize(currentTargetNode.left);
+            if (this.#keyCompareFn(key, currentTargetNode.key) < 0) {
+                currentTargetNode = currentTargetNode.left;
+            } else {
+                candidateIndex = indexBase + leftSize;
+                candidateNode = currentTargetNode;
                 indexBase += leftSize + 1;
                 currentTargetNode = currentTargetNode.right;
             }
