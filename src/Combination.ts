@@ -35,21 +35,21 @@ export class Combination {
      */
     constructor(p: bigint, max: bigint) {
         this.#modOps = new ModOps(p);
+        const max_number = Number(max);
         // 先にfact, ifactを計算しておく
         this.#fact = [1n];
-        for (let i = 1; i <= max; i++) {
+        for (let i = 1; i <= max_number; i++) {
             this.#fact[i] = this.#modOps.mul(this.#fact[i - 1], BigInt(i));
         }
-        // mod pにおける1〜maxの逆元
-        const inv = [0n];
-        for (let i = 1; i <= max; i++) {
-            inv[i] = this.#modOps.inv(BigInt(i));
+        if (max_number === 0) {
+            this.#ifact = [1n];
+            return;
         }
-        // invの累積積を取るとifactになる
-        this.#ifact = [1n];
-        for (let i = 1; i <= max; i++) {
-            this.#ifact[i] = this.#modOps.mul(this.#ifact[i - 1], inv[i]);
-        }
+        // (max!)^(-1) を逆元計算1回で求め、ifact[i-1] = ifact[i] * i で降順に埋める
+        // oxlint-disable-next-line unicorn/no-new-array
+        this.#ifact = new Array<bigint>(max_number + 1);
+        this.#ifact[max_number] = this.#modOps.inv(this.#fact[max_number]);
+        for (let i = max_number; i >= 1; i--) this.#ifact[i - 1] = this.#modOps.mul(this.#ifact[i], BigInt(i));
     }
 
     /**
