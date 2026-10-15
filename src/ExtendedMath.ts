@@ -35,7 +35,9 @@ export class ExtendedMath {
      */
     static gcd<T extends number | bigint>(a: T, b: T): T {
         while (b) {
-            [a, b] = [b, (a % b) as T];
+            const r = (a % b) as T;
+            a = b;
+            b = r;
         }
         return a < 0 ? (-a as T) : a;
     }
