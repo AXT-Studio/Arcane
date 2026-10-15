@@ -44,7 +44,7 @@ export class Iteration {
         // 入力配列のコピーを作成する。
         const a = [...array];
         while (true) {
-            yield [...a]; // 現在の順列のコピーを返す（yield）。
+            yield a.slice(); // 現在の順列のコピーを返す（yield）。
 
             // 1. a[i] < a[i+1] を満たす最大のインデックス i を求める
             let i = a.length - 2;
@@ -64,13 +64,17 @@ export class Iteration {
             }
 
             // 3. a[i] と a[j] を交換する
-            [a[i], a[j]] = [a[j], a[i]];
+            const tmp = a[i];
+            a[i] = a[j];
+            a[j] = tmp;
 
             // 4. a[i+1] から末尾までの部分列を反転する
             let l = i + 1;
             let r = a.length - 1;
             while (l < r) {
-                [a[l], a[r]] = [a[r], a[l]];
+                const t = a[l];
+                a[l] = a[r];
+                a[r] = t;
                 l++;
                 r--;
             }
