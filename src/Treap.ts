@@ -363,6 +363,8 @@ export class Treap<K, V> {
      *
      * @param key - 基準となるキー
      * @returns キーがkey以下となる最大のキー・その値・その順位(0-indexed)。存在しない場合は`undefined`
+     *
+     * @since 2.0.0
      */
     floor(key: K): { key: K; value: V; index: number } | undefined {
         let currentTargetNode = this.root;
