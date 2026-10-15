@@ -153,6 +153,50 @@ export class Treap<K, V> {
     }
 
     /**
+     * @private
+     * keyを持つノードがあれば、それを削除した部分木に書き換えたうえで返します。
+     * @param node - 対象の部分木のノード
+     * @param k - 削除するキー
+     * @param keyCompareFn - キーを比較するための関数。aがbより先なら負、aがbより後なら正、順序が等しいなら0を返す。
+     */
+    static #removeNodeIfExist<K, V>(
+        node: TreapNode<K, V> | null,
+        key: K,
+        keyCompareFn: (a: K, b: K) => number,
+    ): TreapNode<K, V> | null {
+        if (!node) return null;
+        // どうせO(log N)回なので普通に再帰で書けば良いです
+        const cmp = keyCompareFn(key, node.key);
+        // 今のノードが削除対象なら子同士をmerge
+        if (cmp === 0) return Treap.#merge(node.left, node.right);
+        // 左の部分木にあるなら左を見に行くし、そうでなければ右を見に行く
+        if (cmp < 0) {
+            node.left = Treap.#removeNodeIfExist(node.left, key, keyCompareFn);
+        } else {
+            node.right = Treap.#removeNodeIfExist(node.right, key, keyCompareFn);
+        }
+        // サイズは正しく更新すること！
+        node.size = 1 + Treap.#getSize(node.left) + Treap.#getSize(node.right);
+        return node;
+    }
+
+    /**
+     * @private
+     * keyを持つノードが部分木にあればそのノードを、なければnullを返します。
+     * @param k - 削除するキー
+     */
+    #findNode(key: K): TreapNode<K, V> | null {
+        let currentTargetNode = this.root;
+        // まあ、繰り返し降りて探すだけですね
+        while (currentTargetNode) {
+            const cmp = this.#keyCompareFn(key, currentTargetNode.key);
+            if (cmp === 0) return currentTargetNode;
+            currentTargetNode = cmp < 0 ? currentTargetNode.left : currentTargetNode.right;
+        }
+        return null;
+    }
+
+    /**
      * キーと値のペアをTreapに挿入します。
      * すでに同じキーが存在する場合は、その値を上書きします。
      *
@@ -172,17 +216,16 @@ export class Treap<K, V> {
      * @param value - 挿入する要素の値
      */
     set(key: K, value: V): void {
-        // ==== 現在の木を"key未満"・"keyと等しい"・"keyより大きい"の3つに分割して等しいやつは破棄 ====
-        const { less, greater } = Treap.#splitThreeWays(this.root, key, this.#keyCompareFn);
-        const less_nodes = less;
-        const greater_nodes = greater;
-        // ==== 新しいノードを作成 ====
-        const newNode = new TreapNode(key, value);
-        // ==== 3つの木をマージして新しい木を作成 ====
-        // 先にlessとnewNodeをマージ
-        const merged_left = Treap.#merge<K, V>(less_nodes, newNode);
-        // さらにgreaterとマージして完成
-        this.root = Treap.#merge<K, V>(merged_left, greater_nodes);
+        // キーが既存のものなら値を差し替えるだけでよい (split/mergeはしなくていい)
+        const found = this.#findNode(key);
+        if (found) {
+            found.key = key;
+            found.value = value;
+            return;
+        }
+        // keyが存在しない場合、1回のsplitで未満と超過に分かれることが保証されるので分けて足してくっつける
+        const { left, right } = Treap.#split(this.root, key, this.#keyCompareFn);
+        this.root = Treap.#merge<K, V>(Treap.#merge<K, V>(left, new TreapNode(key, value)), right);
     }
 
     /**
@@ -206,12 +249,8 @@ export class Treap<K, V> {
      * @param key - 削除する要素のキー
      */
     delete(key: K): void {
-        // ==== 現在の木を"key未満"・"keyと等しい"・"keyより大きい"の3つに分割して等しいやつは破棄 ====
-        const { less, greater } = Treap.#splitThreeWays<K, V>(this.root, key, this.#keyCompareFn);
-        const less_nodes = less;
-        const greater_nodes = greater;
-        // ==== 2つの木をマージして新しい木を作成 ====
-        this.root = Treap.#merge<K, V>(less_nodes, greater_nodes);
+        // ほぼそれをやるメソッドができたので、呼ぶだけ
+        this.root = Treap.#removeNodeIfExist<K, V>(this.root, key, this.#keyCompareFn);
     }
 
     /**
@@ -234,13 +273,8 @@ export class Treap<K, V> {
      * @returns 指定されたキーの要素の値、存在しない場合は`undefined`
      */
     get(key: K): V | undefined {
-        let currentTargetNode = this.root;
-        while (currentTargetNode) {
-            const cmp = this.#keyCompareFn(key, currentTargetNode.key);
-            if (cmp === 0) return currentTargetNode.value;
-            currentTargetNode = cmp < 0 ? currentTargetNode.left : currentTargetNode.right;
-        }
-        return undefined;
+        // findNodeが見つけてきてくれるのでそれを呼ぶ
+        return this.#findNode(key)?.value;
     }
 
     /**
