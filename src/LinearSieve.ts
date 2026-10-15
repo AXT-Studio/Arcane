@@ -26,15 +26,19 @@ export class LinearSieve {
     static getAllMPF(N: number): number[] {
         /** 発見した素数のリスト */
         const primes: number[] = [];
+        const length = Math.trunc(N + 1);
         /** 最小素因数のリスト */
-        const mpf: number[] = Array.from({ length: N + 1 }, () => NaN);
+        // oxlint-disable-next-line unicorn/no-new-array
+        const mpf: number[] = new Array<number>(length > 0 ? length : 0).fill(NaN);
         for (let i = 2; i <= N; i++) {
             if (Number.isNaN(mpf[i])) {
                 mpf[i] = i;
                 primes.push(i);
             }
-            for (const p of primes) {
-                if (p > mpf[i] || p * i > N) break;
+            const mpfI = mpf[i];
+            for (let j = 0; j < primes.length; j++) {
+                const p = primes[j];
+                if (p > mpfI || p * i > N) break;
                 mpf[p * i] = p;
             }
         }
