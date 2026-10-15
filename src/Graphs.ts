@@ -471,6 +471,49 @@ export class DirectedGraph {
     }
 
     /**
+     * CSR表現(`toCSR()`の戻り値と同じ形式)を受け取り、すべての有向辺の向きを逆にしたグラフのCSR表現を返します。
+     * 逆向きグラフにおける各頂点の辺は、元のグラフでの始点(逆向きグラフの終点)の昇順に並びます。
+     *
+     * 時間計算量: O(V + E) (※Vは頂点の数、Eは辺の数)
+     *
+     * @example
+     * ```ts
+     * const graph = new DirectedGraph(3);
+     * graph.addEdge(0, 1);
+     * graph.addEdge(0, 2);
+     * graph.addEdge(2, 0);
+     * const inv = DirectedGraph.inverseCSR(graph.toCSR());
+     * console.log(inv.head); // Uint32Array [0, 1, 2, 3]
+     * console.log(inv.to); // Uint32Array [2, 0, 0]
+     * ```
+     *
+     * @param csr - 元のグラフのCSR表現
+     * @returns - 辺の向きを逆にしたグラフのCSR表現
+     */
+    static inverseCSR(csr: CSRGraph): CSRGraph {
+        const { head, to } = csr;
+        const vertexCount = head.length - 1;
+        // 各頂点に入ってくる辺の本数を数え、累積和をとって逆向きグラフのheadにする
+        const inverseHead = new Uint32Array(vertexCount + 1);
+        for (let i = 0; i < to.length; i++) inverseHead[to[i] + 1]++;
+        for (let v = 0; v < vertexCount; v++) inverseHead[v + 1] += inverseHead[v];
+        // 頂点ごとの「次に書き込む位置」を持ちながら、辺u->vをv->uとして詰めていく
+        const nextIndex = inverseHead.slice(0, vertexCount);
+        const inverseTo = new Uint32Array(to.length);
+        for (let u = 0; u < vertexCount; u++) {
+            for (let i = head[u]; i < head[u + 1]; i++) {
+                const v = to[i];
+                inverseTo[nextIndex[v]] = u;
+                nextIndex[v]++;
+            }
+        }
+        return {
+            head: inverseHead,
+            to: inverseTo,
+        };
+    }
+
+    /**
      * このグラフの隣接リスト表現を返します。
      *
      * 時間計算量: O(V + E) (※Vは頂点の数、Eは辺の数)
@@ -1264,6 +1307,54 @@ export class WeightedDirectedGraph<W = number> {
             head,
             to,
             weight,
+        };
+    }
+
+    /**
+     * CSR表現(`toCSR()`の戻り値と同じ形式)を受け取り、すべての有向辺の向きを逆にしたグラフのCSR表現を返します。
+     * 逆向きグラフにおける各頂点の辺は、元のグラフでの始点(逆向きグラフの終点)の昇順に並びます。
+     *
+     * 時間計算量: O(V + E) (※Vは頂点の数、Eは辺の数)
+     *
+     * @example
+     * ```ts
+     * const graph = new WeightedDirectedGraph(3);
+     * graph.addEdge(0, 1, 4);
+     * graph.addEdge(0, 2, 5);
+     * graph.addEdge(2, 0, 6);
+     * const inv = WeightedDirectedGraph.inverseCSR(graph.toCSR());
+     * console.log(inv.head); // Uint32Array [0, 1, 2, 3]
+     * console.log(inv.to); // Uint32Array [2, 0, 0]
+     * console.log(inv.weight); // [6, 4, 5]
+     * ```
+     *
+     * @param csr - 元のグラフのCSR表現
+     * @returns - 辺の向きを逆にしたグラフのCSR表現
+     */
+    static inverseCSR<W>(csr: WeightedCSRGraph<W>): WeightedCSRGraph<W> {
+        const { head, to, weight } = csr;
+        const vertexCount = head.length - 1;
+        // 各頂点に入ってくる辺の本数を数え、累積和をとって逆向きグラフのheadにする
+        const inverseHead = new Uint32Array(vertexCount + 1);
+        for (let i = 0; i < to.length; i++) inverseHead[to[i] + 1]++;
+        for (let v = 0; v < vertexCount; v++) inverseHead[v + 1] += inverseHead[v];
+        // 頂点ごとの「次に書き込む位置」を持ちながら、辺u->vをv->uとして詰めていく
+        const nextIndex = inverseHead.slice(0, vertexCount);
+        const inverseTo = new Uint32Array(to.length);
+        // oxlint-disable-next-line unicorn/no-new-array
+        const inverseWeight = new Array<W>(to.length);
+        for (let u = 0; u < vertexCount; u++) {
+            for (let i = head[u]; i < head[u + 1]; i++) {
+                const v = to[i];
+                inverseTo[nextIndex[v]] = u;
+                inverseWeight[nextIndex[v]] = weight[i];
+                nextIndex[v]++;
+            }
+        }
+        return {
+            head: inverseHead,
+            to: inverseTo,
+            weight: inverseWeight,
         };
     }
 
