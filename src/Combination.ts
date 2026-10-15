@@ -41,7 +41,7 @@ export class Combination {
         for (let i = 1; i <= max_number; i++) {
             this.#fact[i] = this.#modOps.mul(this.#fact[i - 1], BigInt(i));
         }
-        if (max_number === 0) {
+        if (max_number <= 0) {
             this.#ifact = [1n];
             return;
         }
