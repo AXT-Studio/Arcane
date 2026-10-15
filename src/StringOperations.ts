@@ -95,6 +95,7 @@ export class StringOperations {
      * 文字列・数列のSuffix Arrayを構築します。
      * Suffix Arrayは、文字列・数列の接尾辞を辞書順に並べたときの、元の文字列・数列における開始位置を格納する配列です。
      * 長さ0の列が渡された場合は、空の配列を返します。
+     * (サロゲートペアやEmoji ZWJ Sequenceを含む文字列はUTF-16コードポイント単位で分解されることに注意してください。)
      *
      * 時間計算量: 以下の通り
      * - s: ArrayLike<number>で、sの最大値と最小値の差が255以下の場合: O(N) (Nは数列の長さ)
@@ -117,7 +118,7 @@ export class StringOperations {
         if (typeof s[0] === "string") {
             // 文字列の場合はUnicode Core Point + 1を取得することで数値の配列に変換する
             for (let i = 0; i < s.length; i++) {
-                transformedArray.push((s[i] as string).codePointAt(0) ?? 0 + 1);
+                transformedArray.push(((s[i] as string).codePointAt(0) ?? 0) + 1);
             }
         } else {
             // 数値の場合はそのままコピーする

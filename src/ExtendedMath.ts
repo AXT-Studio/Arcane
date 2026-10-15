@@ -14,7 +14,8 @@
 export class ExtendedMath {
     /**
      * 2つの整数の最大公約数を求めます。
-     * なお、gcd(0, 0) = 0、gcd(a, 0) = gcd(0, a) = |a| とします。
+     * ただし、gcd(0, 0) = 0、gcd(a, 0) = gcd(0, a) = |a| とします。
+     * a, bにInfinity, NaNなどを代入したときの戻り値は未定義です。
      *
      * 時間計算量: 最悪 O(log(min(|a|, |b|)))
      *
