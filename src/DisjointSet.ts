@@ -11,9 +11,9 @@
  */
 export class DisjointSet {
     /** #parents[i]は要素iの親のインデックス */
-    #parents: number[];
+    #parents: Int32Array;
     /** #size[i]は要素iの属する木のサイズ (※根の要素でのみ有効) */
-    #size: number[];
+    #size: Int32Array;
     /** 現在の連結成分の数 */
     #components: number;
 
@@ -28,16 +28,16 @@ export class DisjointSet {
      * console.log(ds.componentCount); // 5 (初期状態では全ての要素が別々の集合に属しているため、連結成分の数は5)
      * ```
      *
-     * @throws {Error} - `size`が正の整数でない(0以下、もしくは非整数の)場合
-     *
-     * @param size - 要素の数
+     * @param size - 要素の数 (1以上2^31未満の整数)
+     * @throws {Error} - `size`が「1以上2^31未満の整数」でない場合
      */
     constructor(size: number) {
-        if (!Number.isInteger(size) || size <= 0) {
+        if (!Number.isInteger(size) || size <= 0 || 2 ** 31 <= size) {
             throw new Error("DisjointSet: size must be a positive integer.");
         }
-        this.#parents = [...Array(size).keys()];
-        this.#size = Array(size).fill(1);
+        this.#parents = new Int32Array(size);
+        for (let i = 0; i < size; i++) this.#parents[i] = i;
+        this.#size = new Int32Array(size).fill(1);
         this.#components = size;
     }
 
