@@ -283,12 +283,12 @@ export class ExtendedMath {
         let exponent = n;
         while (exponent > 0n) {
             if (exponent % 2n === 1n) {
-                result = (((result * base) % m) + m) % m;
+                result = (result * base) % m;
             }
-            base = (((base * base) % m) + m) % m;
+            base = (base * base) % m;
             exponent = exponent / 2n;
         }
-        return ((result % m) + m) % m;
+        return result;
     }
 
     /**
