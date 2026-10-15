@@ -40,6 +40,16 @@ export class GridIndex2D {
         this.base = I;
     }
 
+    /** @private indexの行番号 */
+    #rowOf(index: number): number {
+        return Math.floor(index / this.W) + this.base;
+    }
+
+    /** @private indexの列番号 */
+    #colOf(index: number): number {
+        return (index % this.W) + this.base;
+    }
+
     /**
      * 2次元座標から1次元のインデックスを取得します。
      * 返されるインデックスは0以上HW未満の整数です。
@@ -88,7 +98,7 @@ export class GridIndex2D {
      * ```
      */
     positionOf(index: number): [r: number, c: number] {
-        return [Math.floor(index / this.W) + this.base, (index % this.W) + this.base];
+        return [this.#rowOf(index), this.#colOf(index)];
     }
 
     /**
@@ -114,19 +124,14 @@ export class GridIndex2D {
      * @param mode - 方向を指定 (4近傍 or 斜めを含む8近傍)
      */
     getAdjacentCellIndexes(index: number, mode: 4 | 8): number[] {
-        const [r, c] = this.positionOf(index);
+        const r = this.#rowOf(index);
+        const c = this.#colOf(index);
         const adjacentCells: number[] = [];
         if (mode === 4) {
-            const D = [0, 1, 0, -1, 0];
-            for (let i = 0; i < 4; i++) {
-                const dr = D[i];
-                const dc = D[i + 1];
-                const nr = r + dr;
-                const nc = c + dc;
-                if (this.isInGrid(nr, nc)) {
-                    adjacentCells.push(this.indexOf(nr, nc));
-                }
-            }
+            if (this.isInGrid(r - 1, c)) adjacentCells.push(this.indexOf(r - 1, c));
+            if (this.isInGrid(r, c - 1)) adjacentCells.push(this.indexOf(r, c - 1));
+            if (this.isInGrid(r, c + 1)) adjacentCells.push(this.indexOf(r, c + 1));
+            if (this.isInGrid(r + 1, c)) adjacentCells.push(this.indexOf(r + 1, c));
         } else {
             for (let dr = -1; dr <= 1; dr++) {
                 for (let dc = -1; dc <= 1; dc++) {
@@ -139,7 +144,6 @@ export class GridIndex2D {
                 }
             }
         }
-        adjacentCells.sort((a, b) => a - b);
         return adjacentCells;
     }
 
