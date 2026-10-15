@@ -17,7 +17,7 @@ export class SparseTable<S> {
     /** Sparse Table本体。#table[k][i] := arrayの[i, i + 2**k)の区間総積 */
     #table: S[][];
     /** floorLog2[i] := i以下で最大の2の冪 (ただしfloorLog2[0]はNaN) */
-    #floorLog2: number[];
+    #floorLog2: Uint8Array;
     /** 二項演算 */
     #op: (a: S, b: S) => S;
 
@@ -52,7 +52,7 @@ export class SparseTable<S> {
             this.#table.push(row);
         }
         // 追加で払う計算量が時間空間ともにO(N)でペイする価値があるので、i以下で最大の2の冪を1からnまで前計算しておく
-        this.#floorLog2 = [NaN, 0];
+        this.#floorLog2 = new Uint8Array(n + 1);
         for (let i = 2; i <= n; i++) {
             this.#floorLog2[i] = this.#floorLog2[Math.floor(i / 2)] + 1;
         }
