@@ -255,8 +255,8 @@ export class Treap<K, V> {
      * treap.set(1, 'one');
      * treap.set(3, 'three');
      * treap.set(5, 'five');
-     * console.log(treap.lowerBound(0)); // => { key: 1, value: 'one', index: 0 } (1が0以上の最小のキーは0番目の{1 -> 'one'})
-     * console.log(treap.lowerBound(3)); // => { key: 3, value: 'three', index: 1 } (3が3以上の最小のキーは1番目の{3 -> 'three'})
+     * console.log(treap.lowerBound(0)); // => { key: 1, value: 'one', index: 0 } (keyが0以上の最小のキーは0番目の{1 -> 'one'})
+     * console.log(treap.lowerBound(3)); // => { key: 3, value: 'three', index: 1 } (keyが3以上の最小のキーは1番目の{3 -> 'three'})
      * console.log(treap.lowerBound(6)); // => undefined (6以上のキーは存在しない)
      * ```
      *
@@ -309,8 +309,8 @@ export class Treap<K, V> {
      * treap.set(1, 'one');
      * treap.set(3, 'three');
      * treap.set(5, 'five');
-     * console.log(treap.upperBound(0)); // => { key: 1, value: 'one', index: 0 } (1が0より大きい最小のキーは0番目の{1 -> 'one'})
-     * console.log(treap.upperBound(3)); // => { key: 5, value: 'five', index: 2 } (5が3より大きい最小のキーは2番目の{5 -> 'five'})
+     * console.log(treap.upperBound(0)); // => { key: 1, value: 'one', index: 0 } (keyが0より大きい最小のキーは0番目の{1 -> 'one'})
+     * console.log(treap.upperBound(3)); // => { key: 5, value: 'five', index: 2 } (keyが3より大きい最小のキーは2番目の{5 -> 'five'})
      * console.log(treap.upperBound(5)); // => undefined (5より大きいキーは存在しない)
      * ```
      *
