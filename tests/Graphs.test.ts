@@ -79,6 +79,15 @@ describe("DirectedGraph - JSDoc @example", () => {
         expect(Array.from(csr.head)).toEqual([0, 2, 2, 3]);
         expect(Array.from(csr.to)).toEqual([1, 2, 0]);
     });
+    it("DirectedGraph.inverseCSR()", () => {
+        const graph = new DirectedGraph(3);
+        graph.addEdge(0, 1);
+        graph.addEdge(0, 2);
+        graph.addEdge(2, 0);
+        const inv = DirectedGraph.inverseCSR(graph.toCSR());
+        expect(Array.from(inv.head)).toEqual([0, 1, 2, 3]);
+        expect(Array.from(inv.to)).toEqual([2, 0, 0]);
+    });
     it("toAdjacencyList()", () => {
         const graph = new DirectedGraph(3);
         graph.addEdge(0, 1);
@@ -307,6 +316,16 @@ describe("WeightedDirectedGraph - JSDoc @example", () => {
         expect(Array.from(csr.head)).toEqual([0, 2, 2, 3]);
         expect(Array.from(csr.to)).toEqual([1, 2, 0]);
         expect(csr.weight).toEqual([4, 5, 6]);
+    });
+    it("WeightedDirectedGraph.inverseCSR()", () => {
+        const graph = new WeightedDirectedGraph(3);
+        graph.addEdge(0, 1, 4);
+        graph.addEdge(0, 2, 5);
+        graph.addEdge(2, 0, 6);
+        const inv = WeightedDirectedGraph.inverseCSR(graph.toCSR());
+        expect(Array.from(inv.head)).toEqual([0, 1, 2, 3]);
+        expect(Array.from(inv.to)).toEqual([2, 0, 0]);
+        expect(inv.weight).toEqual([6, 4, 5]);
     });
     it("toAdjacencyList()", () => {
         const graph = new WeightedDirectedGraph(3);
