@@ -658,6 +658,10 @@ export class DirectedGraph {
         // ランタイムの都合で再帰関数を回避したいので、~vを番兵とする
         // oxlint-disable-next-line unicorn/no-new-array
         const visited_1 = new Array<boolean>(g.vertexCount).fill(false);
+
+        // 辺の走査をCSR表現で行うと速いので、そうする (イテレータを介さず添字で辺を辿れる)
+        const { head, to } = g.toCSR();
+
         const postorder: number[] = [];
         for (let start = 0; start < g.vertexCount; start++) {
             if (visited_1[start]) continue;
@@ -672,13 +676,14 @@ export class DirectedGraph {
                 if (visited_1[v]) continue;
                 visited_1[v] = true;
                 stack.push(~v); // 帰りがけ用の番兵を先に入れておく
-                for (const next of g.outEdges(v)) {
+                for (let i = head[v]; i < head[v + 1]; i++) {
+                    const next = to[i];
                     if (!visited_1[next]) stack.push(next);
                 }
             }
         }
-        // 有向辺の向きをすべて逆にしたグラフを作る
-        const reversed = g.reversed();
+        // 有向辺の向きをすべて逆にしたグラフを(CSR表現のまま)作る
+        const reversed = DirectedGraph.inverseCSR({ head, to });
         // それに対して、帰りがけ順をpopする形で深さ優先探索
         // oxlint-disable-next-line unicorn/no-new-array
         const visited_2 = new Array<boolean>(g.vertexCount).fill(false);
@@ -691,7 +696,8 @@ export class DirectedGraph {
             visited_2[start] = true;
             while (stack.length > 0) {
                 const v = stack.pop()!;
-                for (const next of reversed.outEdges(v)) {
+                for (let i = reversed.head[v]; i < reversed.head[v + 1]; i++) {
+                    const next = reversed.to[i];
                     if (!visited_2[next]) {
                         visited_2[next] = true;
                         stack.push(next);
