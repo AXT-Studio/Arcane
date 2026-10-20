@@ -160,6 +160,7 @@
         i64.const 0       ;; -> [temp: i64, 0: i64]
         i64.lt_s          ;; -> [0 or 1: i32] (r0 < 0のときに1、そうでないとき0)
         if                ;; -> [] (0がpopされたらendまで飛ぶ、そうでなければifの中身を実行する)
+            local.get $temp   ;; -> [temp: i64]
             local.get $p      ;; -> [temp: i64, p: i32]
             i64.extend_i32_u  ;; -> [temp: i64, p: i64]
             i64.add           ;; -> [temp + p: i64]
