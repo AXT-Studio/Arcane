@@ -16,6 +16,7 @@ export { LinearSieve } from "./src/LinearSieve.ts";
 export { MaxFlow } from "./src/MaxFlow.ts";
 export { MinCostFlow } from "./src/MinCostFlow.ts";
 export { ModOps } from "./src/ModOps.ts";
+export { ModOpsFast } from "./src/ModOpsFast.ts";
 export { RollingHash } from "./src/RollingHash.ts";
 export { SegmentTree } from "./src/SegmentTree.ts";
 export { SparseTable } from "./src/SparseTable.ts";
