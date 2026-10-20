@@ -16,11 +16,13 @@ Released under the [MIT License](LICENSE).
     - ライブラリについての情報さえ書かれていれば、作者名“Ayasaka-Koto”は書かなくてもよいです
 - 各ファイルの編集者(AI利用の有無)について
     - `tests/`を除く各ファイルは、(一部はAIを使いながら勉強した上で)Ayasaka-Kotoにより作成されています
-    - `tests/`内の各テストファイルは、以下のAI Agentsを用いて作成しています (ただし一部人の手が入っています)
-        - Grok 4.7 on Cursor
+    - `tests/`内の各テストファイルは、以下のAI Agentsを用いて作成し、一部人の手を加えています
+        - Grok 4.7 (Cursor)
+        - GPT-6 Astra (Codex)
 
 > [!TIP]
 > コードを直接コピペしないと使えない環境については、[AXT-AyaKoto/axt-arcane-bundler](https://github.com/AXT-AyaKoto/axt-arcane-bundler)を使用することができます。  
+> 自動で出典コメントが付与されるほか、JavaScriptへの変換(Type Stripping)を一緒に行う機能もあります。
 > 詳細は[`AXT-AyaKoto/axt-arcane-bundler`のリポジトリ・README](https://github.com/AXT-AyaKoto/axt-arcane-bundler)などを参照してください。
 
 > [!TIP]
