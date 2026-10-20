@@ -40,7 +40,7 @@ export class ModOps {
         this.#mod = mod;
     }
     /**
-     * 引数`value`を、このModOpsの法で割った余りを返します。
+     * 引数`value`を、この演算器の法で割った余りを返します。
      *
      * 時間計算量: O(1)
      *
@@ -52,7 +52,7 @@ export class ModOps {
      * ```
      *
      * @param value - 余りを計算するためのbigint
-     * @returns valueをこのModOpsの法で割った余り
+     * @returns valueをこの演算器の法で割った余り
      */
     normalize(value: bigint): bigint {
         const r = value % this.#mod;
@@ -60,7 +60,7 @@ export class ModOps {
     }
 
     /**
-     * a + bを、このModOpsの法で割った余りを返します。
+     * a + bを、この演算器の法で割った余りを返します。
      *
      * 時間計算量: O(1)
      *
@@ -73,14 +73,14 @@ export class ModOps {
      *
      * @param a - 加算されるbigint
      * @param b - 加算されるbigint
-     * @returns a + bをこのModOpsの法で割った余り
+     * @returns a + bをこの演算器の法で割った余り
      */
     add(a: bigint, b: bigint): bigint {
         return this.normalize(a + b);
     }
 
     /**
-     * 引数として与えられたbigintの総和を、このModOpsの法で割った余りを返します。
+     * 引数として与えられたbigintの総和を、この演算器の法で割った余りを返します。
      *
      * 時間計算量: O(n) (nは引数の数)
      *
@@ -92,7 +92,7 @@ export class ModOps {
      * ```
      *
      * @param values - 足し合わせるbigint (可変長引数)
-     * @returns valuesの総和をこのModOpsの法で割った余り
+     * @returns valuesの総和をこの演算器の法で割った余り
      */
     sum(...values: bigint[]): bigint {
         let total = 0n;
@@ -103,7 +103,7 @@ export class ModOps {
     }
 
     /**
-     * a - bを、このModOpsの法で割った余りを返します。
+     * a - bを、この演算器の法で割った余りを返します。
      *
      * 時間計算量: O(1)
      *
@@ -116,14 +116,14 @@ export class ModOps {
      *
      * @param a - 減算するbigint
      * @param b - 減算されるbigint
-     * @returns a - bをこのModOpsの法で割った余り
+     * @returns a - bをこの演算器の法で割った余り
      */
     sub(a: bigint, b: bigint): bigint {
         return this.normalize(a - b);
     }
 
     /**
-     * a * bを、このModOpsの法で割った余りを返します。
+     * a * bを、この演算器の法で割った余りを返します。
      *
      * 時間計算量: O(1)
      *
@@ -136,14 +136,14 @@ export class ModOps {
      *
      * @param a - 乗算されるbigint
      * @param b - 乗算されるbigint
-     * @returns a * bをこのModOpsの法で割った余り
+     * @returns a * bをこの演算器の法で割った余り
      */
     mul(a: bigint, b: bigint): bigint {
         return this.normalize(a * b);
     }
 
     /**
-     * 引数として与えられたbigintの総積を、このModOpsの法で割った余りを返します。
+     * 引数として与えられたbigintの総積を、この演算器の法で割った余りを返します。
      *
      * 時間計算量: O(n) (nは引数の数)
      *
@@ -155,18 +155,18 @@ export class ModOps {
      * ```
      *
      * @param values - 掛け合わせるbigint (可変長引数)
-     * @returns valuesの総積をこのModOpsの法で割った余り
+     * @returns valuesの総積をこの演算器の法で割った余り
      */
     prod(...values: bigint[]): bigint {
         let total = this.normalize(1n);
         for (const value of values) {
             total = this.mul(total, value);
         }
-        return this.normalize(total);
+        return total;
     }
 
     /**
-     * aのb乗を、このModOpsの法で割った余りを返します。
+     * aのb乗を、この演算器の法で割った余りを返します。
      *
      * 時間計算量: O(log b) (bは指数)
      *
@@ -176,11 +176,10 @@ export class ModOps {
      * console.log(mod7.pow(3n, 4n)); // => 4n (3^4 mod 7 = 81 mod 7 = 4)
      * ```
      *
-     * @throws {RangeError} - `b`が負の整数である場合
-     *
      * @param a - 累乗されるbigint
      * @param b - 累乗するbigint (非負整数でなければならない)
-     * @returns aのb乗をこのModOpsの法で割った余り
+     * @returns aのb乗をこの演算器の法で割った余り
+     * @throws {RangeError} - `b`が負の整数である場合
      */
     pow(a: bigint, b: bigint): bigint {
         if (b < 0n) {
@@ -203,11 +202,11 @@ export class ModOps {
     }
 
     /**
-     * このModOpsの法におけるaの逆元を返します。
+     * この演算器の法におけるaの逆元を返します。
      * なお、法pにおけるaの逆元とは、 av≡1 (mod p) を満たす0以上p未満の唯一の整数vのことです。
      * 1÷a≡v(mod p)と考えることもできます。
      *
-     * 時間計算量: O(log m) (mはこのModOpsの法)
+     * 時間計算量: O(log m) (mはこの演算器の法)
      *
      * @example
      * ```ts
@@ -216,18 +215,18 @@ export class ModOps {
      * ```
      *
      * @param a - 逆元を求めるbigint
-     * @returns aのこのModOpsの法における逆元
-     * @throws Error - aとこのModOpsの法が互いに素でない場合 (つまり、逆元が存在しない場合)
+     * @returns aのこの演算器の法における逆元
+     * @throws Error - aとこの演算器の法が互いに素でない場合 (つまり、逆元が存在しない場合)
      */
     inv(a: bigint): bigint {
         return ExtendedMath.modInv(a, this.#mod);
     }
 
     /**
-     * a / bを、このModOpsの法で割った余りを返します。
-     * すなわち、aにbの逆元を掛けた値をこのModOpsの法で割った余りを返します。
+     * a / bを、この演算器の法で割った余りを返します。
+     * すなわち、aにbの逆元を掛けた値をこの演算器の法で割った余りを返します。
      *
-     * 時間計算量: O(log m) (mはこのModOpsの法)
+     * 時間計算量: O(log m) (mはこの演算器の法)
      *
      * @example
      * ```ts
@@ -237,8 +236,8 @@ export class ModOps {
      *
      * @param a - 除算されるbigint
      * @param b - 除算するbigint (逆元が存在することが前提)
-     * @returns a / bをこのModOpsの法で割った余り
-     * @throws Error - bの逆元が存在しない場合 (つまり、bとこのModOpsの法が互いに素でない場合)
+     * @returns a / bをこの演算器の法で割った余り
+     * @throws Error - bの逆元が存在しない場合 (つまり、bとこの演算器の法が互いに素でない場合)
      */
     div(a: bigint, b: bigint): bigint {
         return this.mul(a, this.inv(b));
