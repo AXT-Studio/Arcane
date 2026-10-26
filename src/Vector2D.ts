@@ -259,6 +259,8 @@ export class Vector2DFloat {
      * @param a - 比較するベクトルのうち、1つ目
      * @param b - 比較するベクトルのうち、2つ目
      * @returns - aがbより前なら負、bがaより前なら正、aとbの角度が同じなら0
+     *
+     * @since 2.2.0
      */
     static compareArgument(a: Vector2DFloat, b: Vector2DFloat): number {
         // 参考: https://atcoder.jp/contests/abc442/editorial/15136
@@ -520,6 +522,8 @@ export class Vector2DInt {
      * @param a - 比較するベクトルのうち、1つ目
      * @param b - 比較するベクトルのうち、2つ目
      * @returns - aがbより前なら負、bがaより前なら正、aとbの角度が同じなら0
+     *
+     * @since 2.2.0
      */
     static compareArgument(a: Vector2DInt, b: Vector2DInt): number {
         // 参考: https://atcoder.jp/contests/abc442/editorial/15136
