@@ -239,6 +239,41 @@ export class Vector2DFloat {
 
         return false;
     }
+
+    /**
+     * (1, 0)とそれが成す角の大きさの昇順となるようにVector2DFloat同士を比較する関数です。
+     * Array.sort()のcompareFnに用いることで、俗に「偏角ソート」と呼ばれるソートを行うことができます。
+     * 右向き(0°)を先頭とし、反時計回りの順でソートされます。
+     * ただし、零ベクトルの入力は想定されておらず、零ベクトルが入力された場合の結果は未定義です。
+     *
+     * @example
+     * ```ts
+     * const a = new Vector2DFloat(-1, 1); // ※第2象限にある
+     * const b = new Vector2DFloat(3, -4); // ※第4象限にある
+     * const c = new Vector2DFloat(20, 1); // ※第1象限にある
+     * const arr = [a, b, c];
+     * arr.sort(Vector2DFloat.compareArgument);
+     * console.log(arr.map(vec => [vec.x, vec.y])) // => [[20, 1], [-1, 1], [3, -4]]
+     * ```
+     *
+     * @param a - 比較するベクトルのうち、1つ目
+     * @param b - 比較するベクトルのうち、2つ目
+     * @returns - aがbより前なら負、bがaより前なら正、aとbの角度が同じなら0
+     */
+    static compareArgument(a: Vector2DFloat, b: Vector2DFloat): number {
+        // 参考: https://atcoder.jp/contests/abc442/editorial/15136
+        // まずは上半分(y>0 または y=0かつx>0)かどうかを見る
+        const isAInUpperSide = a.y > 0 || (a.y === 0 && a.x > 0);
+        const isBInUpperSide = b.y > 0 || (b.y === 0 && b.x > 0);
+        // 上下が異なる場合はそれだけでソート可能
+        if (isAInUpperSide && !isBInUpperSide) return -1;
+        if (!isAInUpperSide && isBInUpperSide) return 1;
+        // 上下が一致する場合、aベクトルとbベクトルの外積の符号でわかる
+        const cross = a.cross(b);
+        if (cross > 0) return -1;
+        if (cross < 0) return 1;
+        return 0;
+    }
 }
 
 /**
@@ -464,5 +499,40 @@ export class Vector2DInt {
         if (t4 === 0 && b1.sub(a2).dot(b2.sub(a2)) <= 0n) return true;
 
         return false;
+    }
+
+    /**
+     * (1, 0)とそれが成す角の大きさの昇順となるようにVector2DInt同士を比較する関数です。
+     * Array.sort()のcompareFnに用いることで、俗に「偏角ソート」と呼ばれるソートを行うことができます。
+     * 右向き(0°)を先頭とし、反時計回りの順でソートされます。
+     * ただし、零ベクトルの入力は想定されておらず、零ベクトルが入力された場合の結果は未定義です。
+     *
+     * @example
+     * ```ts
+     * const a = new Vector2DInt(-1n, 1n); // ※第2象限にある
+     * const b = new Vector2DInt(3n, -4n); // ※第4象限にある
+     * const c = new Vector2DInt(20n, 1n); // ※第1象限にある
+     * const arr = [a, b, c];
+     * arr.sort(Vector2DInt.compareArgument);
+     * console.log(arr.map(vec => [vec.x, vec.y])) // => [[20n, 1n], [-1n, 1n], [3n, -4n]]
+     * ```
+     *
+     * @param a - 比較するベクトルのうち、1つ目
+     * @param b - 比較するベクトルのうち、2つ目
+     * @returns - aがbより前なら負、bがaより前なら正、aとbの角度が同じなら0
+     */
+    static compareArgument(a: Vector2DInt, b: Vector2DInt): number {
+        // 参考: https://atcoder.jp/contests/abc442/editorial/15136
+        // まずは上半分(y>0 または y=0かつx>0)かどうかを見る
+        const isAInUpperSide = a.y > 0n || (a.y === 0n && a.x > 0n);
+        const isBInUpperSide = b.y > 0n || (b.y === 0n && b.x > 0n);
+        // 上下が異なる場合はそれだけでソート可能
+        if (isAInUpperSide && !isBInUpperSide) return -1;
+        if (!isAInUpperSide && isBInUpperSide) return 1;
+        // 上下が一致する場合、aベクトルとbベクトルの外積の符号でわかる
+        const cross = a.cross(b);
+        if (cross > 0n) return -1;
+        if (cross < 0n) return 1;
+        return 0;
     }
 }

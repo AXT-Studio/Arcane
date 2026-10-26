@@ -51,6 +51,18 @@ describe("Vector2DFloat - JSDoc @example", () => {
         const b2 = new Vector2DFloat(2, 0);
         expect(Vector2DFloat.areSegmentsIntersecting(a1, a2, b1, b2)).toBe(true);
     });
+    it("Vector2DFloat.compareArgument()", () => {
+        const a = new Vector2DFloat(-1, 1);
+        const b = new Vector2DFloat(3, -4);
+        const c = new Vector2DFloat(20, 1);
+        const arr = [a, b, c];
+        arr.sort(Vector2DFloat.compareArgument);
+        expect(arr.map((vec) => [vec.x, vec.y])).toEqual([
+            [20, 1],
+            [-1, 1],
+            [3, -4],
+        ]);
+    });
 });
 
 describe("Vector2DInt - JSDoc @example", () => {
@@ -102,6 +114,18 @@ describe("Vector2DInt - JSDoc @example", () => {
         const b1 = new Vector2DInt(0n, 2n);
         const b2 = new Vector2DInt(2n, 0n);
         expect(Vector2DInt.areSegmentsIntersecting(a1, a2, b1, b2)).toBe(true);
+    });
+    it("Vector2DInt.compareArgument()", () => {
+        const a = new Vector2DInt(-1n, 1n);
+        const b = new Vector2DInt(3n, -4n);
+        const c = new Vector2DInt(20n, 1n);
+        const arr = [a, b, c];
+        arr.sort(Vector2DInt.compareArgument);
+        expect(arr.map((vec) => [vec.x, vec.y])).toEqual([
+            [20n, 1n],
+            [-1n, 1n],
+            [3n, -4n],
+        ]);
     });
 });
 
