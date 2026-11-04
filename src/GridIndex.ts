@@ -186,49 +186,52 @@ export class GridIndex<T extends readonly number[]> {
         if (!Number.isInteger(index) || index < 0 || this.size <= index) throw new RangeError("Out of grid");
         if (!Number.isInteger(connectivity) || connectivity < 1 || D < connectivity)
             throw new RangeError("Invalid connectivity");
-        // 選ぶ本数mを先に決めて、D本からm本選ぶ方法をDFSで列挙してプラマイを試す
-        const results: number[] = [];
         const positionOfIndex = this.positionOf(index);
-        for (let m = 1; m <= connectivity; m++) {
-            // D次元×2方向=2D個の選択肢から(同方向の選択が無いように)m個選ぶ必要があって、まあそれはDFSが妥当だと思う
-            // 次元iの正方向をi、負方向を~iとして、番兵使いながら頑張るのが一番手っ取り早そう。帰りがけのpop処理はDを目印に
-            const axis: number[] = [];
-            const stack: number[] = [];
-            for (let i = 0; i < D; i++) stack.push(D, ~i, D, i);
-            while (stack.length > 0) {
-                const current = stack.pop()!;
-                if (current === D) {
-                    axis.pop()!;
-                    continue;
-                }
-                // 選択した軸リストaxisに入れる……のだが、それが境界外となる場合は中止する必要があるのでその判定を先にする
-                const currentAxis = current < 0 ? ~current : current;
-                const direction = current < 0 ? -1 : 1;
-                const adjacentCoordinate = positionOfIndex[currentAxis] + direction;
-                if (
-                    adjacentCoordinate < this.#bases[currentAxis] ||
-                    this.#bases[currentAxis] + this.#shape[currentAxis] <= adjacentCoordinate
-                ) {
-                    // グリッド外にはずれてしまう場合はaxisに入れるのを中止するし、番兵も消す必要がある
-                    stack.pop();
-                    continue;
-                }
-                // その軸・方向を選んでもグリッド外にならないことがわかったら軸リストに入れてOK
-                axis.push(current);
-                if (axis.length === m) {
-                    // 一旦基準マスのindexで初期化して、指定された次元のstrides通りずらせばいい
-                    let adjacentIndex = index;
-                    for (const a of axis) {
-                        if (a < 0) {
-                            adjacentIndex -= this.#strides[~a];
-                        } else {
-                            adjacentIndex += this.#strides[a];
-                        }
+        // D次元×2方向=2D個の選択肢から(同方向の選択が無いように)m個選ぶ必要があって、まあそれはDFSが妥当だと思う
+        // 次元iの正方向を2i, 負方向を2i+1として、~xを帰りがけの番兵に使うと、添字を差分更新できそう
+        const results: number[] = [];
+        let currentIndex = index;
+        let currentCount = 0;
+        const stack: number[] = [];
+        // 端にいてその方向への移動を除外する必要があるかを確認しておいて、ついでに1方向目のstack挿入もしちゃう
+        const isAbleToMove: boolean[] = [];
+        for (let i = 0; i < D; i++) {
+            // 正方向
+            if ((isAbleToMove[2 * i] = positionOfIndex[i] < this.#bases[i] + this.#shape[i] - 1)) {
+                stack.push(~(2 * i), 2 * i);
+            }
+            // 負方向
+            if ((isAbleToMove[2 * i + 1] = this.#bases[i] < positionOfIndex[i])) {
+                stack.push(~(2 * i + 1), 2 * i + 1);
+            }
+        }
+        // DFSぶんまわしタイム
+        while (stack.length > 0) {
+            const command = stack.pop()!;
+            if (command < 0) {
+                // (A) 負の値(帰りがけ番兵)の場合、今の添字をresultsに足したあとに添字変数の差分更新を戻す
+                // 添字自体は今のcurrentIndexをそのまま入れればOK
+                results.push(currentIndex);
+                // 何番目の軸か？と方向はcommandから計算できて、それを打ち消すように差分更新する (打ち消す方向を計算)
+                const axis = Math.floor(~command / 2);
+                const negateDirection = ~command % 2 === 0 ? -1 : 1;
+                currentIndex += negateDirection * this.#strides[axis];
+                // 足している軸の数も減らす
+                currentCount--;
+            } else {
+                // (B) 非負の値の場合、自身を軸リストに入れて、まだ軸を足せるなら1個足す操作をスタックに予約する
+                // 一旦commandを軸と方向に分ける
+                const axis = Math.floor(command / 2);
+                const direction = command % 2 === 0 ? 1 : -1;
+                // 境界判定は先に済ませているので軸追加の差分更新をしていい
+                currentIndex += direction * this.#strides[axis];
+                currentCount++;
+                // 軸を追加した結果まだ軸を足せるなら……
+                if (currentCount < connectivity) {
+                    // 次の軸を足すために、自身より後ろの軸のうち境界で除外されないものをスタックに予約する
+                    for (let next = (axis + 1) * 2; next < 2 * D; next++) {
+                        if (isAbleToMove[next]) stack.push(~next, next);
                     }
-                    results.push(adjacentIndex);
-                } else {
-                    // これより後ろから選ばせる
-                    for (let i = currentAxis + 1; i < D; i++) stack.push(D, ~i, D, i);
                 }
             }
         }
