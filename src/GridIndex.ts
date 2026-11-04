@@ -18,7 +18,7 @@ type GridIndexBases<T extends readonly number[]> = {
 /**
  * 主に多次元配列を扱うための、添字の平坦化・復元を行うためのユーティリティとなるクラスです。
  *
- * @since 2.2.0
+ * @since 2.3.0
  */
 export class GridIndex<T extends readonly number[]> {
     /** 各次元の長さ (0-indexedなら[0, n)、1-indexedなら[1, n]) */
