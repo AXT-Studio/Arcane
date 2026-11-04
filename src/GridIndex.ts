@@ -68,11 +68,6 @@ export class GridIndex<T extends readonly number[]> {
         this.#dimension = shape.length;
     }
 
-    /** @private indexのi番目の次元の座標 */
-    #coordinateOf(index: number, i: number): number {
-        return Math.floor((index % this.#strides[i + 1]) / this.#strides[i]) + this.#bases[i];
-    }
-
     /**
      * 各次元の座標から、平坦化後の添字を取得します。
      * 返される添字は、0以上shapeの総積未満の整数です。
