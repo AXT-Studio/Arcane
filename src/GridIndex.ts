@@ -108,10 +108,17 @@ export class GridIndex<T extends readonly number[]> {
      * @returns - 各次元の座標
      */
     positionOf(index: number): GridIndexPosition<T> {
+        const D = this.#shape.length;
         const result: number[] = [];
-        for (let i = 0; i < this.#shape.length; i++) {
-            result[i] = this.#coordinateOf(index, i);
+        let rest = index;
+        // 余りを取ったものを保存して、整除して……を先頭から繰り返せばいい
+        for (let i = 0; i < D - 1; i++) {
+            const length = this.#shape[i];
+            result.push((rest % length) + this.#bases[i]);
+            rest = Math.floor(rest / length);
         }
+        // 最後だけそのままrest+baseをpushできる
+        if (D > 0) result.push(rest + this.#bases[D - 1]);
         return result as GridIndexPosition<T>;
     }
 
