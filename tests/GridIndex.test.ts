@@ -27,10 +27,6 @@ describe("GridIndex - JSDoc @example", () => {
         expect(grid.includes(9, 9, 9)).toBe(true);
         expect(grid.includes(9, 9, 10)).toBe(false);
     });
-    it("get shape", () => {
-        const grid = new GridIndex([10, 10, 10], [0, 0, 0]);
-        expect(grid.shape).toEqual([10, 10, 10]);
-    });
     it("getAdjacentCellIndexes()", () => {
         const grid = new GridIndex([3, 3], [0, 0]);
         // 順番は保証されない
@@ -38,6 +34,14 @@ describe("GridIndex - JSDoc @example", () => {
         expect(grid.getAdjacentCellIndexes(4, 2).sort((a, b) => a - b)).toEqual([0, 1, 2, 3, 5, 6, 7, 8]);
         expect(grid.getAdjacentCellIndexes(0, 1).sort((a, b) => a - b)).toEqual([1, 3]);
         expect(grid.getAdjacentCellIndexes(5, 2).sort((a, b) => a - b)).toEqual([1, 2, 4, 7, 8]);
+    });
+    it("get shape", () => {
+        const grid = new GridIndex([10, 10, 10], [0, 0, 0]);
+        expect(grid.shape).toEqual([10, 10, 10]);
+    });
+    it("get bases", () => {
+        const grid = new GridIndex([10, 10, 10], [0, 1, 0]);
+        expect(grid.bases).toEqual([0, 1, 0]);
     });
     it("get size", () => {
         const grid = new GridIndex([10, 10, 10], [0, 0, 0]);

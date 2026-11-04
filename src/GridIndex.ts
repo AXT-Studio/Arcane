@@ -146,21 +146,6 @@ export class GridIndex<T extends readonly number[]> {
     }
 
     /**
-     * インスタンス作成時に指定した各次元の長さを配列で返します。
-     *
-     * 時間計算量: O(1)
-     *
-     * @example
-     * ```ts
-     * const grid = new GridIndex([10, 10, 10], [0, 0, 0]);
-     * console.log(grid.shape); // [10, 10, 10]
-     * ```
-     */
-    get shape(): Readonly<T> {
-        return this.#shape;
-    }
-
-    /**
      * 指定された(平坦化後の)添字によって表されるマスに隣接する、グリッド内のマスの(平坦化後の)添字を列挙します。
      * 隣接の判定条件として、最大で何次元を動いてよいかを指定することができます。
      *
@@ -270,6 +255,36 @@ export class GridIndex<T extends readonly number[]> {
             }
         }
         return results;
+    }
+
+    /**
+     * インスタンス作成時に指定した各次元の長さを配列で返します。
+     *
+     * 時間計算量: O(1)
+     *
+     * @example
+     * ```ts
+     * const grid = new GridIndex([10, 10, 10], [0, 0, 0]);
+     * console.log(grid.shape); // [10, 10, 10]
+     * ```
+     */
+    get shape(): Readonly<T> {
+        return this.#shape;
+    }
+
+    /**
+     * インスタンス作成時に指定した各次元の先頭の座標を配列で返します。
+     *
+     * 時間計算量: O(1)
+     *
+     * @example
+     * ```ts
+     * const grid = new GridIndex([10, 10, 10], [0, 1, 0]);
+     * console.log(grid.shape); // [0, 1, 0]
+     * ```
+     */
+    get bases(): Readonly<GridIndexBases<T>> {
+        return this.#bases;
     }
 
     /**
