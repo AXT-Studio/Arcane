@@ -27,6 +27,8 @@ export class GridIndex<T extends readonly number[]> {
     #bases: Readonly<GridIndexBases<T>>;
     /** i番目の軸の座標を1増やしたとき、平坦化添字がいくつ増えるか (便宜上最後にsizeを追加で含む) */
     #strides: [...GridIndexPosition<T>, number];
+    /** 次元数 */
+    #dimension: number;
 
     /**
      * 新しいGridIndexインスタンスを生成します。
@@ -63,6 +65,7 @@ export class GridIndex<T extends readonly number[]> {
             throw new RangeError("The number of cells in the grid is too large. It must be a safe integer.");
         }
         this.#strides = strides as [...GridIndexPosition<T>, number];
+        this.#dimension = shape.length;
     }
 
     /** @private indexのi番目の次元の座標 */
@@ -87,7 +90,7 @@ export class GridIndex<T extends readonly number[]> {
      */
     indexOf(...coords: GridIndexPosition<T>): number {
         let index = 0;
-        for (let i = 0; i < this.#shape.length; i++) {
+        for (let i = 0; i < this.#dimension; i++) {
             index += (coords[i] - this.#bases[i]) * this.#strides[i];
         }
         return index;
@@ -108,17 +111,16 @@ export class GridIndex<T extends readonly number[]> {
      * @returns - 各次元の座標
      */
     positionOf(index: number): GridIndexPosition<T> {
-        const D = this.#shape.length;
         const result: number[] = [];
         let rest = index;
         // 余りを取ったものを保存して、整除して……を先頭から繰り返せばいい
-        for (let i = 0; i < D - 1; i++) {
+        for (let i = 0; i < this.#dimension - 1; i++) {
             const length = this.#shape[i];
             result.push((rest % length) + this.#bases[i]);
             rest = Math.floor(rest / length);
         }
         // 最後だけそのままrest+baseをpushできる
-        if (D > 0) result.push(rest + this.#bases[D - 1]);
+        if (this.#dimension > 0) result.push(rest + this.#bases[this.#dimension - 1]);
         return result as GridIndexPosition<T>;
     }
 
@@ -140,7 +142,7 @@ export class GridIndex<T extends readonly number[]> {
      * @returns - 指定された座標がグリッドの範囲内ならtrue、そうでなければfalse
      */
     includes(...coords: GridIndexPosition<T>): boolean {
-        for (let i = 0; i < this.#shape.length; i++) {
+        for (let i = 0; i < this.#dimension; i++) {
             if (coords[i] < this.#bases[i] || this.#bases[i] + this.#shape[i] <= coords[i]) {
                 return false;
             }
@@ -188,12 +190,41 @@ export class GridIndex<T extends readonly number[]> {
      * @throws {RangeError} - connectivityが1以上このグリッドの次元数以下でないか、indexがこのグリッドの範囲外である場合
      */
     getAdjacentCellIndexes(index: number, connectivity: number): number[] {
-        const D = this.#shape.length;
         // エラーハンドリングは先にやる
-        if (!Number.isInteger(index) || index < 0 || this.size <= index) throw new RangeError("Out of grid");
-        if (!Number.isInteger(connectivity) || connectivity < 1 || D < connectivity)
+        if (!Number.isInteger(index) || index < 0 || this.size <= index) {
+            throw new RangeError("Out of grid");
+        }
+        if (!Number.isInteger(connectivity) || connectivity < 1 || this.#dimension < connectivity) {
             throw new RangeError("Invalid connectivity");
-        const positionOfIndex = this.positionOf(index);
+        }
+        // 2次元グリッドの4近傍(1)・8近傍(2)は需要が高いので特別処理を入れておく
+        if (this.#dimension === 2) {
+            const results: number[] = [];
+            // baseに関係なく平坦化添字だけで境界判定しちゃってよくて、そうする
+            const width = this.#shape[0];
+            const x = index % width;
+            const left = x > 0;
+            const right = x < width - 1;
+            const up = index >= width;
+            const down = index < this.size - width;
+            // 4近傍は1でも2でも入るので、境界判定だけ見て入れる
+            if (left) results.push(index - 1);
+            if (right) results.push(index + 1);
+            if (up) results.push(index - width);
+            if (down) results.push(index + width);
+            // connectivityが2のときは8近傍として斜め4方向を加える必要がある
+            if (connectivity === 2) {
+                if (up) {
+                    if (left) results.push(index - width - 1);
+                    if (right) results.push(index - width + 1);
+                }
+                if (down) {
+                    if (left) results.push(index + width - 1);
+                    if (right) results.push(index + width + 1);
+                }
+            }
+            return results;
+        }
         // D次元×2方向=2D個の選択肢から(同方向の選択が無いように)m個選ぶ必要があって、まあそれはDFSが妥当だと思う
         // 次元iの正方向を2i, 負方向を2i+1として、~xを帰りがけの番兵に使うと、添字を差分更新できそう
         const results: number[] = [];
@@ -201,8 +232,9 @@ export class GridIndex<T extends readonly number[]> {
         let currentCount = 0;
         const stack: number[] = [];
         // 端にいてその方向への移動を除外する必要があるかを確認しておいて、ついでに1方向目のstack挿入もしちゃう
+        const positionOfIndex = this.positionOf(index);
         const isAbleToMove: boolean[] = [];
-        for (let i = 0; i < D; i++) {
+        for (let i = 0; i < this.#dimension; i++) {
             // 正方向
             if ((isAbleToMove[2 * i] = positionOfIndex[i] < this.#bases[i] + this.#shape[i] - 1)) {
                 stack.push(~(2 * i), 2 * i);
@@ -236,7 +268,7 @@ export class GridIndex<T extends readonly number[]> {
                 // 軸を追加した結果まだ軸を足せるなら……
                 if (currentCount < connectivity) {
                     // 次の軸を足すために、自身より後ろの軸のうち境界で除外されないものをスタックに予約する
-                    for (let next = (axis + 1) * 2; next < 2 * D; next++) {
+                    for (let next = (axis + 1) * 2; next < 2 * this.#dimension; next++) {
                         if (isAbleToMove[next]) stack.push(~next, next);
                     }
                 }
