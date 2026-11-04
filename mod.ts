@@ -8,6 +8,7 @@ export { Deque } from "./src/Deque.ts";
 export { DisjointSet } from "./src/DisjointSet.ts";
 export { ExtendedMath } from "./src/ExtendedMath.ts";
 export { UndirectedGraph, DirectedGraph, WeightedDirectedGraph, WeightedUndirectedGraph } from "./src/Graphs.ts";
+export { GridIndex } from "./src/GridIndex.ts";
 export { GridIndex2D } from "./src/GridIndex2D.ts";
 export { IntervalSet } from "./src/IntervalSet.ts";
 export { Iteration } from "./src/Iteration.ts";

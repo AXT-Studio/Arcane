@@ -7,6 +7,7 @@
  * 0-indexedと1-indexedの両方に対応するため、コンストラクタ引数`i`でどちらの形式を使用するかを指定します。
  *
  * @since 1.0.0
+ * @deprecated ver2.3.0以降では3次元以上も扱える`GridIndex`が追加されています。今後はこちらを使用してください。
  */
 export class GridIndex2D {
     /** グリッドの高さ */
