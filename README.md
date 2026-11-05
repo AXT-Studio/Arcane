@@ -5,26 +5,25 @@ AyaExpTech Arcane (`/éɪéksték ɑːkéin/`のように発音)は、主に競�
 ## License
 
 copyright (c) 2026- Ayasaka-Koto(AyaExpTech).  
-Released under the [MIT License](LICENSE).
+Released under the [Zero-Clause BSD License](LICENSE).
 
-- MIT License本来の方法に加えて、下記条件を満たす場合も公開されているコードの複製や改変を許可します
-    - 条件: たとえば以下のような情報を添えることで、**本ライブラリからコピペしたことがわかるようになっている**こと
-        - GitHub Repo URL (`https://github.com/AXT-Studio/Arcane`)
-        - JSR Package URL (`https://jsr.io/@ayaexptech/arcane`)
-        - パッケージ名 (`jsr:@ayaexptech/arcane`)
-        - ライブラリ名 (`AyaExpTech Arcane`)、あるいはその略称 (`AXT Arcane`)
-    - 備考:
-        - 本ライブラリであることさえわかるようになっていれば、作者名“Ayasaka-Koto(AyaExpTech)”は書かなくてもよいです
-        - コード内への直接コメントの他、`package.json`をはじめとする依存関係を管理する設定ファイルに記述がある場合も許可されます
-        - [AtCoderの「ABC, ARC, AGCにおける生成AI対策ルール」](https://atcoder.jp/posts/algorithm_rules_20261014_ja)について、当該ルールを守っていれば本ライブラリのコピペによる利用が許可されます
-- 各ファイルの編集者(AI利用の有無)について
-    - `tests/`内の各テストファイルは、以下のAI Agentsを用いて作成し、一部人の手を加えています
-        - Grok 4.7 (Cursor)
-        - GPT-6 Astra (Codex)
-        - GPT-6.1 Sol (Codex)
-    - それ以外の各ファイルは、原則として人間(Ayasaka-Koto)が作成しています。ただし、以下の例外を含みます
-        - 数行程度の自明な実装で、人間が書いてもAIが書いても同じコードを書くであろうと予想したもの ("リッチなコピペ"としての利用)
-        - 各ファイルのコードを実装するための、アルゴリズムなどの学習 (主にPerplexity Education Proの"ステップバイステップで学ぶ"を利用しています)
+> [!NOTE]
+> 必須ではないですが、もし本ライブラリが役に立ったのであれば、謝辞等で本ライブラリに言及していただけると嬉しいです。
+> ただし、これはあくまで任意のお願いであり、ライセンス上の条件ではありません。
+>
+> Attribution is appreciated, but not required.
+> If you find this project useful, a mention or a link to this repository would make me happy.
+> This is a non-binding request, not a condition of the license.
+
+> [!NOTE] 各ファイルの編集者(AI利用の有無)について
+>
+> - `tests/`内の各テストファイルは、以下のAI Agentsを用いて作成し、一部人の手を加えています
+>     - Grok 4.7 (Cursor)
+>     - GPT-6 Astra (Codex)
+>     - GPT-6.1 Sol (Codex)
+> - それ以外の各ファイルは、原則として人間(Ayasaka-Koto)が作成しています。ただし、以下の例外を含みます
+>     - 数行程度の自明な実装で、人間が書いてもAIが書いても同じコードを書くであろうと予想し、実際そうであったもの ("リッチなコピペ"としての利用)
+>     - 各ファイルのコードを実装するための、アルゴリズムなどの学習 (主にPerplexity Education Proの"ステップバイステップで学ぶ"を利用しています)
 
 > [!TIP]
 > コードを直接コピペしないと使えない環境については、[AXT-AyaKoto/axt-arcane-bundler](https://github.com/AXT-AyaKoto/axt-arcane-bundler)を使用することができます。  
