@@ -44,6 +44,8 @@ export class BinarySearch {
      * 配列`array`の中で、`target`以上と判定される最初の要素のインデックスを返します。
      * `array`内に`target`以上の要素が存在しない場合は`array.length`を返します。
      *
+     * Tips: `target`未満と判定される最後の要素のindexは、`lower_bound() - 1`で求めることができます (`target`未満が存在しない場合`-1`となる)
+     *
      * 時間計算量: O(log N) (Nは配列の要素数)
      *
      * @example
@@ -73,6 +75,8 @@ export class BinarySearch {
     /**
      * 配列`array`の中で、`target`より大きいと判定される最初の要素のインデックスを返します。
      * `array`内に`target`より大きい要素が存在しない場合は`array.length`を返します。
+     *
+     * Tips: `target`以下と判定される最後の要素のindexは、`upper_bound() - 1`で求めることができます (`target`以下が存在しない場合`-1`となる)
      *
      * 時間計算量: O(log N) (Nは配列の要素数)
      *
