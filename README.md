@@ -15,7 +15,8 @@ Released under the [Zero-Clause BSD License](LICENSE).
 > If you find this project useful, a mention or a link to this repository would make me happy.
 > This is a non-binding request, not a condition of the license.
 
-> [!NOTE] 各ファイルの編集者(AI利用の有無)について
+> [!NOTE]
+> 各ファイルの編集者(AI利用の有無)について
 >
 > - `tests/`内の各テストファイルは、以下のAI Agentsを用いて作成し、一部人の手を加えています
 >     - Grok 4.7 (Cursor)
