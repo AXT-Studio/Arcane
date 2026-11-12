@@ -1,7 +1,7 @@
 {
     "name": "@ayaexptech/arcane",
     "version": "0.0.0",
-    "license": "MIT",
+    "license": "0BSD",
     "include": ["README.md", "LICENSE", "src/**/*.ts"],
     "exports": "./mod.ts"
 }
