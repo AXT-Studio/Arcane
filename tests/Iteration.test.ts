@@ -71,6 +71,18 @@ describe("Iteration - JSDoc @example", () => {
         expect(Iteration.accumulate(ints, (a, b) => a * b)).toEqual([2n, 6n, 30n, 210n]);
         expect(Iteration.accumulate(ints, (a, b) => a + b, 0n)).toEqual([0n, 2n, 5n, 10n, 17n]);
     });
+    it("Iteration.setBits() [for-of文における使用]", () => {
+        const bitsA: number[] = [];
+        for (const bits of Iteration.setBits(0b1010)) bitsA.push(bits);
+        expect(bitsA).toEqual([1, 3]);
+        const bitsB: number[] = [];
+        for (const bits of Iteration.setBits(0b0110)) bitsB.push(bits);
+        expect(bitsB).toEqual([1, 2]);
+    });
+    it("Iteration.setBits() [Arrayへの変換]", () => {
+        expect([...Iteration.setBits(0b1010)]).toEqual([1, 3]);
+        expect(Array.from(Iteration.setBits(0b0110))).toEqual([1, 2]);
+    });
 });
 
 describe("Iteration - Edge Cases", () => {
@@ -108,6 +120,30 @@ describe("Iteration - Edge Cases", () => {
         });
         expect(called).toBe(0);
     });
+    it("setBits()は0のとき[]", () => {
+        expect([...Iteration.setBits(0)]).toEqual([]);
+        expect([...Iteration.setBits(0n)]).toEqual([]);
+    });
+    it("setBits()は1のとき[0]", () => {
+        expect([...Iteration.setBits(1)]).toEqual([0]);
+        expect([...Iteration.setBits(1n)]).toEqual([0]);
+    });
+    it("setBits()は負のnumberのときRangeError", () => {
+        expect(() => [...Iteration.setBits(-1)]).toThrow(RangeError);
+    });
+    it("setBits()は負のbigintのときRangeError", () => {
+        expect(() => [...Iteration.setBits(-1n)]).toThrow(RangeError);
+    });
+    it("setBits()は安全整数でないnumberのときRangeError", () => {
+        expect(() => [...Iteration.setBits(NaN)]).toThrow(RangeError);
+        expect(() => [...Iteration.setBits(Infinity)]).toThrow(RangeError);
+        expect(() => [...Iteration.setBits(1.5)]).toThrow(RangeError);
+        expect(() => [...Iteration.setBits(Number.MAX_SAFE_INTEGER + 1)]).toThrow(RangeError);
+    });
+    it("setBits()は53ビットを超えるbigintのとき下位から列挙する", () => {
+        const x = (1n << 60n) + (1n << 100n);
+        expect([...Iteration.setBits(x)]).toEqual([60, 100]);
+    });
 });
 
 describe("Iteration - Random Tests", () => {
@@ -144,5 +180,35 @@ describe("Iteration - Random Tests", () => {
             prods.push(mul(prods[i - 1], a[i]));
         }
         expect(Iteration.accumulate(a, mul)).toEqual(prods);
+    });
+    it("setBits()について、0以上50以下の各ビットを確率rで立てたnumberと比較して一致確認", () => {
+        const trials = 5_000;
+        for (let t = 0; t < trials; t++) {
+            const r = Math.random();
+            let x = 0;
+            const selected: number[] = [];
+            for (let i = 0; i <= 50; i++) {
+                if (Math.random() < r) {
+                    x += 2 ** i;
+                    selected.push(i);
+                }
+            }
+            expect([...Iteration.setBits(x)]).toEqual(selected);
+        }
+    });
+    it("setBits()について、0以上100以下の各ビットを確率rで立てたbigintと比較して一致確認", () => {
+        const trials = 3_400;
+        for (let t = 0; t < trials; t++) {
+            const r = Math.random();
+            let x = 0n;
+            const selected: number[] = [];
+            for (let i = 0; i <= 100; i++) {
+                if (Math.random() < r) {
+                    x += 2n ** BigInt(i);
+                    selected.push(i);
+                }
+            }
+            expect([...Iteration.setBits(x)]).toEqual(selected);
+        }
     });
 });

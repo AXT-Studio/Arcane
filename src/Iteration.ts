@@ -255,4 +255,37 @@ export class Iteration {
         }
         return res;
     }
+
+    /**
+     * 与えられた(非負)整数の「立っているビット」を列挙するジェネレーター関数です。
+     * ダブリングの統合フェーズにおける統合対象の列挙などに用いることができます。
+     *
+     * 時間計算量: O(log n)
+     *
+     * @example for-of文における使用
+     * ```ts
+     * for (const bits of Iteration.setBits(0b1010)) console.log(bits); // 1, 3
+     * for (const bits of Iteration.setBits(0b0110)) console.log(bits); // 1, 2
+     * ```
+     *
+     * @example Arrayへの変換
+     * ```ts
+     * console.log([...Iteration.setBits(0b1010)]); // [1, 3]
+     * console.log(Array.from(Iteration.setBits(0b0110))); // [1, 2]
+     * ```
+     *
+     * @param n - bit列挙を行いたい(非負)整数。numberでもbigintでも可。
+     * @yields 与えられた整数の立っているビットを下位から列挙。iが返されたとき、2^iの位が立っている(1である)ことを示す。
+     * @throws {RangeError} - 引数`n`が`number`で安全な整数でない場合、あるいは引数`n`が非負整数でない場合
+     */
+    static *setBits(n: number | bigint): Generator<number, void, unknown> {
+        if (n < 0) throw new RangeError("n must be a non-negative safe integer.");
+        // numberとbigintに分けたうえで、あとはまあやるだけかな……。
+        if (typeof n === "number") {
+            if (!Number.isSafeInteger(n)) throw new RangeError("n must be a non-negative safe integer.");
+            for (let i = 0; n > 0; i++, n = Math.floor(n / 2)) if (n % 2 === 1) yield i;
+        } else {
+            for (let i = 0; n > 0n; i++, n >>= 1n) if ((n & 1n) !== 0n) yield i;
+        }
+    }
 }
